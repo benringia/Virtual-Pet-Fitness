@@ -1,0 +1,196 @@
+
+  <link rel="stylesheet" href="styles.css">
+
+<div class="shell">
+  <div class="top-bar">
+    <div class="pet-name-wrap">
+      <span class="pet-name" id="pet-name-lbl" onclick="startEditName()">flarepup · egg</span>
+      <input class="pet-name-edit" id="pet-name-input" maxlength="20" onblur="saveName()" onkeydown="if(event.key==='Enter')saveName()"/>
+      <span class="edit-pencil" onclick="startEditName()">✏️</span>
+    </div>
+    <div class="level-badge" id="level-badge">lvl 1</div>
+  </div>
+
+  <div class="pet-stage">
+    <div class="mood-bubble" id="mood-bubble">every step counts! 🌸</div>
+    <div class="pet-svg-wrap" id="pet-svg-wrap"></div>
+  </div>
+
+  <div class="xp-wrap">
+    <div class="xp-row"><span>xp to next level</span><span id="xp-lbl">0 / 100</span></div>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="sc"><div class="sc-val" id="st-lvl" style="color:#e8509a">1</div><div class="sc-lbl">level</div></div>
+    <div class="sc"><div class="sc-val" id="st-str" style="color:#e8509a">0</div><div class="sc-lbl">str</div></div>
+    <div class="sc"><div class="sc-val" id="st-box" style="color:#f4436c">0</div><div class="sc-lbl">box</div></div>
+    <div class="sc"><div class="sc-val" id="st-ten" style="color:#16a34a">0</div><div class="sc-lbl">tennis</div></div>
+    <div class="sc"><div class="sc-val" id="st-walk" style="color:#7c66dc">0</div><div class="sc-lbl">walk</div></div>
+  </div>
+
+  <div class="tip-banner" id="tip-banner"><strong>tip:</strong> consistency beats intensity — even a 10-min walk counts! 🌸</div>
+
+  <div class="streak-bar">
+    <div class="streak-inner">
+      <div class="streak-num" id="streak-num">0</div>
+      <div class="streak-info">
+        <div class="streak-title">day streak 🔥</div>
+        <div class="streak-sub" id="streak-sub">log a workout to start!</div>
+        <div class="streak-dots" id="streak-dots"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="workout-grid">
+    <div class="wcard" style="border-color:#f5cce5;">
+      <div class="wcard-head"><div class="wcard-dot" style="background:#e8509a"></div><div class="wcard-name">Strength 💪</div></div>
+      <div class="wbar-lbl" id="str-lbl">0 / 150 xp</div>
+      <div class="wbar-track"><div class="wbar-fill" id="str-bar" style="width:0%;background:#e8509a"></div></div>
+      <div class="wbtns">
+        <div class="wbtn" onclick="log('str',20,'bodyweight warmup')">🙆 bodyweight · +20</div>
+        <div class="wbtn" onclick="log('str',35,'dumbbell session')">🏋️ dumbbells · +35</div>
+        <div class="wbtn" onclick="log('str',55,'full gym session')">💪 full gym · +55</div>
+        <div class="wbtn" onclick="log('str',80,'new personal best!')">🏆 new pb! · +80</div>
+      </div>
+      <div class="wcard-sessions" id="str-sess">0 sessions</div>
+    </div>
+    <div class="wcard" style="border-color:#ddd0f8;">
+      <div class="wcard-head"><div class="wcard-dot" style="background:#7c66dc"></div><div class="wcard-name">Walking 👟</div></div>
+      <div class="wbar-lbl" id="walk-lbl">0 / 150 xp</div>
+      <div class="wbar-track"><div class="wbar-fill" id="walk-bar" style="width:0%;background:#7c66dc"></div></div>
+      <div class="wbtns">
+        <div class="wbtn" onclick="log('walk',15,'short walk')">🚶 short walk · +15</div>
+        <div class="wbtn" onclick="log('walk',30,'30 min walk')">👟 30 min · +30</div>
+        <div class="wbtn" onclick="log('walk',45,'long walk 1hr+')">🌳 1 hr+ · +45</div>
+        <div class="wbtn" onclick="log('walk',65,'hike / trail')">⛰️ hike/trail · +65</div>
+      </div>
+      <div class="wcard-sessions" id="walk-sess">0 sessions</div>
+    </div>
+    <div class="wcard" style="border-color:#fbbdd0;">
+      <div class="wcard-head"><div class="wcard-dot" style="background:#f4436c"></div><div class="wcard-name">Boxing 🥊</div></div>
+      <div class="wbar-lbl" id="box-lbl">0 / 150 xp</div>
+      <div class="wbar-track"><div class="wbar-fill" id="box-bar" style="width:0%;background:#f4436c"></div></div>
+      <div class="wbtns">
+        <div class="wbtn" onclick="log('box',20,'shadowboxing')">👊 shadow · +20</div>
+        <div class="wbtn" onclick="log('box',35,'bag workout')">🥊 bag · +35</div>
+        <div class="wbtn" onclick="log('box',55,'full class')">🏟️ class · +55</div>
+        <div class="wbtn" onclick="log('box',75,'sparring session')">⚡ sparring · +75</div>
+      </div>
+      <div class="wcard-sessions" id="box-sess">0 sessions</div>
+    </div>
+    <div class="wcard" style="border-color:#bbf7d0;">
+      <div class="wcard-head"><div class="wcard-dot" style="background:#16a34a"></div><div class="wcard-name">Tennis 🎾</div></div>
+      <div class="wbar-lbl" id="ten-lbl">0 / 150 xp</div>
+      <div class="wbar-track"><div class="wbar-fill" id="ten-bar" style="width:0%;background:#16a34a"></div></div>
+      <div class="wbtns">
+        <div class="wbtn" onclick="log('ten',20,'rallying / drills')">🎾 drills · +20</div>
+        <div class="wbtn" onclick="log('ten',35,'casual match')">🏸 casual · +35</div>
+        <div class="wbtn" onclick="log('ten',55,'competitive match')">🏆 match · +55</div>
+        <div class="wbtn" onclick="log('ten',75,'tournament game')">👑 tourney · +75</div>
+      </div>
+      <div class="wcard-sessions" id="ten-sess">0 sessions</div>
+    </div>
+  </div>
+
+  <div class="calorie-card">
+    <div class="cal-head">
+      <div class="cal-title"><span style="font-size:16px;">🔥</span> Calorie deficit</div>
+      <div class="cal-streak-pill" id="cal-streak-pill">0 day streak</div>
+    </div>
+    <div class="cal-goal-row">
+      <label>daily goal:</label>
+      <input type="number" id="cal-goal-input" value="1800" min="1000" max="4000" step="50" oninput="saveCalInputs()" style="background:#fff;color:#3d1f35;"/>
+      <span>kcal target</span>
+    </div>
+    <div class="cal-inputs">
+      <div class="cal-input-block"><label>calories eaten</label><input type="number" id="cal-eaten" placeholder="e.g. 1400" min="0" max="9999" step="10" oninput="saveCalInputs()" style="background:#fff;color:#3d1f35;"/></div>
+      <div class="cal-input-block"><label>calories burned</label><input type="number" id="cal-burned" placeholder="e.g. 300" min="0" max="9999" step="10" oninput="saveCalInputs()" style="background:#fff;color:#3d1f35;"/></div>
+    </div>
+    <div class="cal-summary" id="cal-summary" style="display:none;">
+      <div class="cal-summary-row"><span class="cal-summary-lbl">eaten</span><span class="cal-summary-val" id="cs-eaten" style="color:#f59e0b;">—</span></div>
+      <div class="cal-summary-row"><span class="cal-summary-lbl">burned</span><span class="cal-summary-val" id="cs-burned" style="color:#16a34a;">—</span></div>
+      <div class="cal-summary-row"><span class="cal-summary-lbl">net calories</span><span class="cal-summary-val" id="cs-net">—</span></div>
+      <div class="cal-summary-row"><span class="cal-summary-lbl">deficit</span><span class="cal-summary-val" id="cs-deficit">—</span></div>
+    </div>
+    <div class="cal-bar-wrap" id="cal-bar-wrap" style="display:none;">
+      <div class="cal-bar-lbl"><span>0</span><span id="cal-bar-goal-lbl">goal</span></div>
+      <div class="cal-bar-track"><div class="cal-bar-fill" id="cal-bar-fill" style="width:0%"></div></div>
+    </div>
+    <button id="cal-log-btn" onclick="logCalories()" onmouseover="this.style.background='#fde8f5'" onmouseout="this.style.background='#fff0f8'">log today's calories 🔥</button>
+    <div class="cal-note">resets daily · be honest with yourself, queen 💖</div>
+  </div>
+
+  <div class="predict-card">
+    <div class="predict-head"><div class="predict-title"><span style="font-size:16px;">🔮</span> Monthly predictions</div><div class="predict-subtitle">based on your current pace</div></div>
+    <div class="predict-tabs">
+      <div class="ptab active" onclick="switchTab('cal')" id="ptab-cal">calories</div>
+      <div class="ptab" onclick="switchTab('workout')" id="ptab-workout">workouts</div>
+      <div class="ptab" onclick="switchTab('xp')" id="ptab-xp">xp &amp; level</div>
+    </div>
+    <div id="predict-content"></div>
+    <div class="predict-disclaimer">✨ predictions improve as you log more days!</div>
+  </div>
+
+  <div class="diet-section">
+    <div class="diet-card">
+      <div class="diet-card-head">
+        <div class="diet-title-row"><span style="font-size:16px;">🥗</span> Diet today</div>
+        <div class="diet-streak-pill" id="diet-streak-pill">0 day streak</div>
+      </div>
+      <div class="diet-habits">
+        <div class="diet-row" data-habit="water" onclick="toggleDiet(this)"><span class="diet-icon">💧</span><span class="diet-name">drank 8 glasses of water</span><span class="diet-xp">+15 xp</span><div class="diet-check"><span class="diet-tick">✓</span></div></div>
+        <div class="diet-row" data-habit="veggies" onclick="toggleDiet(this)"><span class="diet-icon">🥦</span><span class="diet-name">ate veggies / salad</span><span class="diet-xp">+15 xp</span><div class="diet-check"><span class="diet-tick">✓</span></div></div>
+        <div class="diet-row" data-habit="protein" onclick="toggleDiet(this)"><span class="diet-icon">🍗</span><span class="diet-name">hit protein goal</span><span class="diet-xp">+20 xp</span><div class="diet-check"><span class="diet-tick">✓</span></div></div>
+        <div class="diet-row" data-habit="nojunk" onclick="toggleDiet(this)"><span class="diet-icon">🚫</span><span class="diet-name">no junk food today</span><span class="diet-xp">+20 xp</span><div class="diet-check"><span class="diet-tick">✓</span></div></div>
+        <div class="diet-row" data-habit="balanced" onclick="toggleDiet(this)"><span class="diet-icon">🍽️</span><span class="diet-name">ate balanced meals</span><span class="diet-xp">+15 xp</span><div class="diet-check"><span class="diet-tick">✓</span></div></div>
+      </div>
+      <div class="diet-note">habits reset daily · come back tomorrow! 🌸</div>
+    </div>
+  </div>
+
+  <div class="custom-section">
+    <div class="sec-title">log something else</div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <input id="custom-input" placeholder="e.g. swimming, yoga..."
+        style="flex:1;min-width:0;background:#ffffff;color:#3d1f35;border:1.5px solid #f2d0e5;border-radius:10px;padding:.42rem .75rem;font-family:'DM Mono',monospace;font-size:12px;outline:none;"
+        onfocus="this.style.borderColor='#e8509a'" onblur="this.style.borderColor='#f2d0e5'"/>
+      <select id="custom-xp"
+        style="flex-shrink:0;width:88px;background:#ffffff;color:#3d1f35;border:1.5px solid #f2d0e5;border-radius:10px;padding:.42rem .35rem;font-family:'DM Mono',monospace;font-size:9px;outline:none;">
+        <option value="15">light +15</option>
+        <option value="30">moderate +30</option>
+        <option value="55">intense +55</option>
+      </select>
+      <button id="log-custom-btn" onclick="logCustom()" onmouseover="this.style.background='#fde8f5'" onmouseout="this.style.background='#fff0f8'">+ log</button>
+    </div>
+  </div>
+
+  <div class="log-section">
+    <div class="sec-title">recent activity</div>
+    <div class="log-list" id="log-list">
+      <div class="log-item"><span style="color:#a07090">nothing yet — your first workout awaits! 🌸</span><span></span></div>
+    </div>
+  </div>
+
+  <div class="evo-card">
+    <div class="sec-title">evolution path</div>
+    <div class="evo-row">
+      <div class="evo-step"><div class="evo-dot active" id="e0">🥚</div><div class="evo-lbl">egg</div></div>
+      <div class="evo-line" id="el0"></div>
+      <div class="evo-step"><div class="evo-dot future" id="e1">🐾</div><div class="evo-lbl">pup</div></div>
+      <div class="evo-line" id="el1"></div>
+      <div class="evo-step"><div class="evo-dot future" id="e2">🌸</div><div class="evo-lbl">blossom</div></div>
+      <div class="evo-line" id="el2"></div>
+      <div class="evo-step"><div class="evo-dot future" id="e3">💪</div><div class="evo-lbl">fighter</div></div>
+      <div class="evo-line" id="el3"></div>
+      <div class="evo-step"><div class="evo-dot future" id="e4">👑</div><div class="evo-lbl">queen</div></div>
+    </div>
+  </div>
+
+  <button id="reset-pet-btn" onclick="resetAll()" onmouseover="this.style.background='#fde8f5'" onmouseout="this.style.background='#fff0f8'">🥚 reset pet &amp; start over</button>
+
+  <div class="footer"><div class="save-ind" id="save-ind">loading...</div></div>
+  <div class="toast-wrap"><div class="toast" id="toast"></div></div>
+</div>
+
+  <script src="app.js"></script>
