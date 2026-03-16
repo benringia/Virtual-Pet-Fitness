@@ -1,50 +1,110 @@
 import { todayStr } from './dates.js'
-import { getLevelFromXP, DIET_HABIT_XP } from './xp.js'
+import { XP_PER_LEVEL, DIET_HABITS } from './xp.js'
 
-const WINDOW = 7
-
-function cutoffDate() {
+function cutoff(days) {
   const d = new Date(todayStr() + 'T00:00:00')
-  d.setDate(d.getDate() - WINDOW)
+  d.setDate(d.getDate() - days)
   return d.toISOString().slice(0, 10)
 }
 
-export function computePredictions(state) {
-  const cutoff = cutoffDate()
+function confidenceLabel(daysOfData) {
+  if (daysOfData < 7)  return 'low'
+  if (daysOfData < 14) return 'medium'
+  return 'high'
+}
 
-  // Workouts in window
-  const recentWorkouts = state.workouts.filter(w => w.date >= cutoff && w.date < todayStr())
-  const avgWorkouts = recentWorkouts.length / WINDOW
+function computeCaloriePredictions(state) {
+  const cutoff7 = cutoff(7)
+  const today = todayStr()
+  const entries = state.calHistory.filter(d => d.date >= cutoff7)
 
-  // Workout XP in window
-  const workoutXP = recentWorkouts.reduce((sum, w) => sum + w.xp, 0)
+  // Include today's in-progress data if present (checkDayRollover ensures this is always today's)
+  if (state.calories.eaten > 0 || state.calories.burned > 0) {
+    entries.push({ date: today, eaten: state.calories.eaten, burned: state.calories.burned })
+  }
 
-  // Diet XP in window
-  const dietXP = Object.entries(state.dietHabits)
-    .filter(([date]) => date >= cutoff && date < todayStr())
-    .reduce((sum, [, habits]) => {
-      const checked = Object.values(habits).filter(Boolean).length
-      return sum + checked * DIET_HABIT_XP
-    }, 0)
+  const daysOfData = entries.length
+  if (daysOfData === 0) return { hasData: false }
 
-  const avgXP = (workoutXP + dietXP) / WINDOW
-
-  // Calorie history in window
-  const recentCal = state.calHistory.filter(d => d.date >= cutoff)
-  const avgCalories = recentCal.length > 0
-    ? recentCal.reduce((sum, d) => sum + d.eaten, 0) / recentCal.length
-    : null
-
-  const hasData = recentWorkouts.length > 0 || recentCal.length > 0
-
-  if (!hasData) return { calories30d: null, workouts30d: null, xp30d: null, projectedLevel: null }
-
-  const xp30d = Math.round(avgXP * 30)
+  const totalDeficit = entries.reduce((sum, d) => sum + (d.burned - d.eaten), 0)
+  const avgDailyDeficit = totalDeficit / daysOfData
+  const projected30dDeficit = Math.round(avgDailyDeficit * 30)
+  const weightChangeLbs = Math.round((projected30dDeficit / 3500) * 10) / 10
 
   return {
-    calories30d: avgCalories !== null ? Math.round(avgCalories * 30) : null,
-    workouts30d: Math.round(avgWorkouts * 30),
-    xp30d,
-    projectedLevel: getLevelFromXP(state.xp + xp30d),
+    hasData: true,
+    avgDailyDeficit: Math.round(avgDailyDeficit),
+    projected30dDeficit,
+    weightChangeLbs,
+    daysOfData,
+    confidence: confidenceLabel(daysOfData),
+  }
+}
+
+function computeWorkoutPredictions(state) {
+  const cutoff14 = cutoff(14)
+  const recent = state.workouts.filter(w => w.date >= cutoff14)
+  const daysWithWorkouts = new Set(recent.map(w => w.date)).size
+
+  if (recent.length === 0) return { hasData: false }
+
+  const weeklyAvg = Math.round((recent.length / 2) * 10) / 10
+  const projected30d = Math.round(weeklyAvg * 4.3)
+
+  return {
+    hasData: true,
+    weeklyAvg,
+    projected30d,
+    daysOfData: daysWithWorkouts,
+    confidence: confidenceLabel(daysWithWorkouts),
+  }
+}
+
+function computeXpPredictions(state) {
+  const cutoff14 = cutoff(14)
+
+  // Build a map of date → xp for all dates in window
+  const xpByDate = {}
+
+  for (const w of state.workouts) {
+    if (w.date >= cutoff14) {
+      xpByDate[w.date] = (xpByDate[w.date] ?? 0) + w.xp
+    }
+  }
+
+  for (const [date, habits] of Object.entries(state.dietHabits)) {
+    if (date >= cutoff14) {
+      const habitXp = DIET_HABITS.reduce((sum, h) => sum + (habits[h.key] ? h.xp : 0), 0)
+      if (habitXp > 0) xpByDate[date] = (xpByDate[date] ?? 0) + habitXp
+    }
+  }
+
+  const activeDates = Object.values(xpByDate).filter(xp => xp > 0)
+  const daysWithXp = activeDates.length
+
+  if (daysWithXp === 0) return { hasData: false }
+
+  const totalXp = activeDates.reduce((sum, xp) => sum + xp, 0)
+  const avgDailyXp = totalXp / daysWithXp
+  const projected30d = Math.round(avgDailyXp * 30)
+  const levelsGained = Math.floor(projected30d / XP_PER_LEVEL)
+  const projectedLevel = state.level + levelsGained
+
+  return {
+    hasData: true,
+    avgDailyXp: Math.round(avgDailyXp),
+    projected30d,
+    levelsGained,
+    projectedLevel,
+    daysOfData: daysWithXp,
+    confidence: confidenceLabel(daysWithXp),
+  }
+}
+
+export function computePredictions(state) {
+  return {
+    calories: computeCaloriePredictions(state),
+    workouts: computeWorkoutPredictions(state),
+    xp:       computeXpPredictions(state),
   }
 }
