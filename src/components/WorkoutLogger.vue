@@ -68,6 +68,14 @@
   <!-- Log something else (Custom) -->
   <div class="bg-white rounded-2xl shadow-sm px-4 py-3 mb-4">
     <p class="text-xs text-gray-400 uppercase tracking-widest mb-2">Log something else</p>
+
+    <input
+      v-model="activityName"
+      type="text"
+      placeholder="enter activity"
+      class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:border-pink-300"
+    />
+
     <div class="flex items-center gap-2">
       <button
         v-for="sub in CUSTOM_SUBTYPES"
@@ -83,20 +91,13 @@
       <div class="flex-1" />
       <button
         @click="logCustom"
-        class="px-4 py-1.5 bg-pink-400 hover:bg-pink-500 text-white rounded-full text-sm font-medium transition-colors"
+        :disabled="!activityName.trim()"
+        class="px-4 py-1.5 bg-pink-400 text-white rounded-full text-sm font-medium transition-all duration-150 hover:bg-pink-500 disabled:opacity-40 disabled:cursor-not-allowed"
+        :class="logged ? 'scale-95 bg-pink-600' : ''"
       >
-        + log
+        {{ logged ? '✓' : '+ log' }}
       </button>
     </div>
-
-    <!-- Custom name input -->
-    <input
-      v-if="selectedCustom?.label === 'custom'"
-      v-model="customName"
-      type="text"
-      placeholder="workout name…"
-      class="mt-2 w-full border border-gray-200 rounded-full px-3 py-1 text-sm focus:outline-none focus:border-pink-300"
-    />
   </div>
 
   <!-- Recent activity -->
@@ -111,7 +112,7 @@
         :key="i"
         class="flex items-center justify-between text-sm"
       >
-        <span class="text-gray-600">{{ w.name }}</span>
+        <span class="text-gray-600">{{ w.activity ?? w.name }}</span>
         <span class="text-pink-400 font-medium text-xs">+{{ w.xp }} xp</span>
       </li>
     </ul>
@@ -122,7 +123,7 @@
 import { ref, computed } from 'vue'
 import { state } from '../store/state.js'
 import { WORKOUT_SUBTYPES, WORKOUT_META, WORKOUT_CAP, addXP } from '../utils/xp.js'
-import { todayStr } from '../utils/dates.js'
+import { todayStr, maybeSetStartDate } from '../utils/dates.js'
 import { updateWorkoutStreak } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
 
@@ -142,7 +143,8 @@ const TIPS = [
 ]
 
 const selectedCustom = ref(CUSTOM_SUBTYPES[0])
-const customName = ref('')
+const activityName = ref('')
+const logged = ref(false)
 
 const currentTip = TIPS[Math.floor(Math.random() * TIPS.length)]
 
@@ -165,6 +167,7 @@ const sessionCounts = computed(() => {
 })
 
 function logWorkout(type, sub) {
+  maybeSetStartDate(state)
   state.workouts.push({ type, name: `${type} – ${sub.label}`, xp: sub.xp, date: today })
   addXP(state, sub.xp)
   updateWorkoutStreak(state)
@@ -172,14 +175,17 @@ function logWorkout(type, sub) {
 }
 
 function logCustom() {
+  const name = activityName.value.trim()
+  if (!name) return
   const sub = selectedCustom.value
-  if (!sub) return
-  const name = sub.label === 'custom' ? (customName.value.trim() || 'Custom') : sub.label
-  state.workouts.push({ type: 'Custom', name, xp: sub.xp, date: today })
+  maybeSetStartDate(state)
+  state.workouts.push({ type: 'Custom', activity: name, intensity: sub.label, xp: sub.xp, date: today })
   addXP(state, sub.xp)
   updateWorkoutStreak(state)
   setMood('workout')
-  if (sub.label === 'custom') customName.value = ''
+  activityName.value = ''
+  logged.value = true
+  setTimeout(() => { logged.value = false }, 1000)
 }
 
 const recentWorkouts = computed(() => [...state.workouts].reverse().slice(0, 5))

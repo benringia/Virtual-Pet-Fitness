@@ -86,7 +86,7 @@ import { computed, ref } from 'vue'
 import { state } from '../store/state.js'
 import { setMood } from '../utils/pet.js'
 import { updateDeficitStreak } from '../utils/streaks.js'
-import { todayStr } from '../utils/dates.js'
+import { todayStr, maybeSetStartDate } from '../utils/dates.js'
 
 const balance = computed(() =>
   state.calories.goal - (state.calories.eaten - state.calories.burned)
@@ -95,6 +95,7 @@ const isDeficit = computed(() => balance.value > 0)
 const logged = ref(false)
 
 function logCalories() {
+  maybeSetStartDate(state)
   updateDeficitStreak(state, todayStr(), state.calories.eaten, state.calories.burned, state.calories.goal)
   setMood(isDeficit.value ? 'happy' : 'diet')
   logged.value = true

@@ -1,6 +1,9 @@
 const STORAGE_KEY = 'flarepup-v5'
 
 const defaultState = {
+  petName: "Flarepup",
+  startDate: null,
+  currentDate: null,
   xp: 0,
   level: 1,
   workouts: [],

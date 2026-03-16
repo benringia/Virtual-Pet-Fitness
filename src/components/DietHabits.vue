@@ -40,7 +40,7 @@
 import { computed } from 'vue'
 import { state } from '../store/state.js'
 import { DIET_HABITS, addXP } from '../utils/xp.js'
-import { todayStr } from '../utils/dates.js'
+import { todayStr, maybeSetStartDate } from '../utils/dates.js'
 import { updateDietStreak } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
 
@@ -51,6 +51,7 @@ const todayHabits = computed(() => state.dietHabits[todayKey] ?? {})
 function toggle(habit) {
   if (!state.dietHabits[todayKey]) state.dietHabits[todayKey] = {}
   const wasChecked = !!state.dietHabits[todayKey][habit.key]
+  if (!wasChecked) maybeSetStartDate(state)
   state.dietHabits[todayKey][habit.key] = !wasChecked
   addXP(state, wasChecked ? -habit.xp : habit.xp)
   updateDietStreak(state)
