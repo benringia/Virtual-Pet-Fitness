@@ -34,6 +34,8 @@ import { computed } from 'vue'
 import { state } from '../store/state.js'
 import { DIET_HABITS, DIET_HABIT_XP, addXP } from '../utils/xp.js'
 import { todayStr } from '../utils/dates.js'
+import { updateDietStreak } from '../utils/streaks.js'
+import { setMood } from '../utils/pet.js'
 
 const todayKey = todayStr()
 
@@ -48,5 +50,8 @@ function toggle(key) {
   const wasChecked = !!state.dietHabits[todayKey][key]
   state.dietHabits[todayKey][key] = !wasChecked
   addXP(state, wasChecked ? -DIET_HABIT_XP : DIET_HABIT_XP)
+  updateDietStreak(state)
+  const allDone = DIET_HABITS.every(h => state.dietHabits[todayKey][h.key])
+  setMood(allDone ? 'excited' : 'diet')
 }
 </script>

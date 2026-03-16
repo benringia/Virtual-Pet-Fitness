@@ -56,6 +56,8 @@ import { ref, computed } from 'vue'
 import { state } from '../store/state.js'
 import { WORKOUT_TYPES, WORKOUT_XP, addXP } from '../utils/xp.js'
 import { todayStr } from '../utils/dates.js'
+import { updateWorkoutStreak } from '../utils/streaks.js'
+import { setMood } from '../utils/pet.js'
 
 const selectedType = ref('Strength')
 const customName = ref('')
@@ -66,6 +68,8 @@ function logWorkout() {
 
   state.workouts.push({ type: selectedType.value, name, xp, date: todayStr() })
   addXP(state, xp)
+  updateWorkoutStreak(state)
+  setMood('workout')
 
   if (selectedType.value === 'Custom') customName.value = ''
 }
