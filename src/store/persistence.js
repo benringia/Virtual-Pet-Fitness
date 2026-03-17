@@ -1,7 +1,7 @@
 const STORAGE_KEY = 'flarepup-v5'
 
 const defaultState = {
-  petName: "Flarepup",
+  petName: "Petfit",
   startDate: null,
   currentDate: null,
   xp: 0,

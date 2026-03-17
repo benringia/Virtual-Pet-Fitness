@@ -329,3 +329,5 @@ Shows:
 No new state fields unless strictly necessary.
 No external chart libraries — SVG only.
 Reads from existing global state only.
+
+App name: Petfit (localStorage key remains `flarepup-v5`)
