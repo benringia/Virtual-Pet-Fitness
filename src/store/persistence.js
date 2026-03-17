@@ -8,7 +8,7 @@ const defaultState = {
   level: 1,
   workouts: [],
   dietHabits: {},
-  calories: { eaten: 0, burned: 0, goal: 2000, date: null },
+  calories: { eaten: 0, burned: 0, burnedManual: [], goal: 2000, date: null },
   streaks: {
     workout: { count: 0, lastDate: null },
     diet: { count: 0, lastDate: null },
@@ -18,6 +18,7 @@ const defaultState = {
   weightLog: [],
   weightGoal: null,
   weightUnit: 'kg',
+  meals: [],
 }
 
 export function loadState() {

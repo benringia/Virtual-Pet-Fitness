@@ -22,59 +22,28 @@
       </div>
     </div>
 
-    <!-- Eaten / Burned inputs -->
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1">Calories Eaten</label>
-        <div class="flex items-center justify-between border border-gray-200 rounded-xl px-3 py-2">
-          <input
-            type="number" min="0"
-            :value="state.calories.eaten"
-            @change="state.calories.eaten = +$event.target.value"
-            class="text-xl font-bold text-gray-600 w-full bg-transparent focus:outline-none"
-            placeholder="e.g. 1400"
-          />
-          <div class="flex flex-col gap-0.5 shrink-0">
-            <button @click="state.calories.eaten += 50" class="text-gray-400 hover:text-pink-400 leading-none text-xs">▲</button>
-            <button @click="state.calories.eaten = Math.max(0, state.calories.eaten - 50)" class="text-gray-400 hover:text-pink-400 leading-none text-xs">▼</button>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1">Calories Burned</label>
-        <div class="flex items-center justify-between border border-gray-200 rounded-xl px-3 py-2">
-          <input
-            type="number" min="0"
-            :value="state.calories.burned"
-            @change="state.calories.burned = +$event.target.value"
-            class="text-xl font-bold text-gray-600 w-full bg-transparent focus:outline-none"
-            placeholder="e.g. 300"
-          />
-          <div class="flex flex-col gap-0.5 shrink-0">
-            <button @click="state.calories.burned += 50" class="text-gray-400 hover:text-pink-400 leading-none text-xs">▲</button>
-            <button @click="state.calories.burned = Math.max(0, state.calories.burned - 50)" class="text-gray-400 hover:text-pink-400 leading-none text-xs">▼</button>
-          </div>
-        </div>
+    <!-- Calories Eaten (read-only) -->
+    <div class="mb-4">
+      <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1">Calories Eaten</label>
+      <div class="flex items-center border border-pink-100 rounded-xl px-3 py-2 bg-pink-50">
+        <span class="text-xl font-bold text-pink-400 w-full">{{ state.calories.eaten || 0 }}</span>
+        <span class="text-xs text-pink-300 shrink-0">kcal</span>
       </div>
     </div>
 
-    <!-- Log button -->
-    <button
-      @click="logCalories"
-      class="w-full py-2.5 rounded-full border border-pink-300 text-pink-500 text-sm font-medium hover:bg-pink-50 transition-all duration-150"
-      :class="logged ? 'scale-95 bg-pink-100 border-pink-400' : ''"
-    >
-      {{ logged ? '✓ logged!' : "log today's calories 🔥" }}
-    </button>
+    <!-- Remaining calories -->
+    <div v-if="state.calories.eaten > 0" class="text-center py-2">
+      <div class="text-xs text-gray-400 mb-1 uppercase tracking-widest">remaining calories</div>
+      <div class="text-2xl font-semibold" :class="isDeficit ? 'text-green-500' : 'text-red-400'">
+        {{ Math.abs(balance) }} kcal
+      </div>
+    </div>
 
-    <!-- Balance display -->
-    <div
-      v-if="state.calories.eaten > 0"
-      class="text-center mt-2 text-xs font-medium"
-      :class="isDeficit ? 'text-green-500' : 'text-red-400'"
-    >
-      {{ isDeficit ? 'deficit' : 'surplus' }}: {{ Math.abs(balance) }} kcal
+    <!-- Today's meal history -->
+    <div v-if="todaysMeals.length" class="mt-3 max-h-24 overflow-y-auto">
+      <div v-for="meal in todaysMeals" :key="meal.id" class="text-xs text-gray-400 bg-pink-50 rounded-lg px-2 py-1 mb-1 last:mb-0">
+        – {{ meal.calories }} kcal from <span class="capitalize">{{ meal.name }}</span>
+      </div>
     </div>
 
     <p class="text-center text-xs text-gray-300 mt-2">resets daily · be honest with yourself, queen 💜</p>
@@ -82,23 +51,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { state } from '../store/state.js'
-import { setMood } from '../utils/pet.js'
-import { updateDeficitStreak } from '../utils/streaks.js'
-import { todayStr, maybeSetStartDate } from '../utils/dates.js'
+import { getTodayDate } from '../utils/dates.js'
 
 const balance = computed(() =>
-  state.calories.goal - (state.calories.eaten - state.calories.burned)
+  state.calories.goal - state.calories.eaten
 )
 const isDeficit = computed(() => balance.value > 0)
-const logged = ref(false)
-
-function logCalories() {
-  maybeSetStartDate(state)
-  updateDeficitStreak(state, todayStr(), state.calories.eaten, state.calories.burned, state.calories.goal)
-  setMood(isDeficit.value ? 'happy' : 'diet')
-  logged.value = true
-  setTimeout(() => { logged.value = false }, 1200)
-}
+const todaysMeals = computed(() => state.meals.filter(m => m.date === getTodayDate()))
 </script>

@@ -58,6 +58,7 @@ export const DIET_HABIT_XP = 10 // kept for legacy compatibility
 
 export const WEIGHT_LOG_XP = 10
 export const WEIGHT_STREAK_BONUS_XP = 15
+export const MEAL_LOG_XP = 10
 
 // Evolution stages: [minLevel, stageName, emoji]
 const STAGES = [

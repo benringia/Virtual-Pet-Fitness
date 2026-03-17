@@ -331,3 +331,49 @@ No external chart libraries — SVG only.
 Reads from existing global state only.
 
 App name: Petfit (localStorage key remains `flarepup-v5`)
+
+### Meal Logger
+
+A new card below the Diet Today card for logging individual meals.
+
+Component: `src/components/MealLogger.vue`
+
+State addition:
+meals: []  // { id, date, name, calories, protein, type }
+// type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
+
+XP: +10 XP per meal logged (via xp.js)
+
+Behavior:
+- Log meal name, calories, protein (g), and meal type
+- Today's meals shown grouped by type
+- Logged calories auto-add to calories.eaten in existing state
+- Only today's meals shown; history preserved in state
+- Resets display daily, history kept
+- Delete per entry supported
+
+Placement in App.vue: below DietHabits.vue
+
+
+### Calories Burned Sources
+
+Component: `src/components/CaloriesBurned.vue`
+Placed in App.vue below WorkoutLogger.
+
+Calories burned is derived from two sources:
+
+1. Auto-calculated from today's logged workouts
+   - Logic in src/utils/calories.js
+   - Each workout type/intensity maps to a kcal estimate
+
+2. Manual override for fitness watch users
+   - Stored in calories.burnedManual in state
+   - null = use auto-calculated value
+   - number = use manual value
+
+State addition:
+calories.burnedManual: null
+
+UI shows source label: "estimated from workouts" or "from fitness watch"
+Clearing manual input reverts to auto-calculated.
+CaloriesTracker.vue reads calories.burned — do not modify it.

@@ -6,20 +6,22 @@
       <ProgressDashboard v-if="activeView === 'progress'" />
 
       <div v-if="activeView === 'tracker'" class="lg:grid lg:grid-cols-[1fr_2fr_1fr] lg:gap-6 lg:items-start">
-        <!-- Left column: Pet + WeightLog -->
+        <!-- Left column: Pet + WeightLog + StatsPanel -->
         <div class="contents lg:block lg:overflow-y-auto">
           <Pet />
           <WeightLog />
+          <StatsPanel />
         </div>
-        <!-- Center column: WorkoutLogger -->
+        <!-- Center column: WorkoutLogger + CaloriesBurned -->
         <div class="contents lg:block lg:overflow-y-auto">
           <WorkoutLogger />
+          <CaloriesBurned />
         </div>
-        <!-- Right column: DietHabits + CaloriesTracker + StatsPanel -->
+        <!-- Right column: DietHabits + MealLogger + CaloriesTracker -->
         <div class="contents lg:block lg:overflow-y-auto">
           <DietHabits />
+          <MealLogger />
           <CaloriesTracker />
-          <StatsPanel />
         </div>
       </div>
 
@@ -35,6 +37,8 @@ import WorkoutLogger from './components/WorkoutLogger.vue'
 import DietHabits from './components/DietHabits.vue'
 import CaloriesTracker from './components/CaloriesTracker.vue'
 import WeightLog from './components/WeightLog.vue'
+import MealLogger from './components/MealLogger.vue'
+import CaloriesBurned from './components/CaloriesBurned.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import ProgressDashboard from './components/ProgressDashboard.vue'
 import { state } from './store/state.js'
