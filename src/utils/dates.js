@@ -52,6 +52,7 @@ export function checkDayRollover(state) {
 
   state.calories.eaten = 0
   state.calories.burned = 0
+  state.calories.burnedManual = []
   state.calories.date = today
   resetExpiredStreaks(state)
 }

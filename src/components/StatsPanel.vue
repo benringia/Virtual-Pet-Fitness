@@ -160,6 +160,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { state } from '../store/state.js'
+import { resetState } from '../store/persistence.js'
 import { computePredictions } from '../utils/predictions.js'
 import { getStageFromLevel, STAGE_LIST } from '../utils/xp.js'
 import { getTodayDate, daysBetween, formatDate } from '../utils/dates.js'
@@ -191,20 +192,7 @@ function confidenceClass(level) { return CONFIDENCE_CLASSES[level] ?? '' }
 
 function confirmReset() {
   if (confirm('Reset your pet and start over? This cannot be undone.')) {
-    state.xp = 0
-    state.level = 1
-    state.workouts = []
-    state.dietHabits = {}
-    state.calories = { eaten: 0, burned: 0, goal: 2000, date: null }
-    state.streaks = {
-      workout: { count: 0, lastDate: null },
-      diet:    { count: 0, lastDate: null },
-      deficit: { count: 0, lastDate: null },
-    }
-    state.calHistory = []
-    state.startDate = null
-    state.currentDate = null
-    localStorage.removeItem('flarepup-v5')
+    resetState(state)
   }
 }
 </script>
