@@ -275,3 +275,57 @@ State should also store:
 
 startDate → when the user first started using the app  
 currentDate → today's date
+
+### Body Weight Log
+
+Users can log their body weight daily to track progress over time.
+
+**State additions:**
+weightLog: []        // { date: 'YYYY-MM-DD', weight: number, unit: 'kg' | 'lbs' }
+weightGoal: null     // target weight in same unit as logs
+weightUnit: 'kg'     // user preference, toggleable
+
+**XP rules:**
+- +10 XP for logging weight on a new day
+- +15 XP bonus for a 7-day logging streak
+
+**Component:** `src/components/WeightLog.vue`
+
+UI includes:
+- weight input for today
+- kg / lbs unit toggle
+- optional goal weight input
+- SVG line chart of last 30 entries (no external library)
+- current weight, goal, and difference display
+- 7-day logging streak indicator
+
+Behavior:
+- one entry per day maximum
+- logging again on the same day updates the existing entry
+- XP awarded via existing xp.js util
+- persisted through existing localStorage autosave
+
+Placement in App.vue: between CaloriesTracker and StatsPanel
+
+
+### Progress Dashboard
+
+A separate view toggled from the main tracker via a tab switcher.
+
+Tab state managed in App.vue using a reactive `activeView` ref:
+- 'tracker' → default main view
+- 'progress' → ProgressDashboard.vue
+
+Component: `src/components/ProgressDashboard.vue`
+
+Shows:
+- Weight trend SVG line chart (from weightLog state)
+  - Dashed goal line if weightGoal is set
+  - Current weight, starting weight, total change
+- Workout history timeline grouped by date (from workouts state)
+- XP earned per day SVG bar chart — last 30 days (from calHistory + workouts)
+- Streak history for all 3 streaks with best streak tracking
+
+No new state fields unless strictly necessary.
+No external chart libraries — SVG only.
+Reads from existing global state only.

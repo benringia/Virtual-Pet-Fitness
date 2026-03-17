@@ -15,6 +15,9 @@ const defaultState = {
     deficit: { count: 0, lastDate: null },
   },
   calHistory: [],
+  weightLog: [],
+  weightGoal: null,
+  weightUnit: 'kg',
 }
 
 export function loadState() {
