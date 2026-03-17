@@ -145,7 +145,7 @@ const currentWeight = computed(() => last30.value.at(-1)?.weight ?? null)
 
 const diff = computed(() => {
   if (currentWeight.value === null || !state.weightGoal) return null
-  return +(currentWeight.value - state.weightGoal).toFixed(1)
+  return +(state.weightGoal - currentWeight.value).toFixed(1)
 })
 
 const diffPositive = computed(() => diff.value !== null && diff.value > 0)
