@@ -13,9 +13,9 @@
   </div>
 
   <!-- Tip banner -->
-  <div class="border-l-4 border-pink-300 bg-white rounded-r-2xl shadow-sm mb-4 px-4 py-2.5">
+  <div class="border-l-4 border-indigo-300 bg-white rounded-r-2xl shadow-sm mb-4 px-4 py-2.5">
     <p class="text-xs text-gray-500 italic">
-      <span class="text-pink-500 font-semibold not-italic">tip:</span> {{ currentTip }}
+      <span class="text-indigo-500 font-semibold not-italic">tip:</span> {{ currentTip }}
     </p>
   </div>
 
@@ -38,9 +38,9 @@
         <div class="flex justify-between text-xs text-gray-400 mb-1">
           <span>{{ todayXP[type] }} / {{ WORKOUT_CAP }} xp</span>
         </div>
-        <div class="w-full bg-pink-100 rounded-full h-1">
+        <div class="w-full bg-indigo-100 rounded-full h-1">
           <div
-            class="bg-pink-400 h-1 rounded-full transition-all duration-300"
+            class="bg-indigo-500 h-1 rounded-full transition-all duration-300"
             :style="{ width: Math.min((todayXP[type] / WORKOUT_CAP) * 100, 100) + '%' }"
           />
         </div>
@@ -52,9 +52,9 @@
           v-for="sub in WORKOUT_SUBTYPES[type]"
           :key="sub.label"
           @click="logWorkout(type, sub)"
-          class="text-xs px-2 py-1 rounded-full bg-pink-50 text-gray-600 hover:bg-pink-100 hover:text-pink-600 transition-colors"
+          class="text-xs px-2 py-1 rounded-full bg-indigo-50 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
         >
-          {{ sub.label }} <span class="text-pink-400">+{{ sub.xp }}</span>
+          {{ sub.label }} <span class="text-indigo-500">+{{ sub.xp }}</span>
         </button>
       </div>
 
@@ -73,7 +73,7 @@
       v-model="activityName"
       type="text"
       placeholder="enter activity"
-      class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:border-pink-300"
+      class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:border-indigo-300"
     />
 
     <div class="flex items-center gap-2">
@@ -83,17 +83,17 @@
         @click="selectedCustom = sub"
         class="text-xs px-3 py-1.5 rounded-full border transition-colors"
         :class="selectedCustom?.label === sub.label
-          ? 'bg-pink-400 text-white border-pink-400'
-          : 'bg-pink-50 text-gray-500 border-pink-100 hover:border-pink-300'"
+          ? 'bg-indigo-500 text-white border-indigo-500'
+          : 'bg-indigo-50 text-gray-500 border-indigo-100 hover:border-indigo-300'"
       >
-        {{ sub.label }} <span :class="selectedCustom?.label === sub.label ? 'text-white' : 'text-pink-400'">+{{ sub.xp }}</span>
+        {{ sub.label }} <span :class="selectedCustom?.label === sub.label ? 'text-white' : 'text-indigo-500'">+{{ sub.xp }}</span>
       </button>
       <div class="flex-1" />
       <button
         @click="logCustom"
         :disabled="!activityName.trim()"
-        class="px-4 py-1.5 bg-pink-400 text-white rounded-full text-sm font-medium transition-all duration-150 hover:bg-pink-500 disabled:opacity-40 disabled:cursor-not-allowed"
-        :class="logged ? 'scale-95 bg-pink-600' : ''"
+        class="px-4 py-1.5 bg-indigo-500 text-white rounded-full text-sm font-medium transition-all duration-150 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed"
+        :class="logged ? 'scale-95 bg-indigo-700' : ''"
       >
         {{ logged ? '✓' : '+ log' }}
       </button>
@@ -113,7 +113,7 @@
         class="flex items-center justify-between text-sm"
       >
         <span class="text-gray-600">{{ w.activity ?? w.name }}</span>
-        <span class="text-pink-400 font-medium text-xs">+{{ w.xp }} xp</span>
+        <span class="text-indigo-500 font-medium text-xs">+{{ w.xp }} xp</span>
       </li>
     </ul>
   </div>

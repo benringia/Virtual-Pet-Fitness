@@ -59,8 +59,8 @@ const isGoalMet = computed(() =>
           :key="level"
           @click="state.proteinActivityLevel = level"
           :class="state.proteinActivityLevel === level
-            ? 'bg-violet-400 text-white'
-            : 'bg-violet-50 text-gray-500 hover:bg-violet-100'"
+            ? 'bg-indigo-500 text-white'
+            : 'bg-indigo-50 text-gray-500 hover:bg-indigo-100'"
           class="px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize"
         >{{ level }}</button>
       </div>
@@ -69,7 +69,7 @@ const isGoalMet = computed(() =>
       <div class="bg-gray-100 rounded-full h-2 mb-2">
         <div
           class="h-2 rounded-full transition-all duration-300"
-          :class="isGoalMet ? 'bg-green-400' : 'bg-rose-400'"
+          :class="isGoalMet ? 'bg-emerald-500' : 'bg-indigo-500'"
           :style="{ width: progress + '%' }"
         ></div>
       </div>
@@ -77,7 +77,7 @@ const isGoalMet = computed(() =>
       <!-- Consumed / goal -->
       <div
         class="text-sm font-semibold mb-3"
-        :class="isGoalMet ? 'text-green-600' : 'text-rose-500'"
+        :class="isGoalMet ? 'text-emerald-600' : 'text-indigo-500'"
       >
         {{ totalProtein }}g / {{ proteinGoal }}g
       </div>
@@ -87,10 +87,10 @@ const isGoalMet = computed(() =>
         <div
           v-for="meal in mealsWithProtein"
           :key="meal.id"
-          class="flex justify-between text-xs text-gray-400 bg-violet-50 rounded-lg px-2 py-1"
+          class="flex justify-between text-xs text-gray-400 bg-indigo-50 rounded-lg px-2 py-1"
         >
           <span class="capitalize truncate mr-2">{{ meal.name }}</span>
-          <span class="shrink-0 font-medium text-violet-500">{{ meal.protein }}g</span>
+          <span class="shrink-0 font-medium text-indigo-500">{{ meal.protein }}g</span>
         </div>
       </div>
     </template>

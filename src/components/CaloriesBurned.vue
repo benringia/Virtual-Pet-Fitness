@@ -3,14 +3,14 @@
     <div class="flex items-center gap-2 mb-3">
       <span class="text-base">🏃</span>
       <h2 class="font-semibold text-gray-700">Calories Burned</h2>
-      <span v-if="isManual" class="ml-auto text-xs bg-pink-100 text-pink-500 rounded-full px-2.5 py-0.5 font-medium">from fitness watch</span>
+      <span v-if="isManual" class="ml-auto text-xs bg-indigo-100 text-indigo-500 rounded-full px-2.5 py-0.5 font-medium">from fitness watch</span>
     </div>
 
     <!-- Total -->
     <div class="mb-1">
       <div class="text-xs text-gray-400 mb-1">{{ isManual ? 'manual entries' : 'estimated from workouts' }}</div>
       <div class="flex items-baseline gap-1">
-        <span class="text-2xl font-bold text-pink-500">{{ effectiveBurned }}</span>
+        <span class="text-2xl font-bold text-indigo-500">{{ effectiveBurned }}</span>
         <span class="text-sm text-gray-400">kcal</span>
       </div>
     </div>
@@ -21,16 +21,16 @@
         <div
           v-for="(item, i) in autoResult.items"
           :key="i"
-          class="flex justify-between text-xs text-gray-500 py-1 border-b border-pink-50 last:border-0"
+          class="flex justify-between text-xs text-gray-500 py-1 border-b border-indigo-50 last:border-0"
         >
           <span>{{ displayName(item.workout) }}</span>
-          <span class="text-pink-400 font-medium">{{ item.kcal }} kcal</span>
+          <span class="text-indigo-400 font-medium">{{ item.kcal }} kcal</span>
         </div>
       </div>
       <p v-else class="mt-2 text-xs text-gray-400">log a workout to see estimates</p>
     </template>
 
-    <div class="border-t border-pink-50 mt-4 pt-4">
+    <div class="border-t border-indigo-50 mt-4 pt-4">
       <label class="block text-xs text-gray-400 mb-1.5">Got a fitness watch? Enter exact calories burned</label>
 
       <!-- Add entry inputs -->
@@ -40,7 +40,7 @@
           type="text"
           placeholder="activity name (optional)"
           maxlength="50"
-          class="flex-1 border border-pink-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-300"
+          class="flex-1 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
         />
         <input
           v-model="kcalInput"
@@ -48,13 +48,13 @@
           type="number"
           min="0"
           placeholder="e.g. 320 kcal"
-          class="w-32 border border-pink-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-300"
+          class="w-32 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
         />
         <button
           @click="addManualEntry"
           :disabled="!canAddEntry"
           class="px-3 py-2 rounded-xl text-xs font-semibold transition-colors"
-          :class="canAddEntry ? 'bg-pink-400 text-white hover:bg-pink-500' : 'bg-pink-100 text-pink-300 cursor-not-allowed'"
+          :class="canAddEntry ? 'bg-indigo-500 text-white hover:bg-indigo-600' : 'bg-indigo-100 text-indigo-300 cursor-not-allowed'"
         >Add</button>
       </div>
 
@@ -63,10 +63,10 @@
         <div
           v-for="(entry, i) in manualEntries"
           :key="i"
-          class="flex justify-between items-center text-xs text-gray-500 bg-pink-50 rounded-lg px-3 py-2"
+          class="flex justify-between items-center text-xs text-gray-500 bg-indigo-50 rounded-lg px-3 py-2"
         >
-          <span class="flex items-center text-pink-400 font-medium">
-            <span class="w-2 h-2 rounded-full bg-pink-300 inline-block mr-2 shrink-0"></span>
+          <span class="flex items-center text-indigo-500 font-medium">
+            <span class="w-2 h-2 rounded-full bg-indigo-300 inline-block mr-2 shrink-0"></span>
             <span class="capitalize">{{ entry.label ? `${entry.label} – ${entry.kcal} kcal` : `${entry.kcal} kcal` }}</span>
           </span>
           <button

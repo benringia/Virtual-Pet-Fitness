@@ -19,7 +19,7 @@
         <span class="flex-1 text-sm text-gray-600">{{ habit.label }}</span>
         <span
           class="text-xs font-medium px-2 py-0.5 rounded-full"
-          :class="todayHabits[habit.key] ? 'bg-pink-100 text-pink-500' : 'bg-gray-100 text-gray-400'"
+          :class="todayHabits[habit.key] ? 'bg-indigo-100 text-indigo-500' : 'bg-gray-100 text-gray-400'"
         >
           +{{ habit.xp }} xp
         </span>
@@ -27,7 +27,7 @@
           type="checkbox"
           :checked="todayHabits[habit.key] ?? false"
           @change="toggle(habit)"
-          class="w-4 h-4 accent-pink-400 cursor-pointer"
+          class="w-4 h-4 accent-indigo-500 cursor-pointer"
         />
       </li>
     </ul>

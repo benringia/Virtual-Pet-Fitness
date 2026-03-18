@@ -1,66 +1,65 @@
 <template>
-  <section class="bg-white rounded-2xl border border-pink-100 shadow-sm p-4 mb-4">
-    <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3">⚖️ Weight Log</h2>
+  <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4">
+    <button
+      @click="isOpen = !isOpen"
+      class="w-full flex items-center justify-between mb-0 focus:outline-none"
+      :aria-expanded="isOpen"
+    >
+      <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase">⚖️ Weight Log</h2>
+      <span class="text-gray-400 text-xs transition-transform duration-200" :class="isOpen ? 'rotate-180' : ''">▼</span>
+    </button>
 
-    <!-- Input row -->
-    <div class="flex gap-2 mb-3">
+    <transition
+      enter-active-class="transition-all duration-200 ease-out overflow-hidden"
+      leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+      enter-from-class="opacity-0 max-h-0"
+      enter-to-class="opacity-100 max-h-screen"
+      leave-from-class="opacity-100 max-h-screen"
+      leave-to-class="opacity-0 max-h-0"
+    >
+    <div v-show="isOpen" class="mt-3">
+
+    <!-- Inputs + Log button -->
+    <div class="flex flex-col gap-2 mb-4">
       <input
         v-model.number="weightInput"
         type="number"
         min="1"
         step="0.1"
-        :placeholder="`weight in ${state.weightUnit}`"
-        class="flex-1 border border-pink-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-400"
+        placeholder="weight in kg"
+        class="w-full border border-indigo-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
       />
-      <!-- Unit toggle -->
-      <div class="flex rounded-xl overflow-hidden border border-pink-200 text-xs font-semibold">
-        <button
-          @click="setUnit('kg')"
-          :class="state.weightUnit === 'kg' ? 'bg-pink-400 text-white' : 'text-gray-400 hover:bg-pink-50'"
-          class="px-3 py-2 transition-colors"
-        >kg</button>
-        <button
-          @click="setUnit('lbs')"
-          :class="state.weightUnit === 'lbs' ? 'bg-pink-400 text-white' : 'text-gray-400 hover:bg-pink-50'"
-          class="px-3 py-2 transition-colors"
-        >lbs</button>
-      </div>
-      <button
-        @click="handleLog"
-        :disabled="!weightInput || weightInput <= 0"
-        class="bg-pink-400 disabled:opacity-40 text-white rounded-xl px-4 py-2 text-xs font-semibold hover:bg-pink-500 transition-colors"
-      >Log</button>
-    </div>
-
-    <!-- Goal input -->
-    <div class="flex items-center gap-2 mb-4">
-      <label class="text-xs text-gray-400 whitespace-nowrap">Goal weight</label>
       <input
         v-model.number="goalInput"
         type="number"
         min="1"
         step="0.1"
-        :placeholder="`target in ${state.weightUnit}`"
+        placeholder="goal weight in kg"
         @change="saveGoal"
-        class="flex-1 border border-pink-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-pink-300"
+        class="w-full border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
       />
+      <button
+        @click="handleLog"
+        :disabled="!weightInput || weightInput <= 0 || !goalInput || goalInput <= 0"
+        class="w-full bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2 text-xs font-semibold hover:bg-indigo-600 transition-colors"
+      >Log</button>
     </div>
 
-    <!-- Stats row -->
-    <div v-if="currentWeight !== null" class="flex gap-3 mb-4">
-      <div class="flex-1 bg-pink-50 rounded-xl p-3 text-center">
-        <div class="text-xs text-gray-400 mb-1">Current</div>
-        <div class="text-lg font-bold text-gray-700">{{ currentWeight }}<span class="text-xs font-normal text-gray-400 ml-1">{{ state.weightUnit }}</span></div>
+    <!-- Stats rows -->
+    <div v-if="currentWeight !== null" class="flex flex-col gap-2 mb-4">
+      <div class="bg-indigo-50 rounded-xl px-3 py-2 flex justify-between items-center">
+        <span class="text-xs text-gray-400">Current</span>
+        <span class="text-sm font-bold text-gray-700">{{ currentWeight }} <span class="text-xs font-normal text-gray-400">{{ state.weightUnit }}</span></span>
       </div>
-      <div v-if="state.weightGoal" class="flex-1 bg-purple-50 rounded-xl p-3 text-center">
-        <div class="text-xs text-gray-400 mb-1">Goal</div>
-        <div class="text-lg font-bold text-gray-700">{{ state.weightGoal }}<span class="text-xs font-normal text-gray-400 ml-1">{{ state.weightUnit }}</span></div>
+      <div v-if="state.weightGoal" class="bg-indigo-50 rounded-xl px-3 py-2 flex justify-between items-center">
+        <span class="text-xs text-gray-400">Goal</span>
+        <span class="text-sm font-bold text-gray-700">{{ state.weightGoal }} <span class="text-xs font-normal text-gray-400">{{ state.weightUnit }}</span></span>
       </div>
-      <div v-if="diff !== null" class="flex-1 rounded-xl p-3 text-center" :class="diffPositive ? 'bg-orange-50' : 'bg-green-50'">
-        <div class="text-xs text-gray-400 mb-1">Difference</div>
-        <div class="text-lg font-bold" :class="diffPositive ? 'text-orange-400' : 'text-green-500'">
-          {{ diffPositive ? '+' : '' }}{{ diff }}<span class="text-xs font-normal ml-1">{{ state.weightUnit }}</span>
-        </div>
+      <div v-if="diff !== null" class="rounded-xl px-3 py-2 flex justify-between items-center" :class="diffPositive ? 'bg-orange-50' : 'bg-green-50'">
+        <span class="text-xs text-gray-400">Difference</span>
+        <span class="text-sm font-bold" :class="diffPositive ? 'text-orange-400' : 'text-green-500'">
+          {{ diffPositive ? '+' : '' }}{{ diff }} <span class="text-xs font-normal">{{ state.weightUnit }}</span>
+        </span>
       </div>
     </div>
 
@@ -85,7 +84,7 @@
         <polyline
           :points="chartPoints"
           fill="none"
-          stroke="#f472b6"
+          stroke="#6366f1"
           stroke-width="2"
           stroke-linejoin="round"
           stroke-linecap="round"
@@ -95,7 +94,7 @@
           v-for="(pt, i) in chartCoords"
           :key="i"
           :cx="pt.x" :cy="pt.y" r="3"
-          fill="#f472b6"
+          fill="#6366f1"
         />
         <!-- Min / max labels -->
         <text :x="SVG_W - 2" :y="minY + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ chartMin }}</text>
@@ -104,11 +103,16 @@
     </div>
 
     <p v-else-if="!last30.length" class="text-xs text-gray-400 text-center py-2">Log your weight to see your trend chart.</p>
+
+    </div>
+    </transition>
   </section>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+
+const isOpen = ref(false)
 import { state } from '../store/state.js'
 import { logWeight, getWeightStreak } from '../utils/weight.js'
 
@@ -119,9 +123,6 @@ const PAD = 10
 const weightInput = ref(null)
 const goalInput = ref(state.weightGoal)
 
-function setUnit(unit) {
-  state.weightUnit = unit
-}
 
 function saveGoal() {
   state.weightGoal = goalInput.value > 0 ? goalInput.value : null

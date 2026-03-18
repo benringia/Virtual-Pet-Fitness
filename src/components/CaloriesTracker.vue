@@ -16,7 +16,7 @@
           type="number" min="0" step="100"
           :value="state.calories.goal"
           @change="state.calories.goal = +$event.target.value"
-          class="w-20 text-center font-semibold text-gray-700 border-b border-gray-200 focus:outline-none focus:border-pink-300 bg-transparent"
+          class="w-20 text-center font-semibold text-gray-700 border-b border-gray-200 focus:outline-none focus:border-indigo-300 bg-transparent"
         />
         <span class="text-xs text-gray-400">kcal target</span>
       </div>
@@ -25,9 +25,9 @@
     <!-- Calories Eaten (read-only) -->
     <div class="mb-4">
       <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1">Calories Eaten</label>
-      <div class="flex items-center border border-pink-100 rounded-xl px-3 py-2 bg-pink-50">
-        <span class="text-xl font-bold text-pink-400 w-full">{{ state.calories.eaten || 0 }}</span>
-        <span class="text-xs text-pink-300 shrink-0">kcal</span>
+      <div class="flex items-center border border-indigo-100 rounded-xl px-3 py-2 bg-indigo-50">
+        <span class="text-xl font-bold text-indigo-500 w-full">{{ state.calories.eaten || 0 }}</span>
+        <span class="text-xs text-indigo-300 shrink-0">kcal</span>
       </div>
     </div>
 
@@ -41,7 +41,7 @@
 
     <!-- Today's meal history -->
     <div v-if="todaysMeals.length" class="mt-3 max-h-24 overflow-y-auto">
-      <div v-for="meal in todaysMeals" :key="meal.id" class="text-xs text-gray-400 bg-pink-50 rounded-lg px-2 py-1 mb-1 last:mb-0">
+      <div v-for="meal in todaysMeals" :key="meal.id" class="text-xs text-gray-400 bg-indigo-50 rounded-lg px-2 py-1 mb-1 last:mb-0">
         – {{ meal.calories }} kcal from <span class="capitalize">{{ meal.name }}</span>
       </div>
     </div>

@@ -11,7 +11,7 @@
         v-for="t in TYPES"
         :key="t"
         @click="selectedType = t"
-        :class="selectedType === t ? 'bg-pink-400 text-white' : 'bg-pink-50 text-gray-500 hover:bg-pink-100'"
+        :class="selectedType === t ? 'bg-indigo-500 text-white' : 'bg-indigo-50 text-gray-500 hover:bg-indigo-100'"
         class="px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize"
       >{{ t }}</button>
     </div>
@@ -23,7 +23,7 @@
         type="text"
         placeholder="meal name"
         maxlength="60"
-        class="w-full border border-pink-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-300"
+        class="w-full border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
       />
       <div class="flex gap-2 min-w-0">
         <input
@@ -31,14 +31,14 @@
           type="number"
           placeholder="calories"
           min="0"
-          class="w-1/2 min-w-0 border border-pink-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-300"
+          class="w-1/2 min-w-0 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
         />
         <input
           v-model.number="mealProtein"
           type="number"
           placeholder="protein (g)"
           min="0"
-          class="w-1/2 min-w-0 border border-pink-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-300"
+          class="w-1/2 min-w-0 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
         />
       </div>
     </div>
@@ -47,7 +47,7 @@
       @click="logMeal"
       :disabled="!canLog"
       class="w-full rounded-xl py-2 text-sm font-semibold transition-colors"
-      :class="canLog ? 'bg-pink-400 text-white hover:bg-pink-500' : 'bg-pink-100 text-pink-300 cursor-not-allowed'"
+      :class="canLog ? 'bg-indigo-500 text-white hover:bg-indigo-600' : 'bg-indigo-100 text-indigo-300 cursor-not-allowed'"
     >+ log meal <span class="text-xs font-normal opacity-75">+{{ MEAL_LOG_XP }} xp</span></button>
 
     <!-- Today's meals -->
@@ -58,12 +58,12 @@
           <div
             v-for="meal in group.meals"
             :key="meal.id"
-            class="flex items-center justify-between text-sm py-1.5 border-b border-pink-50 last:border-0"
+            class="flex items-center justify-between text-sm py-1.5 border-b border-indigo-50 last:border-0"
           >
             <span class="text-gray-700 font-medium truncate mr-2">{{ meal.name }}</span>
             <div class="flex items-center gap-2 shrink-0">
               <span class="text-xs text-gray-400">{{ meal.calories }} kcal</span>
-              <span v-if="meal.protein" class="text-xs text-purple-400">{{ meal.protein }}g</span>
+              <span v-if="meal.protein" class="text-xs text-indigo-400">{{ meal.protein }}g</span>
               <button
                 @click="deleteMeal(meal)"
                 class="text-gray-300 hover:text-red-400 transition-colors text-xs leading-none"
@@ -75,9 +75,9 @@
       </div>
 
       <!-- Totals -->
-      <div class="mt-3 pt-3 border-t border-pink-100 flex gap-4 text-xs text-gray-500">
-        <span>Total: <span class="font-semibold text-pink-500">{{ totalCalories }} kcal</span></span>
-        <span v-if="totalProtein">Protein: <span class="font-semibold text-purple-400">{{ totalProtein }}g</span></span>
+      <div class="mt-3 pt-3 border-t border-indigo-100 flex gap-4 text-xs text-gray-500">
+        <span>Total: <span class="font-semibold text-indigo-500">{{ totalCalories }} kcal</span></span>
+        <span v-if="totalProtein">Protein: <span class="font-semibold text-indigo-400">{{ totalProtein }}g</span></span>
       </div>
     </template>
   </div>

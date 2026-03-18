@@ -1,14 +1,14 @@
 <template>
   <!-- Pet display card -->
-  <div class="bg-white rounded-2xl shadow-sm mb-4 overflow-hidden">
-    <div class="relative bg-linear-to-b from-pink-100 to-white px-4 pt-4 pb-6 flex flex-col items-center min-h-40">
+  <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
+    <div class="relative bg-linear-to-b from-indigo-100 to-indigo-50 px-4 pt-4 pb-6 flex flex-col items-center min-h-40">
       <!-- Motivational pill -->
-      <div class="absolute top-3 right-3 bg-white border border-pink-200 rounded-full px-3 py-1 text-xs text-pink-400">
+      <div class="absolute top-3 right-3 bg-white border border-indigo-200 rounded-full px-3 py-1 text-xs text-indigo-400">
         every step counts! 🌸
       </div>
 
       <!-- Pet emoji -->
-      <div class="text-8xl select-none mt-4" :class="animClass">{{ stageEmoji }}</div>
+      <div class="text-9xl select-none mt-4" :class="animClass">{{ stageEmoji }}</div>
 
       <!-- Mood overlay badge -->
       <div v-if="moodOverlay" class="mt-2 text-2xl">{{ moodOverlay }}</div>
@@ -20,9 +20,9 @@
         <span>xp to next level</span>
         <span>{{ xpProgress }} / {{ XP_PER_LEVEL }}</span>
       </div>
-      <div class="w-full bg-pink-100 rounded-full h-1.5">
+      <div class="w-full bg-indigo-100 rounded-full h-1.5">
         <div
-          class="bg-pink-400 h-1.5 rounded-full transition-all duration-500"
+          class="bg-indigo-500 h-1.5 rounded-full transition-all duration-500"
           :style="{ width: xpPct + '%' }"
         />
       </div>
@@ -33,7 +33,7 @@
   <div class="flex justify-between gap-2 mb-4">
     <!-- Level -->
     <div class="flex-1 bg-white rounded-2xl shadow-sm py-2 text-center">
-      <div class="text-base font-bold text-pink-500">{{ state.level }}</div>
+      <div class="text-base font-bold text-indigo-500">{{ state.level }}</div>
       <div class="text-xs text-gray-400 uppercase tracking-wide">level</div>
     </div>
     <!-- Per-type session counts -->
