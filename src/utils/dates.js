@@ -1,7 +1,9 @@
 import { updateDeficitStreak, resetExpiredStreaks } from './streaks.js'
+import { triggerAchievement } from './achievements.js'
 
 export function todayStr() {
-  return new Date().toISOString().slice(0, 10)
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 export function isSameDay(a, b) {
@@ -55,4 +57,5 @@ export function checkDayRollover(state) {
   state.calories.burnedManual = []
   state.calories.date = today
   resetExpiredStreaks(state)
+  triggerAchievement('dayReset', '🌅', 'New day!', 'Habits and calories have reset. Keep it up!')
 }

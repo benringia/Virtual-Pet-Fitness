@@ -21,6 +21,7 @@
               ><span>📊</span> Progress</button>
             </nav>
             <WeightLog />
+            <ReminderSettings />
           </StatsPanel>
         </div>
       </aside>
@@ -128,10 +129,17 @@ import MealLogger from './components/MealLogger.vue'
 
 import StatsPanel from './components/StatsPanel.vue'
 import ProgressDashboard from './components/ProgressDashboard.vue'
+import ReminderSettings from './components/ReminderSettings.vue'
 import { state } from './store/state.js'
 import { checkDayRollover } from './utils/dates.js'
+import { scheduleReminder } from './utils/reminder.js'
 
-onMounted(() => checkDayRollover(state))
+onMounted(() => {
+  checkDayRollover(state)
+  if (state.reminder.enabled && Notification.permission === 'granted') {
+    scheduleReminder(state.reminder.time)
+  }
+})
 
 const activeView = ref('tracker')
 const activeRightTab = ref('diet')

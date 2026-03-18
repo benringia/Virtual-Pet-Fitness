@@ -9,6 +9,7 @@ const BORDER_COLORS = {
   workout:  'border-blue-400',
   diet:     'border-green-400',
   weight:   'border-pink-400',
+  dayReset: 'border-indigo-400',
 }
 
 const EVOLUTION_MAP = {

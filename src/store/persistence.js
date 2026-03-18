@@ -21,6 +21,7 @@ const defaultState = {
   meals: [],
   proteinActivityLevel: 'active',
   petMood: 'idle',
+  reminder: { enabled: false, time: '20:00' },
 }
 
 export function loadState() {

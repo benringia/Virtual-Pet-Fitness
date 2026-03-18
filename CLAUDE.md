@@ -445,3 +445,35 @@ Logic in: src/utils/achievements.js
 Both components mounted at root level in App.vue.
 triggerAchievement() called from: xp.js, Pet.vue, ProteinCounter.vue,
 CaloriesTracker.vue, streak logic, WorkoutLogger.vue, DietHabits.vue, WeightLog.vue
+
+### Daily Notifications
+
+**Day Reset Toast:**
+- Fires once per day when daily reset is detected
+- Calls triggerAchievement('dayReset', message) after reset runs
+- Uses existing ToastNotification system
+
+**End of Day Reminder:**
+Component: src/components/ReminderSettings.vue
+Logic: src/utils/reminder.js
+Placed in sidebar above reset button.
+
+State addition:
+reminder: {
+  enabled: false,
+  time: '20:00'
+}
+
+Uses browser Notification API (no external services).
+scheduleReminder(time) uses setTimeout to fire at set time.
+Scheduled on app load in App.vue onMounted if enabled + permission granted.
+Gracefully handles permission denied state.
+
+**Countdown to Reset:**
+Displayed inside ReminderSettings.vue, below the time picker.
+Only visible when reminder.enabled is true.
+Updates every minute via setInterval (cleared on onUnmounted).
+Format: "X hrs Y mins until reset" or "X mins until reset" (under 1hr).
+Disappears when daily reset fires (currentDate updates to today).
+Uses local time only — no UTC. Midnight = next 00:00 local.
+Style: small text, indigo-400, no extra card/border.
