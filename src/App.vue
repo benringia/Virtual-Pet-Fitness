@@ -22,6 +22,21 @@
             </nav>
             <WeightLog />
             <ReminderSettings />
+            <div class="mx-2 mb-3">
+              <button
+                @click="handleLogRestDay"
+                :disabled="!restDayAllowed"
+                :class="restDayAllowed
+                  ? 'border-indigo-400 text-indigo-500 hover:bg-indigo-50'
+                  : 'border-gray-200 text-gray-300 cursor-not-allowed'"
+                class="w-full py-2 rounded-xl border text-sm font-medium transition-colors"
+              >
+                {{ restLogged ? '✓ Rest day logged' : '😴 Log Rest Day' }}
+              </button>
+              <p class="text-xs text-center text-gray-400 mt-1.5">
+                {{ restDaysThisWeek }} of 2 rest days used this week
+              </p>
+            </div>
           </StatsPanel>
         </div>
       </aside>
@@ -115,7 +130,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import Header from './components/Header.vue'
 import ToastNotification from './components/ToastNotification.vue'
 import EvolutionModal from './components/EvolutionModal.vue'
@@ -133,6 +148,17 @@ import ReminderSettings from './components/ReminderSettings.vue'
 import { state } from './store/state.js'
 import { checkDayRollover } from './utils/dates.js'
 import { scheduleReminder } from './utils/reminder.js'
+import { canLogRestDay, logRestDay, getRestDaysThisWeek } from './utils/restDay.js'
+
+const restDaysThisWeek = computed(() => getRestDaysThisWeek(state.restDays))
+const restDayAllowed = computed(() => canLogRestDay(state))
+const restLogged = ref(false)
+
+function handleLogRestDay() {
+  logRestDay(state)
+  restLogged.value = true
+  setTimeout(() => { restLogged.value = false }, 1500)
+}
 
 onMounted(() => {
   checkDayRollover(state)

@@ -22,6 +22,8 @@ const defaultState = {
   proteinActivityLevel: 'active',
   petMood: 'idle',
   reminder: { enabled: false, time: '20:00' },
+  restDays: [],
+  todayIsRestDay: false,
 }
 
 export function loadState() {

@@ -477,3 +477,23 @@ Format: "X hrs Y mins until reset" or "X mins until reset" (under 1hr).
 Disappears when daily reset fires (currentDate updates to today).
 Uses local time only — no UTC. Midnight = next 00:00 local.
 Style: small text, indigo-400, no extra card/border.
+
+### Rest Day Logging
+Component: src/components/WorkoutLogger.vue (button added below accordions)
+Logic: src/utils/restDay.js
+State:
+  - restDays: [] — persistent array of logged rest day date strings
+  - todayIsRestDay: false — resets daily
+
+Rules:
+  - Max 2 rest days per Mon–Sun week
+  - One log per day max
+  - Awards +8 XP on log
+  - Sets petMood to "resting" for the day
+  - Protects workout streak — treated same as a logged workout
+  - todayIsRestDay resets daily; restDays array never clears (history)
+
+Mood: "resting" added to mood.js — lowest priority, message: "taking it easy today 😴"
+
+Helper text in UI: "X of 2 rest days used this week"
+Button style: indigo outline (not filled), disabled when limit reached or already logged today

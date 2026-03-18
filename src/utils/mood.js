@@ -8,6 +8,7 @@ export const MOOD_MESSAGES = {
   hungry:  'feed me something! 🍽️',
   tired:   'i missed you... 😓',
   sad:     "let's get back on track 😢",
+  resting: 'taking it easy today 😴',
 }
 
 function getYesterday() {
@@ -61,5 +62,6 @@ export function computeMood(state, { streakBroke = false } = {}) {
     !!(state.dietHabits[yesterday] && Object.values(state.dietHabits[yesterday]).some(Boolean))
   if (!activeYesterday) return 'tired'
 
+  if (state.todayIsRestDay) return 'resting'
   return 'idle'
 }
