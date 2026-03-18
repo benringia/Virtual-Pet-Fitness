@@ -40,7 +40,6 @@
           <div class="w-full lg:flex-1 min-w-0">
             <Pet />
             <WorkoutLogger />
-            <CaloriesBurned />
           </div>
 
           <!-- Right panel -->
@@ -60,10 +59,35 @@
                 <div class="text-xs text-gray-400 leading-tight mt-0.5">diet<br>streak</div>
               </div>
             </div>
-            <DietHabits />
-            <MealLogger />
-            <CaloriesTracker />
-            <ProteinCounter />
+            <!-- Tabbed right panel card -->
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <!-- Tab bar -->
+              <div class="flex gap-1 p-3 border-b border-indigo-50">
+                <button
+                  v-for="tab in [
+                    { id: 'diet',     label: 'Diet' },
+                    { id: 'meals',    label: 'Meals' },
+                    { id: 'calories', label: 'Calories' },
+                    { id: 'protein',  label: 'Protein' },
+                  ]"
+                  :key="tab.id"
+                  @click="activeRightTab = tab.id"
+                  :class="activeRightTab === tab.id
+                    ? 'bg-indigo-500 text-white'
+                    : 'bg-indigo-50 text-indigo-400 hover:bg-indigo-100'"
+                  class="flex-1 text-xs font-medium py-1.5 px-2 rounded-full transition-colors"
+                >{{ tab.label }}</button>
+              </div>
+
+              <!-- Tab content -->
+              <div v-show="activeRightTab === 'diet'"><DietHabits /></div>
+              <div v-show="activeRightTab === 'meals'"><MealLogger /></div>
+              <div v-show="activeRightTab === 'calories'">
+                <CaloriesTracker />
+                <CaloriesBurned />
+              </div>
+              <div v-show="activeRightTab === 'protein'"><ProteinCounter /></div>
+            </div>
           </div>
 
         </div>
@@ -106,4 +130,5 @@ import { checkDayRollover } from './utils/dates.js'
 onMounted(() => checkDayRollover(state))
 
 const activeView = ref('tracker')
+const activeRightTab = ref('diet')
 </script>

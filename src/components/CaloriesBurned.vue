@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-sm mb-4 px-4 py-4">
+  <div class="bg-white rounded-2xl shadow-sm mb-4 px-4 pt-4 pb-4">
     <div class="flex items-center gap-2 mb-3">
       <span class="text-base">🏃</span>
       <h2 class="font-semibold text-gray-700">Calories Burned</h2>
@@ -30,8 +30,8 @@
       <p v-else class="mt-2 text-xs text-gray-400">log a workout to see estimates</p>
     </template>
 
-    <div class="border-t border-indigo-50 mt-4 pt-4">
-      <label class="block text-xs text-gray-400 mb-1.5">Got a fitness watch? Enter exact calories burned</label>
+    <div class="bg-indigo-50 rounded-xl p-4 mt-4 border border-indigo-100">
+      <p class="font-medium text-indigo-600 mb-2 text-sm">⌚ Got a fitness watch?</p>
 
       <!-- Add entry inputs -->
       <div class="flex gap-2 items-center mb-2">
@@ -40,7 +40,7 @@
           type="text"
           placeholder="activity name (optional)"
           maxlength="50"
-          class="flex-1 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
+          class="flex-1 min-w-0 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300 bg-white"
         />
         <input
           v-model="kcalInput"
@@ -48,12 +48,12 @@
           type="number"
           min="0"
           placeholder="e.g. 320 kcal"
-          class="w-32 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
+          class="flex-1 min-w-0 border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300 bg-white"
         />
         <button
           @click="addManualEntry"
           :disabled="!canAddEntry"
-          class="px-3 py-2 rounded-xl text-xs font-semibold transition-colors"
+          class="px-4 py-2 rounded-lg text-xs font-semibold transition-colors"
           :class="canAddEntry ? 'bg-indigo-500 text-white hover:bg-indigo-600' : 'bg-indigo-100 text-indigo-300 cursor-not-allowed'"
         >Add</button>
       </div>
@@ -63,7 +63,7 @@
         <div
           v-for="(entry, i) in manualEntries"
           :key="i"
-          class="flex justify-between items-center text-xs text-gray-500 bg-indigo-50 rounded-lg px-3 py-2"
+          class="flex justify-between items-center text-xs text-gray-500 bg-white rounded-lg px-3 py-2"
         >
           <span class="flex items-center text-indigo-500 font-medium">
             <span class="w-2 h-2 rounded-full bg-indigo-300 inline-block mr-2 shrink-0"></span>
@@ -71,7 +71,7 @@
           </span>
           <button
             @click="removeEntry(i)"
-            class="text-gray-300 hover:text-red-400 transition-colors"
+            class="text-red-400 hover:text-red-600 transition-colors"
             aria-label="Remove entry"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
