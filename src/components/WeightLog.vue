@@ -5,7 +5,7 @@
       class="w-full flex items-center justify-between mb-0 focus:outline-none"
       :aria-expanded="isOpen"
     >
-      <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase">⚖️ Weight Log</h2>
+      <h2 class="text-xs font-medium tracking-wide text-indigo-400 uppercase">⚖️ Weight Log</h2>
       <span class="text-gray-400 text-xs transition-transform duration-200" :class="isOpen ? 'rotate-180' : ''">▼</span>
     </button>
 
@@ -27,7 +27,7 @@
         min="1"
         step="0.1"
         placeholder="weight in kg"
-        class="w-full border border-indigo-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+        class="w-full border border-indigo-200 rounded-xl px-3 py-2 text-sm text-gray-400 focus:outline-none focus:border-indigo-400"
       />
       <input
         v-model.number="goalInput"
@@ -36,7 +36,7 @@
         step="0.1"
         placeholder="goal weight in kg"
         @change="saveGoal"
-        class="w-full border border-indigo-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-300"
+        class="w-full border border-indigo-100 rounded-xl px-3 py-2 text-sm text-gray-400 focus:outline-none focus:border-indigo-300"
       />
       <button
         @click="handleLog"
@@ -48,16 +48,16 @@
     <!-- Stats rows -->
     <div v-if="currentWeight !== null" class="flex flex-col gap-2 mb-4">
       <div class="bg-indigo-50 rounded-xl px-3 py-2 flex justify-between items-center">
-        <span class="text-xs text-gray-400">Current</span>
-        <span class="text-sm font-bold text-gray-700">{{ currentWeight }} <span class="text-xs font-normal text-gray-400">{{ state.weightUnit }}</span></span>
+        <span class="text-xs text-gray-400 uppercase tracking-wide">Current</span>
+        <span class="text-sm font-semibold text-indigo-700">{{ currentWeight }} <span class="text-xs font-normal text-gray-400">{{ state.weightUnit }}</span></span>
       </div>
       <div v-if="state.weightGoal" class="bg-indigo-50 rounded-xl px-3 py-2 flex justify-between items-center">
-        <span class="text-xs text-gray-400">Goal</span>
-        <span class="text-sm font-bold text-gray-700">{{ state.weightGoal }} <span class="text-xs font-normal text-gray-400">{{ state.weightUnit }}</span></span>
+        <span class="text-xs text-gray-400 uppercase tracking-wide">Goal</span>
+        <span class="text-sm font-semibold text-indigo-700">{{ state.weightGoal }} <span class="text-xs font-normal text-gray-400">{{ state.weightUnit }}</span></span>
       </div>
       <div v-if="diff !== null" class="rounded-xl px-3 py-2 flex justify-between items-center" :class="diffPositive ? 'bg-orange-50' : 'bg-green-50'">
-        <span class="text-xs text-gray-400">Difference</span>
-        <span class="text-sm font-bold" :class="diffPositive ? 'text-orange-400' : 'text-green-500'">
+        <span class="text-xs text-gray-400 uppercase tracking-wide">Difference</span>
+        <span class="text-sm font-semibold" :class="diffPositive ? 'text-emerald-500' : 'text-red-400'">
           {{ diffPositive ? '+' : '' }}{{ diff }} <span class="text-xs font-normal">{{ state.weightUnit }}</span>
         </span>
       </div>
@@ -66,7 +66,7 @@
     <!-- Streak badge -->
     <div v-if="streak > 0" class="flex items-center gap-2 mb-4 bg-yellow-50 border border-yellow-200 rounded-xl px-3 py-2">
       <span class="text-sm">🔥</span>
-      <span class="text-xs font-semibold text-yellow-700">{{ streak }}-day logging streak</span>
+      <span class="text-xs font-semibold text-amber-600">{{ streak }}-day logging streak</span>
       <span v-if="streak >= 7" class="ml-auto text-xs bg-yellow-200 text-yellow-800 rounded-full px-2 py-0.5 font-bold">+15 XP bonus!</span>
     </div>
 

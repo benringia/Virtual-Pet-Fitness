@@ -78,23 +78,11 @@
       </div>
 
       <!-- Divider -->
-      <hr class="border-gray-100 my-3" />
+      <hr class="border-gray-100 mt-3 mb-3" />
 
-      <!-- Recent activity -->
-      <p class="text-xs text-gray-400 uppercase tracking-widest mb-2">Recent activity</p>
-      <p v-if="!recentWorkouts.length" class="text-sm text-gray-300">
-        nothing yet – your first workout awaits! 🌸
-      </p>
-      <ul v-else class="space-y-1">
-        <li
-          v-for="(w, i) in recentWorkouts"
-          :key="i"
-          class="flex items-center justify-between text-sm"
-        >
-          <span class="text-gray-600">{{ w.activity ?? w.name }}</span>
-          <span class="text-indigo-500 font-medium text-xs">+{{ w.xp }} xp</span>
-        </li>
-      </ul>
+      <!-- Estimated burn -->
+      <p class="text-xs text-indigo-500 font-semibold uppercase tracking-wide mb-2">🔥 Estimated Calories Burned</p>
+      <CaloriesBurned />
     </div>
   </div>
 
@@ -158,6 +146,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import CaloriesBurned from './CaloriesBurned.vue'
 import { state } from '../store/state.js'
 import { WORKOUT_SUBTYPES, WORKOUT_META, WORKOUT_CAP, addXP } from '../utils/xp.js'
 import { todayStr, maybeSetStartDate } from '../utils/dates.js'
@@ -241,7 +230,6 @@ function logCustom() {
   setTimeout(() => { logged.value = false }, 1000)
 }
 
-const recentWorkouts = computed(() => [...state.workouts].reverse().slice(0, 5))
 </script>
 
 <style scoped>

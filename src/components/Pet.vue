@@ -7,6 +7,36 @@
         every step counts! 🌸
       </div>
 
+      <!-- Pet name / stage / level (top left) -->
+      <div class="absolute top-3 left-3 flex flex-col bg-white rounded-2xl px-4 py-3 shadow-md border border-indigo-100">
+        <!-- Name row -->
+        <div class="group flex items-center gap-1">
+          <template v-if="!editing">
+            <span class="text-lg font-bold text-indigo-700 tracking-tight leading-tight">{{ state.petName }}</span>
+            <button
+              @click="startEdit"
+              aria-label="Rename pet"
+              class="opacity-0 group-hover:opacity-100 cursor-pointer text-indigo-300 hover:text-indigo-500 transition-opacity ml-1 text-sm leading-none"
+            >✏️</button>
+          </template>
+          <template v-else>
+            <input
+              ref="inputEl"
+              v-model="editValue"
+              maxlength="20"
+              @keyup.enter="saveEdit"
+              @blur="saveEdit"
+              class="text-lg font-bold text-indigo-700 tracking-tight bg-transparent border-b border-indigo-400 focus:outline-none w-32 leading-tight"
+            />
+          </template>
+        </div>
+        <!-- Stage + level row -->
+        <div class="flex items-center gap-2 mt-1">
+          <span class="text-xs font-semibold uppercase tracking-widest text-indigo-400">{{ stage }}</span>
+          <span class="bg-indigo-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">lvl {{ state.level }}</span>
+        </div>
+      </div>
+
       <!-- Pet emoji -->
       <div class="text-9xl select-none mt-4" :class="animClass">{{ stageEmoji }}</div>
 
@@ -49,10 +79,26 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, nextTick } from 'vue'
 import { state } from '../store/state.js'
 import { getStageFromLevel, WORKOUT_META, XP_PER_LEVEL } from '../utils/xp.js'
 import { mood } from '../utils/pet.js'
+
+const editing = ref(false)
+const editValue = ref('')
+const inputEl = ref(null)
+
+function startEdit() {
+  editValue.value = state.petName
+  editing.value = true
+  nextTick(() => inputEl.value?.focus())
+}
+
+function saveEdit() {
+  const trimmed = editValue.value.trim()
+  state.petName = trimmed || state.petName
+  editing.value = false
+}
 
 const STAGE_EMOJI = { Egg: '🥚', Pup: '🐶', Blossom: '🌸', Fighter: '🥷', Queen: '👸' }
 const MOOD_OVERLAY = { idle: '', happy: '😊', excited: '✨', diet: '🥗', workout: '💪' }

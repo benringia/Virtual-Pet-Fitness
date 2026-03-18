@@ -1,37 +1,33 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-sm mb-4 px-4 pt-4 pb-4">
-    <div class="flex items-center gap-2 mb-3">
-      <span class="text-base">🏃</span>
-      <h2 class="font-semibold text-gray-700">Calories Burned</h2>
-      <span v-if="isManual" class="ml-auto text-xs bg-indigo-100 text-indigo-500 rounded-full px-2.5 py-0.5 font-medium">from fitness watch</span>
-    </div>
-
+  <div>
     <!-- Total -->
     <div class="mb-1">
-      <div class="text-xs text-gray-400 mb-1">{{ isManual ? 'manual entries' : 'estimated from workouts' }}</div>
-      <div class="flex items-baseline gap-1">
+      <div class="flex items-baseline gap-1.5">
         <span class="text-2xl font-bold text-indigo-500">{{ effectiveBurned }}</span>
         <span class="text-sm text-gray-400">kcal</span>
+        <span v-if="isManual" class="ml-1 text-xs bg-indigo-100 text-indigo-500 rounded-full px-2.5 py-0.5 font-medium">from fitness watch</span>
+        <span v-else class="text-xs text-gray-400">estimated</span>
       </div>
     </div>
 
     <!-- Workout breakdown (auto mode) -->
-    <template v-if="!isManual">
-      <div v-if="autoResult.items.length" class="mt-2 space-y-1 max-h-48 overflow-y-auto">
-        <div
-          v-for="(item, i) in autoResult.items"
-          :key="i"
-          class="flex justify-between text-xs text-gray-500 py-1 border-b border-indigo-50 last:border-0"
-        >
-          <span>{{ displayName(item.workout) }}</span>
-          <span class="text-indigo-400 font-medium">{{ item.kcal }} kcal</span>
-        </div>
+    <hr class="border-indigo-100 my-3" />
+    <p class="text-xs uppercase tracking-wide text-indigo-400 font-medium mb-2">Recent activities</p>
+    <div v-if="autoResult.items.length" class="space-y-1 max-h-48 overflow-y-auto">
+      <div
+        v-for="(item, i) in autoResult.items"
+        :key="i"
+        class="flex justify-between text-xs text-gray-500 py-1 border-b border-indigo-50 last:border-0"
+      >
+        <span>{{ displayName(item.workout) }}</span>
+        <span class="text-indigo-400 font-medium">{{ item.kcal }} kcal <span class="text-gray-400 font-normal">est.</span></span>
       </div>
-      <p v-else class="mt-2 text-xs text-gray-400">log a workout to see estimates</p>
-    </template>
+    </div>
+    <p v-else class="text-xs text-gray-400">log a workout to see estimates</p>
 
-    <div class="bg-indigo-50 rounded-xl p-4 mt-4 border border-indigo-100">
-      <p class="font-medium text-indigo-600 mb-2 text-sm">⌚ Got a fitness watch?</p>
+    <div class="bg-indigo-50 rounded-xl p-3 mt-3 border border-indigo-100">
+      <p class="font-medium text-indigo-600 text-sm">⌚ Have a fitness watch?</p>
+      <p class="text-xs text-indigo-400 mt-0.5 mb-2">Log your exact calories burned for more accuracy.</p>
 
       <!-- Add entry inputs -->
       <div class="flex gap-2 items-center mb-2">

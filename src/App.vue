@@ -84,7 +84,6 @@
               <div v-show="activeRightTab === 'meals'"><MealLogger /></div>
               <div v-show="activeRightTab === 'calories'">
                 <CaloriesTracker />
-                <CaloriesBurned />
               </div>
               <div v-show="activeRightTab === 'protein'"><ProteinCounter /></div>
             </div>
@@ -121,7 +120,7 @@ import CaloriesTracker from './components/CaloriesTracker.vue'
 import ProteinCounter from './components/ProteinCounter.vue'
 import WeightLog from './components/WeightLog.vue'
 import MealLogger from './components/MealLogger.vue'
-import CaloriesBurned from './components/CaloriesBurned.vue'
+
 import StatsPanel from './components/StatsPanel.vue'
 import ProgressDashboard from './components/ProgressDashboard.vue'
 import { state } from './store/state.js'
