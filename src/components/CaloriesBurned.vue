@@ -2,11 +2,13 @@
   <div>
     <!-- Total -->
     <div class="mb-1">
-      <div class="flex items-baseline gap-1.5">
-        <span class="text-2xl font-bold text-indigo-500">{{ effectiveBurned }}</span>
-        <span class="text-sm text-gray-400">kcal</span>
-        <span v-if="isManual" class="ml-1 text-xs bg-indigo-100 text-indigo-500 rounded-full px-2.5 py-0.5 font-medium">from fitness watch</span>
-        <span v-else class="text-xs text-gray-400">estimated</span>
+      <div class="flex items-baseline gap-1.5 mb-1">
+        <span class="text-2xl font-bold text-indigo-500">{{ totalBurned }}</span>
+        <span class="text-sm text-gray-400">kcal total</span>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-xs text-gray-400">{{ autoCalories }} kcal from activities</span>
+        <span v-if="hasWatchEntries" class="text-xs text-indigo-400 font-medium">{{ watchCalories }} kcal from fitness watch</span>
       </div>
     </div>
 
@@ -102,17 +104,14 @@ const manualEntries = computed(() => state.calories.burnedManual ?? [])
 
 const autoResult = computed(() => getTodayBurned(state.workouts, getTodayDate()))
 
-const isManual = computed(() => manualEntries.value.length > 0)
-
-const effectiveBurned = computed(() =>
-  isManual.value
-    ? manualEntries.value.reduce((s, e) => s + e.kcal, 0)
-    : autoResult.value.total
-)
+const watchCalories = computed(() => manualEntries.value.reduce((s, e) => s + e.kcal, 0))
+const autoCalories = computed(() => autoResult.value.total)
+const totalBurned = computed(() => autoCalories.value + watchCalories.value)
+const hasWatchEntries = computed(() => manualEntries.value.length > 0)
 
 const canAddEntry = computed(() => kcalInput.value !== '' && +kcalInput.value > 0)
 
-watch(effectiveBurned, val => { state.calories.burned = val }, { immediate: true })
+watch(totalBurned, val => { state.calories.burned = val }, { immediate: true })
 
 function addManualEntry() {
   if (!canAddEntry.value) return

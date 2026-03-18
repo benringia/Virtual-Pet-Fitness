@@ -16,7 +16,7 @@ Use the DocsExplorer subagent for efficient documentation lookup.
 
 ## Project Overview
 
-Virtual Pet Fitness is a **gamified fitness tracker web app** — client-only, no backend, no auth, no external DB.
+Petfit is a **gamified fitness tracker web app** — client-only, no backend, no auth, no external DB.
 
 Users log workouts, calories, and diet habits to evolve a virtual pet through stages:
 
@@ -497,3 +497,26 @@ Mood: "resting" added to mood.js — lowest priority, message: "taking it easy t
 
 Helper text in UI: "X of 2 rest days used this week"
 Button style: indigo outline (not filled), disabled when limit reached or already logged today
+
+### Weekly Report
+Component: src/components/WeeklyReportModal.vue
+Logic: src/utils/weeklyReport.js
+State: lastWeeklyReportShown: null — stores Monday date string of last auto-show
+
+Auto-pop: fires once every Monday on first app load of the week.
+Manual trigger: "📊 Weekly Report" button at top of Progress tab in 
+ProgressDashboard.vue.
+Requires manual dismissal (no auto-close).
+
+Report covers last Mon–Sun:
+- Workouts logged (X of 7 days)
+- Avg daily calorie deficit
+- Protein goal hit (X of 7 days)
+- Diet habits completion rate (%)
+- XP earned last week
+- Streak status (all 3 streaks)
+- Best day (most XP)
+- Summary line based on overall performance
+
+Style: center modal, white + indigo, scrollable on mobile.
+Follows same pattern as EvolutionModal.vue.

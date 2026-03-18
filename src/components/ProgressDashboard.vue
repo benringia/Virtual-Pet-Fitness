@@ -1,5 +1,15 @@
 <template>
-  <div class="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
+  <div>
+    <div class="mb-4">
+      <button
+        @click="showWeeklyReport = true"
+        class="w-full border border-indigo-300 text-indigo-500 hover:bg-indigo-50 font-medium py-2.5 rounded-xl text-sm transition-colors"
+      >
+        📊 Weekly Report
+      </button>
+    </div>
+
+    <div class="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
 
     <!-- 1. Weight Trend -->
     <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4 lg:mb-0">
@@ -212,7 +222,8 @@
       </div>
     </section>
 
-  </div>
+    </div><!-- end grid -->
+  </div><!-- end wrapper -->
 </template>
 
 <script setup>
@@ -221,6 +232,7 @@ import { state } from '../store/state.js'
 import { WORKOUT_META, STAGE_LIST, getStageFromLevel } from '../utils/xp.js'
 import { todayStr } from '../utils/dates.js'
 import { computePredictions } from '../utils/predictions.js'
+import { showWeeklyReport } from '../utils/weeklyReport.js'
 
 const W = 300
 const H = 100

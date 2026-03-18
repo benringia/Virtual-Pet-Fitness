@@ -2,8 +2,8 @@ const STORAGE_KEY = 'flarepup-v5'
 
 const defaultState = {
   petName: "Petfit",
-  startDate: null,
-  currentDate: null,
+  startDate: localDateStr(),
+  currentDate: localDateStr(),
   xp: 0,
   level: 1,
   workouts: [],
@@ -24,6 +24,7 @@ const defaultState = {
   reminder: { enabled: false, time: '20:00' },
   restDays: [],
   todayIsRestDay: false,
+  lastWeeklyReportShown: null,
 }
 
 export function loadState() {
@@ -39,9 +40,14 @@ export function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
 
+function localDateStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export function resetState(state) {
   import('../utils/achievements.js').then(({ clearShownToday }) => clearShownToday())
-  const today = new Date().toISOString().slice(0, 10)
+  const today = localDateStr()
   console.log('[resetState] before:', JSON.stringify({
     meals: state.meals?.length,
     'calories.eaten': state.calories?.eaten,
@@ -71,6 +77,8 @@ export function resetState(state) {
     weightGoal: null,
     weightUnit: 'kg',
     meals: [],
+    restDays: [],
+    todayIsRestDay: false,
   })
   saveState(state)
   console.log('[resetState] after:', JSON.stringify({

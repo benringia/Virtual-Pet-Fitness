@@ -111,6 +111,7 @@
 
     <ToastNotification />
     <EvolutionModal />
+    <WeeklyReportModal />
 
     <!-- Mobile bottom nav (fixed) -->
     <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-indigo-100 flex z-20" aria-label="Mobile navigation">
@@ -145,10 +146,12 @@ import MealLogger from './components/MealLogger.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import ProgressDashboard from './components/ProgressDashboard.vue'
 import ReminderSettings from './components/ReminderSettings.vue'
+import WeeklyReportModal from './components/WeeklyReportModal.vue'
 import { state } from './store/state.js'
 import { checkDayRollover } from './utils/dates.js'
 import { scheduleReminder } from './utils/reminder.js'
 import { canLogRestDay, logRestDay, getRestDaysThisWeek } from './utils/restDay.js'
+import { showWeeklyReport, getThisMonday } from './utils/weeklyReport.js'
 
 const restDaysThisWeek = computed(() => getRestDaysThisWeek(state.restDays))
 const restDayAllowed = computed(() => canLogRestDay(state))
@@ -164,6 +167,14 @@ onMounted(() => {
   checkDayRollover(state)
   if (state.reminder.enabled && Notification.permission === 'granted') {
     scheduleReminder(state.reminder.time)
+  }
+  const today = new Date()
+  if (today.getDay() === 1) {
+    const thisMonday = getThisMonday()
+    if (state.lastWeeklyReportShown !== thisMonday) {
+      showWeeklyReport.value = true
+      state.lastWeeklyReportShown = thisMonday
+    }
   }
 })
 

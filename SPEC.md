@@ -8,7 +8,7 @@ Keep responses extremely concise. Focus on key information only. Avoid long expl
 
 # Project Overview
 
-Virtual Pet Fitness is a **gamified fitness tracker web app**.
+Petfit is a **gamified fitness tracker web app**.
 
 Users log workouts, calories, and diet habits to evolve a virtual pet through stages.
 
