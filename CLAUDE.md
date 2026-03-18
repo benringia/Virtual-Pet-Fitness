@@ -377,3 +377,27 @@ calories.burnedManual: null
 UI shows source label: "estimated from workouts" or "from fitness watch"
 Clearing manual input reverts to auto-calculated.
 CaloriesTracker.vue reads calories.burned — do not modify it.
+
+
+
+### Protein Counter
+
+Component: `src/components/ProteinCounter.vue`
+Placed in App.vue below CaloriesTracker.
+
+State addition:
+proteinActivityLevel: 'active' // 'sedentary' | 'active' | 'athlete'
+
+Protein goal = latest weight from weightLog × activity multiplier:
+- sedentary → 0.8g per kg
+- active → 1.6g per kg
+- athlete → 2.2g per kg
+
+Shows:
+- Activity level pill selector
+- Progress bar (consumed vs goal)
+- Total consumed / goal in grams
+- Breakdown list by meal (from meals state)
+
+If no weight logged, shows prompt to log weight first.
+Protein data sourced from meals array — no separate protein input.

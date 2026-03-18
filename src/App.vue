@@ -22,6 +22,7 @@
           <DietHabits />
           <MealLogger />
           <CaloriesTracker />
+          <ProteinCounter />
         </div>
       </div>
 
@@ -36,6 +37,7 @@ import Pet from './components/Pet.vue'
 import WorkoutLogger from './components/WorkoutLogger.vue'
 import DietHabits from './components/DietHabits.vue'
 import CaloriesTracker from './components/CaloriesTracker.vue'
+import ProteinCounter from './components/ProteinCounter.vue'
 import WeightLog from './components/WeightLog.vue'
 import MealLogger from './components/MealLogger.vue'
 import CaloriesBurned from './components/CaloriesBurned.vue'

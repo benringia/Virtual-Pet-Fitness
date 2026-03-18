@@ -19,6 +19,7 @@ const defaultState = {
   weightGoal: null,
   weightUnit: 'kg',
   meals: [],
+  proteinActivityLevel: 'active',
 }
 
 export function loadState() {
