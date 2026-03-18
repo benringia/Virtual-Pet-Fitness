@@ -401,3 +401,28 @@ Shows:
 
 If no weight logged, shows prompt to log weight first.
 Protein data sourced from meals array — no separate protein input.
+
+### Pet Mood System
+
+State addition:
+petMood: 'idle'
+
+Logic in: src/utils/mood.js via computeMood()
+
+Moods and triggers:
+- idle → default, no activity today
+- happy → meal logged or diet habit completed
+- excited → calorie goal hit or streak milestone (7, 14, 30 days)
+- strong → workout logged
+- hungry → no meal logged after 12pm
+- tired → no activity for more than 1 day
+- sad → streak just broke
+
+Priority: excited > strong > happy > hungry > tired > sad > idle
+
+computeMood() reads from state and returns highest priority mood.
+Called after every relevant user action.
+Result saved to state.petMood.
+
+Displayed in Pet.vue as a dynamic speech bubble (top right of pet card).
+Replaces the static "every step counts!" message.

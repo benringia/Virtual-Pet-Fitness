@@ -43,6 +43,7 @@ import { DIET_HABITS, addXP } from '../utils/xp.js'
 import { todayStr, maybeSetStartDate } from '../utils/dates.js'
 import { updateDietStreak } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
+import { computeMood, willStreakBreak } from '../utils/mood.js'
 
 const todayKey = todayStr()
 
@@ -54,8 +55,10 @@ function toggle(habit) {
   if (!wasChecked) maybeSetStartDate(state)
   state.dietHabits[todayKey][habit.key] = !wasChecked
   addXP(state, wasChecked ? -habit.xp : habit.xp)
+  const broke = willStreakBreak(state)
   updateDietStreak(state)
   const allDone = DIET_HABITS.every(h => state.dietHabits[todayKey][h.key])
   setMood(allDone ? 'excited' : 'diet')
+  state.petMood = computeMood(state, { streakBroke: broke })
 }
 </script>

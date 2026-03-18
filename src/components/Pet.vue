@@ -2,9 +2,16 @@
   <!-- Pet display card -->
   <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
     <div class="relative bg-linear-to-b from-indigo-100 to-indigo-50 px-4 pt-4 pb-6 flex flex-col items-center min-h-40">
-      <!-- Motivational pill -->
-      <div class="absolute top-3 right-3 bg-white border border-indigo-200 rounded-full px-3 py-1 text-xs text-indigo-400">
-        every step counts! 🌸
+      <!-- Mood speech bubble -->
+      <div class="bubble-float absolute top-3 right-3 inline-block" style="filter: drop-shadow(2px 2px 4px rgba(99, 102, 241, 0.15))">
+        <Transition name="mood-fade" mode="out-in">
+          <div :key="state.petMood" class="relative">
+            <div class="bg-white rounded-2xl px-4 py-2 border border-indigo-100">
+              <span class="text-sm font-medium text-indigo-500">{{ moodMessage }}</span>
+            </div>
+            <div style="position:absolute;left:-8px;top:58%;transform:translateY(-50%);width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:10px solid white;"></div>
+          </div>
+        </Transition>
       </div>
 
       <!-- Pet name / stage / level (top left) -->
@@ -38,7 +45,13 @@
       </div>
 
       <!-- Pet emoji -->
-      <div class="text-9xl select-none mt-4" :class="animClass">{{ stageEmoji }}</div>
+      <div class="relative mt-4 flex items-center justify-center">
+        <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;left:-4px;animation-delay:0s">✨</span>
+        <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;right:-4px;animation-delay:0.25s">✨</span>
+        <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;left:-4px;animation-delay:0.5s">✨</span>
+        <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;right:-4px;animation-delay:0.75s">✨</span>
+        <div class="text-9xl select-none" :class="nearEvolution ? 'bounce' : animClass">{{ stageEmoji }}</div>
+      </div>
 
       <!-- Mood overlay badge -->
       <div v-if="moodOverlay" class="mt-2 text-2xl">{{ moodOverlay }}</div>
@@ -83,6 +96,7 @@ import { computed, ref, nextTick } from 'vue'
 import { state } from '../store/state.js'
 import { getStageFromLevel, WORKOUT_META, XP_PER_LEVEL } from '../utils/xp.js'
 import { mood } from '../utils/pet.js'
+import { MOOD_MESSAGES } from '../utils/mood.js'
 
 const editing = ref(false)
 const editValue = ref('')
@@ -104,13 +118,26 @@ const STAGE_EMOJI = { Egg: '🥚', Pup: '🐶', Blossom: '🌸', Fighter: '🥷'
 const MOOD_OVERLAY = { idle: '', happy: '😊', excited: '✨', diet: '🥗', workout: '💪' }
 const MOOD_ANIM = { idle: '', happy: 'animate-bounce', excited: 'animate-bounce', diet: 'animate-pulse', workout: 'animate-bounce' }
 
+const xpIntoLevel = computed(() => state.xp % XP_PER_LEVEL)
+const evolutionLevels = [3, 6, 10, 15]
+const nearEvolution = computed(() => {
+  const nextEvolution = evolutionLevels.find(l => l > state.level)
+  return nextEvolution && state.level === nextEvolution - 1 && xpIntoLevel.value >= 75
+})
+
+const moodMessage = computed(() =>
+  nearEvolution.value
+    ? 'i can feel it... almost there! ✨'
+    : (MOOD_MESSAGES[state.petMood] ?? MOOD_MESSAGES.idle)
+)
+
 const stage = computed(() => getStageFromLevel(state.level))
 const stageEmoji = computed(() => STAGE_EMOJI[stage.value])
 const moodOverlay = computed(() => MOOD_OVERLAY[mood.value])
 const animClass = computed(() => MOOD_ANIM[mood.value])
 
-const xpProgress = computed(() => state.xp % XP_PER_LEVEL)
-const xpPct = computed(() => (xpProgress.value / XP_PER_LEVEL) * 100)
+const xpProgress = xpIntoLevel
+const xpPct = computed(() => (xpIntoLevel.value / XP_PER_LEVEL) * 100)
 
 const sessionCounts = computed(() => {
   const counts = { Strength: 0, Walking: 0, Boxing: 0, Tennis: 0 }
@@ -120,3 +147,35 @@ const sessionCounts = computed(() => {
   return counts
 })
 </script>
+
+<style scoped>
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+.bubble-float {
+  animation: float 1.6s ease-in-out infinite;
+}
+
+
+@keyframes bounce-pet {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.bounce { animation: bounce-pet 0.8s ease-in-out infinite; }
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.sparkle { animation: sparkle 1s ease-in-out infinite; }
+
+.mood-fade-enter-active,
+.mood-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.mood-fade-enter-from,
+.mood-fade-leave-to {
+  opacity: 0;
+}
+</style>

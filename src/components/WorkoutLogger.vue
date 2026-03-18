@@ -152,6 +152,7 @@ import { WORKOUT_SUBTYPES, WORKOUT_META, WORKOUT_CAP, addXP } from '../utils/xp.
 import { todayStr, maybeSetStartDate } from '../utils/dates.js'
 import { updateWorkoutStreak } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
+import { computeMood, willStreakBreak } from '../utils/mood.js'
 
 const MAIN_TYPES = ['Strength', 'Walking', 'Boxing', 'Tennis']
 
@@ -212,8 +213,10 @@ function logWorkout(type, sub) {
   maybeSetStartDate(state)
   state.workouts.push({ type, name: `${type} – ${sub.label}`, xp: sub.xp, date: today })
   addXP(state, sub.xp)
+  const broke = willStreakBreak(state)
   updateWorkoutStreak(state)
   setMood('workout')
+  state.petMood = computeMood(state, { streakBroke: broke })
 }
 
 function logCustom() {
@@ -223,8 +226,10 @@ function logCustom() {
   maybeSetStartDate(state)
   state.workouts.push({ type: 'Custom', activity: name, intensity: sub.label, xp: sub.xp, date: today })
   addXP(state, sub.xp)
+  const broke = willStreakBreak(state)
   updateWorkoutStreak(state)
   setMood('workout')
+  state.petMood = computeMood(state, { streakBroke: broke })
   activityName.value = ''
   logged.value = true
   setTimeout(() => { logged.value = false }, 1000)

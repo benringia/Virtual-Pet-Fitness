@@ -92,6 +92,7 @@ import { ref, computed } from 'vue'
 import { state } from '../store/state.js'
 import { addXP, MEAL_LOG_XP } from '../utils/xp.js'
 import { getTodayDate, maybeSetStartDate } from '../utils/dates.js'
+import { computeMood } from '../utils/mood.js'
 
 const TYPES = ['breakfast', 'lunch', 'dinner', 'snack']
 
@@ -128,6 +129,7 @@ function logMeal() {
   state.calories.eaten += calories
   addXP(state, MEAL_LOG_XP)
   maybeSetStartDate(state)
+  state.petMood = computeMood(state)
   mealName.value = ''
   mealCalories.value = null
   mealProtein.value = null

@@ -20,6 +20,7 @@ const defaultState = {
   weightUnit: 'kg',
   meals: [],
   proteinActivityLevel: 'active',
+  petMood: 'idle',
 }
 
 export function loadState() {
