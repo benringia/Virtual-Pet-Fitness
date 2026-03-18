@@ -44,6 +44,11 @@ import { todayStr, maybeSetStartDate } from '../utils/dates.js'
 import { updateDietStreak } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
 import { computeMood, willStreakBreak } from '../utils/mood.js'
+import { triggerAchievement } from '../utils/achievements.js'
+
+const STREAK_MILESTONES = [7, 14, 30]
+const STREAK_MESSAGES = { 7: 'One week of consistency', 14: 'Two weeks strong', 30: 'One month of dedication' }
+const STREAK_EMOJIS = { 7: '🔥', 14: '💫', 30: '👑' }
 
 const todayKey = todayStr()
 
@@ -58,6 +63,13 @@ function toggle(habit) {
   const broke = willStreakBreak(state)
   updateDietStreak(state)
   const allDone = DIET_HABITS.every(h => state.dietHabits[todayKey][h.key])
+  if (allDone) {
+    triggerAchievement('diet', '🥗', 'Diet complete!', 'All habits checked today', `diet-complete-${todayKey}`)
+  }
+  const dietCount = state.streaks.diet.count
+  if (STREAK_MILESTONES.includes(dietCount)) {
+    triggerAchievement('streak', STREAK_EMOJIS[dietCount], `${dietCount}-day streak!`, STREAK_MESSAGES[dietCount], `streak-${dietCount}-diet-${todayStr()}`)
+  }
   setMood(allDone ? 'excited' : 'diet')
   state.petMood = computeMood(state, { streakBroke: broke })
 }

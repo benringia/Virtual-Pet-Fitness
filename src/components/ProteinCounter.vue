@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { state } from '../store/state.js'
-import { getTodayDate } from '../utils/dates.js'
+import { getTodayDate, todayStr } from '../utils/dates.js'
+import { triggerAchievement } from '../utils/achievements.js'
 
 const MULTIPLIERS = { sedentary: 0.8, active: 1.6, athlete: 2.2 }
 const LEVELS = ['sedentary', 'active', 'athlete']
@@ -41,6 +42,16 @@ const progress = computed(() => {
 const isGoalMet = computed(() =>
   proteinGoal.value !== null && totalProtein.value >= proteinGoal.value
 )
+
+watch(totalProtein, (val) => {
+  if (proteinGoal.value === null) return
+  const todayKey = todayStr()
+  if (!state.dietHabits[todayKey]) state.dietHabits[todayKey] = {}
+  state.dietHabits[todayKey]['protein'] = val >= proteinGoal.value
+  if (val >= proteinGoal.value) {
+    triggerAchievement('protein', '💪', 'Protein goal hit!', 'You hit your daily protein target', `protein-${todayKey}`)
+  }
+})
 </script>
 
 <template>

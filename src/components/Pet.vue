@@ -92,11 +92,12 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick } from 'vue'
+import { computed, ref, nextTick, watch } from 'vue'
 import { state } from '../store/state.js'
 import { getStageFromLevel, WORKOUT_META, XP_PER_LEVEL } from '../utils/xp.js'
 import { mood } from '../utils/pet.js'
 import { MOOD_MESSAGES } from '../utils/mood.js'
+import { triggerEvolution } from '../utils/achievements.js'
 
 const editing = ref(false)
 const editValue = ref('')
@@ -138,6 +139,12 @@ const animClass = computed(() => MOOD_ANIM[mood.value])
 
 const xpProgress = xpIntoLevel
 const xpPct = computed(() => (xpIntoLevel.value / XP_PER_LEVEL) * 100)
+
+watch(() => state.level, (newLevel, oldLevel) => {
+  const newStage = getStageFromLevel(newLevel)
+  const oldStage = getStageFromLevel(oldLevel)
+  if (newStage !== oldStage) triggerEvolution(oldStage, newStage)
+})
 
 const sessionCounts = computed(() => {
   const counts = { Strength: 0, Walking: 0, Boxing: 0, Tennis: 0 }

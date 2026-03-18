@@ -115,6 +115,8 @@ import { ref, computed } from 'vue'
 const isOpen = ref(false)
 import { state } from '../store/state.js'
 import { logWeight, getWeightStreak } from '../utils/weight.js'
+import { triggerAchievement } from '../utils/achievements.js'
+import { todayStr } from '../utils/dates.js'
 
 const SVG_W = 300
 const SVG_H = 80
@@ -132,6 +134,9 @@ function handleLog() {
   if (!weightInput.value || weightInput.value <= 0) return
   logWeight(state, weightInput.value)
   weightInput.value = null
+  if (state.weightGoal && currentWeight.value !== null && currentWeight.value <= state.weightGoal) {
+    triggerAchievement('weight', '⚖️', 'Weight goal reached!', 'You hit your target weight', `weight-goal-${todayStr()}`)
+  }
 }
 
 const last30 = computed(() =>

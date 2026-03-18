@@ -426,3 +426,22 @@ Result saved to state.petMood.
 
 Displayed in Pet.vue as a dynamic speech bubble (top right of pet card).
 Replaces the static "every step counts!" message.
+
+### Achievement Notification System
+
+Two notification types:
+
+1. Toast (ToastNotification.vue) — bottom-right, auto-dismisses after 4s
+   Used for: level up, protein goal, calorie goal, streak milestones,
+   first workout, all diet habits completed, weight goal hit
+
+2. Evolution Modal (EvolutionModal.vue) — center screen, requires dismissal
+   Used for: pet evolution only (Egg→Pup, Pup→Blossom, Blossom→Fighter, Fighter→Queen)
+
+Logic in: src/utils/achievements.js
+- triggerAchievement(type, message) adds to notification queue
+- No duplicate toasts for same achievement within same day
+
+Both components mounted at root level in App.vue.
+triggerAchievement() called from: xp.js, Pet.vue, ProteinCounter.vue,
+CaloriesTracker.vue, streak logic, WorkoutLogger.vue, DietHabits.vue, WeightLog.vue

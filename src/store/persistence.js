@@ -37,6 +37,7 @@ export function saveState(state) {
 }
 
 export function resetState(state) {
+  import('../utils/achievements.js').then(({ clearShownToday }) => clearShownToday())
   const today = new Date().toISOString().slice(0, 10)
   console.log('[resetState] before:', JSON.stringify({
     meals: state.meals?.length,

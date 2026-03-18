@@ -153,6 +153,11 @@ import { todayStr, maybeSetStartDate } from '../utils/dates.js'
 import { updateWorkoutStreak } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
 import { computeMood, willStreakBreak } from '../utils/mood.js'
+import { triggerAchievement } from '../utils/achievements.js'
+
+const STREAK_MILESTONES = [7, 14, 30]
+const STREAK_MESSAGES = { 7: 'One week of consistency', 14: 'Two weeks strong', 30: 'One month of dedication' }
+const STREAK_EMOJIS = { 7: '🔥', 14: '💫', 30: '👑' }
 
 const MAIN_TYPES = ['Strength', 'Walking', 'Boxing', 'Tennis']
 
@@ -209,12 +214,23 @@ const sessionCounts = computed(() => {
   return counts
 })
 
+function fireWorkoutToasts() {
+  if (state.workouts.length === 1) {
+    triggerAchievement('workout', '🏋️', 'First workout!', 'Your journey begins', 'workout-first')
+  }
+  const count = state.streaks.workout.count
+  if (STREAK_MILESTONES.includes(count)) {
+    triggerAchievement('streak', STREAK_EMOJIS[count], `${count}-day streak!`, STREAK_MESSAGES[count], `streak-${count}-workout-${todayStr()}`)
+  }
+}
+
 function logWorkout(type, sub) {
   maybeSetStartDate(state)
   state.workouts.push({ type, name: `${type} – ${sub.label}`, xp: sub.xp, date: today })
   addXP(state, sub.xp)
   const broke = willStreakBreak(state)
   updateWorkoutStreak(state)
+  fireWorkoutToasts()
   setMood('workout')
   state.petMood = computeMood(state, { streakBroke: broke })
 }
@@ -228,6 +244,7 @@ function logCustom() {
   addXP(state, sub.xp)
   const broke = willStreakBreak(state)
   updateWorkoutStreak(state)
+  fireWorkoutToasts()
   setMood('workout')
   state.petMood = computeMood(state, { streakBroke: broke })
   activityName.value = ''

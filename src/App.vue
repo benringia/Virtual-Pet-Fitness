@@ -93,6 +93,9 @@
       </main>
     </div>
 
+    <ToastNotification />
+    <EvolutionModal />
+
     <!-- Mobile bottom nav (fixed) -->
     <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-indigo-100 flex z-20" aria-label="Mobile navigation">
       <button
@@ -113,6 +116,8 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import Header from './components/Header.vue'
+import ToastNotification from './components/ToastNotification.vue'
+import EvolutionModal from './components/EvolutionModal.vue'
 import Pet from './components/Pet.vue'
 import WorkoutLogger from './components/WorkoutLogger.vue'
 import DietHabits from './components/DietHabits.vue'

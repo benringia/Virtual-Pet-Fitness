@@ -1,3 +1,6 @@
+import { triggerAchievement } from './achievements.js'
+import { todayStr } from './dates.js'
+
 export const XP_PER_LEVEL = 100
 
 export const WORKOUT_TYPES = ['Strength', 'Walking', 'Boxing', 'Tennis', 'Custom']
@@ -89,6 +92,10 @@ export function getStageFromLevel(level) {
 }
 
 export function addXP(state, amount) {
+  const oldLevel = state.level
   state.xp += amount
   state.level = getLevelFromXP(state.xp)
+  if (state.level > oldLevel) {
+    triggerAchievement('levelup', '⬆️', 'Level up!', `You reached level ${state.level}`, `levelup-${state.level}-${todayStr()}`)
+  }
 }

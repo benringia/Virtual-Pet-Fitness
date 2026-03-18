@@ -51,13 +51,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { state } from '../store/state.js'
 import { getTodayDate } from '../utils/dates.js'
+import { triggerAchievement } from '../utils/achievements.js'
+import { todayStr } from '../utils/dates.js'
 
 const balance = computed(() =>
   state.calories.goal - state.calories.eaten
 )
 const isDeficit = computed(() => balance.value > 0)
+
+watch(isDeficit, (val, old) => {
+  if (val && !old) {
+    triggerAchievement('calorie', '🔥', 'Calorie goal reached!', 'Great job staying on track', `calorie-${todayStr()}`)
+  }
+})
 const todaysMeals = computed(() => state.meals.filter(m => m.date === getTodayDate()))
 </script>
