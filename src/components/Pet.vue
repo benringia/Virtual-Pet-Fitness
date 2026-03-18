@@ -1,25 +1,14 @@
 <template>
   <!-- Pet display card -->
-  <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
-    <div class="relative bg-linear-to-b from-indigo-100 to-indigo-50 px-4 pt-4 pb-6 flex flex-col items-center min-h-40">
-      <!-- Mood speech bubble -->
-      <div class="bubble-float absolute top-3 right-3 inline-block" style="filter: drop-shadow(2px 2px 4px rgba(99, 102, 241, 0.15))">
-        <Transition name="mood-fade" mode="out-in">
-          <div :key="state.petMood" class="relative">
-            <div class="bg-white rounded-2xl px-4 py-2 border border-indigo-100">
-              <span class="text-sm font-medium text-indigo-500">{{ moodMessage }}</span>
-            </div>
-            <div style="position:absolute;left:-8px;top:58%;transform:translateY(-50%);width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:10px solid white;"></div>
-          </div>
-        </Transition>
-      </div>
+  <div class="bg-indigo-50 rounded-2xl shadow-sm mb-4 p-4">
 
-      <!-- Pet name / stage / level (top left) -->
-      <div class="absolute top-3 left-3 flex flex-col bg-white rounded-2xl px-4 py-3 shadow-md border border-indigo-100">
-        <!-- Name row -->
+    <!-- Row 1: Name/stage/level + mood bubble -->
+    <div class="flex justify-between items-start mb-2">
+      <!-- Left: name + stage + level -->
+      <div class="flex flex-col">
         <div class="group flex items-center gap-1">
           <template v-if="!editing">
-            <span class="text-lg font-bold text-indigo-700 tracking-tight leading-tight">{{ state.petName }}</span>
+            <span class="text-base font-bold text-indigo-700 leading-tight capitalize">{{ state.petName }}</span>
             <button
               @click="startEdit"
               aria-label="Rename pet"
@@ -33,39 +22,47 @@
               maxlength="20"
               @keyup.enter="saveEdit"
               @blur="saveEdit"
-              class="text-lg font-bold text-indigo-700 tracking-tight bg-transparent border-b border-indigo-400 focus:outline-none w-32 leading-tight"
+              class="text-base font-bold text-indigo-700 bg-transparent border-b border-indigo-400 focus:outline-none w-32 leading-tight"
             />
           </template>
         </div>
-        <!-- Stage + level row -->
         <div class="flex items-center gap-2 mt-1">
           <span class="text-xs font-semibold uppercase tracking-widest text-indigo-400">{{ stage }}</span>
           <span class="bg-indigo-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">lvl {{ state.level }}</span>
         </div>
       </div>
 
-      <!-- Pet emoji -->
-      <div class="relative mt-4 flex items-center justify-center">
+      <!-- Right: mood bubble -->
+      <div class="bubble-float max-w-35 shrink-0 ml-2">
+        <Transition name="mood-fade" mode="out-in">
+          <div :key="state.petMood" class="bg-white rounded-xl border border-indigo-100 shadow-sm p-2">
+            <span class="text-xs font-medium text-indigo-500">{{ moodMessage }}</span>
+          </div>
+        </Transition>
+      </div>
+    </div>
+
+    <!-- Row 2: Pet emoji -->
+    <div class="flex flex-col items-center my-4">
+      <div class="relative flex items-center justify-center">
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;left:-4px;animation-delay:0s">✨</span>
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;right:-4px;animation-delay:0.25s">✨</span>
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;left:-4px;animation-delay:0.5s">✨</span>
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;right:-4px;animation-delay:0.75s">✨</span>
-        <div class="text-9xl select-none" :class="nearEvolution ? 'bounce' : animClass">{{ stageEmoji }}</div>
+        <div class="text-7xl select-none" :class="nearEvolution ? 'bounce' : animClass">{{ stageEmoji }}</div>
       </div>
-
-      <!-- Mood overlay badge -->
-      <div v-if="moodOverlay" class="mt-2 text-2xl">{{ moodOverlay }}</div>
+      <div v-if="moodOverlay" class="mt-1 text-2xl">{{ moodOverlay }}</div>
     </div>
 
-    <!-- XP bar -->
-    <div class="px-4 pb-3">
+    <!-- Row 3: XP bar -->
+    <div>
       <div class="flex justify-between text-xs text-gray-400 mb-1">
         <span>xp to next level</span>
         <span>{{ xpProgress }} / {{ XP_PER_LEVEL }}</span>
       </div>
-      <div class="w-full bg-indigo-100 rounded-full h-1.5">
+      <div class="w-full bg-indigo-100 rounded-full h-2">
         <div
-          class="bg-indigo-500 h-1.5 rounded-full transition-all duration-500"
+          class="bg-indigo-500 h-2 rounded-full transition-all duration-500"
           :style="{ width: xpPct + '%' }"
         />
       </div>

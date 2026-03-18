@@ -54,12 +54,12 @@
 
           <!-- Center column -->
           <div class="w-full lg:flex-1 min-w-0">
-            <Pet />
             <WorkoutLogger />
           </div>
 
           <!-- Right panel -->
           <div class="w-full lg:w-80 shrink-0">
+            <Pet />
             <!-- Mini stat cards -->
             <div class="grid grid-cols-3 gap-2 mb-4">
               <div class="bg-white rounded-2xl shadow-sm p-3 text-center">

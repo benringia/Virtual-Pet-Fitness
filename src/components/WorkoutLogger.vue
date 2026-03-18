@@ -43,46 +43,42 @@
     </button>
 
     <!-- Section body -->
-    <div v-show="showCustom" class="bg-white px-4 pb-4">
-      <!-- Custom input -->
-      <div class="pt-3">
-        <p class="text-xs text-gray-400 uppercase tracking-widest mb-2">What did you do today?</p>
-        <input
-          v-model="activityName"
-          type="text"
-          placeholder="enter activity"
-          class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:border-indigo-300"
-        />
-        <div class="flex items-center gap-2">
-          <button
-            v-for="sub in CUSTOM_SUBTYPES"
-            :key="sub.label"
-            @click="selectedCustom = sub"
-            class="text-xs px-3 py-1.5 rounded-full border transition-colors"
-            :class="selectedCustom?.label === sub.label
-              ? 'bg-indigo-500 text-white border-indigo-500'
-              : 'bg-indigo-50 text-gray-500 border-indigo-100 hover:border-indigo-300'"
-          >
-            {{ sub.label }} <span :class="selectedCustom?.label === sub.label ? 'text-white' : 'text-indigo-500'">+{{ sub.xp }}</span>
-          </button>
-          <div class="flex-1" />
-          <button
-            @click="logCustom"
-            :disabled="!activityName.trim()"
-            class="px-4 py-1.5 bg-indigo-500 text-white rounded-full text-sm font-medium transition-all duration-150 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed"
-            :class="logged ? 'scale-95 bg-indigo-700' : ''"
-          >
-            {{ logged ? '✓' : '+ log' }}
-          </button>
+    <div v-show="showCustom" class="bg-white px-4 pt-3 pb-4">
+      <CaloriesBurned>
+        <!-- Activity Logger -->
+        <div class="bg-indigo-50 rounded-xl p-4">
+          <p class="text-xs text-indigo-500 uppercase tracking-widest mb-2">What did you do today?</p>
+          <input
+            v-model="activityName"
+            type="text"
+            placeholder="enter activity"
+            class="w-full bg-white border border-indigo-200 rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+          <p class="text-xs text-indigo-400 uppercase tracking-wide mb-2">Intensity</p>
+          <div class="flex items-center gap-2">
+            <button
+              v-for="sub in CUSTOM_SUBTYPES"
+              :key="sub.label"
+              @click="selectedCustom = sub"
+              class="text-xs px-3 py-1.5 rounded-full border transition-colors"
+              :class="selectedCustom?.label === sub.label
+                ? 'bg-indigo-600 text-white border-transparent'
+                : 'bg-white border-indigo-200 text-indigo-400 hover:border-indigo-400'"
+            >
+              {{ sub.label }} <span :class="selectedCustom?.label === sub.label ? 'text-white' : 'text-indigo-500'">+{{ sub.xp }}</span>
+            </button>
+            <div class="flex-1" />
+            <button
+              @click="logCustom"
+              :disabled="!activityName.trim()"
+              class="px-4 py-1.5 bg-indigo-600 text-white rounded-full text-sm font-medium transition-all duration-150 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              :class="logged ? 'scale-95 bg-indigo-700' : ''"
+            >
+              {{ logged ? '✓' : '+ log' }}
+            </button>
+          </div>
         </div>
-      </div>
-
-      <!-- Divider -->
-      <hr class="border-gray-100 mt-3 mb-3" />
-
-      <!-- Estimated burn -->
-      <p class="text-xs text-indigo-500 font-semibold uppercase tracking-wide mb-2">🔥 Estimated Calories Burned</p>
-      <CaloriesBurned />
+      </CaloriesBurned>
     </div>
   </div>
 
@@ -163,9 +159,9 @@ const STREAK_EMOJIS = { 7: '🔥', 14: '💫', 30: '👑' }
 const MAIN_TYPES = ['Strength', 'Walking', 'Boxing', 'Tennis']
 
 const CUSTOM_SUBTYPES = [
-  { label: 'light',  xp: 15 },
-  { label: 'medium', xp: 25 },
-  { label: 'custom', xp: 20 },
+  { label: 'Easy',     xp: 15 },
+  { label: 'Moderate', xp: 25 },
+  { label: 'Intense',  xp: 20 },
 ]
 
 const TIPS = [

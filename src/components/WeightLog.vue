@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const isOpen = ref(false)
 import { state } from '../store/state.js'
@@ -130,10 +130,15 @@ function saveGoal() {
   state.weightGoal = goalInput.value > 0 ? goalInput.value : null
 }
 
+watch(() => state.weightGoal, (val) => {
+  if (val === null) goalInput.value = ''
+})
+
 function handleLog() {
   if (!weightInput.value || weightInput.value <= 0) return
   logWeight(state, weightInput.value)
   weightInput.value = null
+  goalInput.value = ''
   if (state.weightGoal && currentWeight.value !== null && currentWeight.value <= state.weightGoal) {
     triggerAchievement('weight', '⚖️', 'Weight goal reached!', 'You hit your target weight', `weight-goal-${todayStr()}`)
   }

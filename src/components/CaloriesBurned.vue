@@ -1,37 +1,55 @@
 <template>
   <div>
-    <!-- Total -->
-    <div class="mb-1">
-      <div class="flex items-baseline gap-1.5 mb-1">
-        <span class="text-2xl font-bold text-indigo-500">{{ totalBurned }}</span>
-        <span class="text-sm text-gray-400">kcal total</span>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <span class="text-xs text-gray-400">{{ autoCalories }} kcal from activities</span>
-        <span v-if="hasWatchEntries" class="text-xs text-indigo-400 font-medium">{{ watchCalories }} kcal from fitness watch</span>
-      </div>
+    <!-- Sub-tab bar -->
+    <div class="flex gap-4 mb-3 border-b border-gray-200">
+      <button
+        @click="activeTab = 'activities'"
+        class="text-sm font-medium pb-2 transition-colors -mb-px"
+        :class="activeTab === 'activities' ? 'text-indigo-600 font-bold border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'"
+      >📝 Log</button>
+      <button
+        @click="activeTab = 'watch'"
+        class="text-sm font-medium pb-2 transition-colors -mb-px"
+        :class="activeTab === 'watch' ? 'text-indigo-600 font-bold border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'"
+      >⌚ Watch</button>
     </div>
 
-    <!-- Workout breakdown (auto mode) -->
-    <hr class="border-indigo-100 my-3" />
-    <p class="text-xs uppercase tracking-wide text-indigo-400 font-medium mb-2">Recent activities</p>
-    <div v-if="autoResult.items.length" class="space-y-1 max-h-48 overflow-y-auto">
-      <div
-        v-for="(item, i) in autoResult.items"
-        :key="i"
-        class="flex justify-between text-xs text-gray-500 py-1 border-b border-indigo-50 last:border-0"
-      >
-        <span>{{ displayName(item.workout) }}</span>
-        <span class="text-indigo-400 font-medium">{{ item.kcal }} kcal <span class="text-gray-400 font-normal">est.</span></span>
+    <!-- Tab: Activities -->
+    <div v-show="activeTab === 'activities'">
+      <!-- Calories summary pills -->
+      <p class="text-xs uppercase tracking-wide text-gray-400 mb-2">🔥 Estimated Calories Burned</p>
+      <div class="flex flex-wrap gap-2 mb-3">
+        <span class="bg-indigo-50 text-indigo-600 rounded-full px-3 py-1 text-xs font-semibold">{{ totalBurned }} kcal total</span>
+        <span class="bg-indigo-50 text-gray-500 rounded-full px-3 py-1 text-xs">{{ autoCalories }} from activities</span>
+        <span v-if="hasWatchEntries" class="bg-indigo-50 text-gray-500 rounded-full px-3 py-1 text-xs">{{ watchCalories }} from watch</span>
       </div>
+
+      <!-- Activity Logger (injected from WorkoutLogger via slot) -->
+      <template v-if="$slots.default">
+        <hr class="border-gray-100 mb-3" />
+        <slot />
+      </template>
+
+      <!-- Recent Activities -->
+      <template v-if="autoResult.items.length">
+        <hr class="border-gray-100 my-3" />
+        <p class="text-xs uppercase tracking-wide text-gray-400 mb-2">Recent Activities</p>
+        <div class="space-y-1 max-h-48 overflow-y-auto">
+          <div
+            v-for="(item, i) in autoResult.items"
+            :key="i"
+            class="flex justify-between text-xs text-gray-500 py-1 border-b border-indigo-50 last:border-0"
+          >
+            <span>{{ displayName(item.workout) }}</span>
+            <span class="text-indigo-400 font-medium">{{ item.kcal }} kcal <span class="text-gray-400 font-normal">est.</span></span>
+          </div>
+        </div>
+      </template>
     </div>
-    <p v-else class="text-xs text-gray-400">log a workout to see estimates</p>
 
-    <div class="bg-indigo-50 rounded-xl p-3 mt-3 border border-indigo-100">
-      <p class="font-medium text-indigo-600 text-sm">⌚ Have a fitness watch?</p>
-      <p class="text-xs text-indigo-400 mt-0.5 mb-2">Log your exact calories burned for more accuracy.</p>
-
-      <!-- Add entry inputs -->
+    <!-- Tab: Watch -->
+    <div v-show="activeTab === 'watch'">
+      <p class="text-xs text-gray-400 mb-3">Log your exact calories burned for more accuracy.</p>
       <div class="flex gap-2 items-center mb-2">
         <input
           v-model="labelInput"
@@ -55,13 +73,11 @@
           :class="canAddEntry ? 'bg-indigo-500 text-white hover:bg-indigo-600' : 'bg-indigo-100 text-indigo-300 cursor-not-allowed'"
         >Add</button>
       </div>
-
-      <!-- Manual entries list -->
-      <div v-if="manualEntries.length" class="space-y-1 max-h-32 overflow-y-auto pr-3">
+      <div v-if="manualEntries.length" class="space-y-1 max-h-40 overflow-y-auto">
         <div
           v-for="(entry, i) in manualEntries"
           :key="i"
-          class="flex justify-between items-center text-xs text-gray-500 bg-white rounded-lg px-3 py-2"
+          class="flex justify-between items-center text-xs text-gray-500 bg-indigo-50 rounded-lg px-3 py-2"
         >
           <span class="flex items-center text-indigo-500 font-medium">
             <span class="w-2 h-2 rounded-full bg-indigo-300 inline-block mr-2 shrink-0"></span>
@@ -96,6 +112,8 @@ if (!Array.isArray(state.calories.burnedManual)) {
     typeof e === 'number' ? { label: '', kcal: e } : e
   )
 }
+
+const activeTab = ref('activities')
 
 const labelInput = ref('')
 const kcalInput = ref('')
