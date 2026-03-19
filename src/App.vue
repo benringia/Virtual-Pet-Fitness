@@ -99,7 +99,42 @@
       </aside>
 
       <!-- MAIN CONTENT -->
-      <main class="flex-1 min-w-0 overflow-y-auto pb-16 lg:pb-0 lg:pl-16">
+      <div class="flex flex-col flex-1 min-w-0 lg:pl-16">
+      <!-- Top header bar -->
+      <header class="flex items-center justify-between px-6 py-3 sticky top-0 z-10">
+        <!-- Left: Page title -->
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium">{{ timeGreeting }}</p>
+          <h1 class="text-xl font-bold text-gray-800 leading-tight">
+            Welcome back, <span class="text-indigo-600 capitalize">{{ state.petName || 'Flarepup' }}</span> 👋
+          </h1>
+        </div>
+        <!-- Center: Search bar (placeholder) -->
+        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 w-64">
+          <svg class="w-4 h-4 text-gray-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" placeholder="Search..." class="bg-transparent text-xs text-gray-500 placeholder-gray-400 outline-none w-full" disabled/>
+        </div>
+        <!-- Right: Notification + Avatar (placeholders) -->
+        <div class="flex items-center gap-3">
+          <button class="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" title="Coming soon">
+            <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full"/>
+          </button>
+          <div class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-xl px-2 py-1 transition-colors" title="Coming soon">
+            <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
+              <span class="text-xs font-semibold text-indigo-600">{{ (state.petName || 'F')[0].toUpperCase() }}</span>
+            </div>
+            <span class="text-xs font-medium text-gray-700">{{ state.petName || 'Flarepup' }}</span>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1 min-w-0 overflow-y-auto pb-16 lg:pb-0">
 
         <!-- Progress view -->
         <div v-if="activeView === 'progress'" class="p-4 lg:p-6">
@@ -116,6 +151,11 @@
               <!-- WorkoutLogger -->
               <div class="break-inside-avoid mb-4 w-full">
                 <WorkoutLogger />
+              </div>
+
+              <!-- MyWorkoutsPreview -->
+              <div class="break-inside-avoid mb-4 w-full">
+                <MyWorkoutsPreview />
               </div>
 
               <!-- StatsPanel (Your Journey) -->
@@ -179,35 +219,55 @@
             <!-- Activity Stats card -->
             <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
               <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Activity Stats</h3>
-              <!-- Workout type bars -->
-              <div class="space-y-2 mb-4">
-                <div v-for="wt in state.workoutTypes" :key="wt.id" class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500 w-16 truncate shrink-0">{{ wt.name }}</span>
-                  <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
-                    <div
-                      class="h-2 rounded-full transition-all duration-500"
-                      :style="{
-                        width: ((workoutSessionCounts[wt.name] ?? 0) / maxWorkoutSessions * 100) + '%',
-                        backgroundColor: wt.color
-                      }"
-                    />
-                  </div>
-                  <span class="text-xs font-semibold text-gray-600 w-5 text-right shrink-0">
-                    {{ workoutSessionCounts[wt.name] ?? 0 }}
+              <!-- Today's Activity donut -->
+              <div class="flex items-center gap-4 mb-4">
+                <div class="relative w-16 h-16 shrink-0">
+                  <svg viewBox="0 0 64 64" class="w-16 h-16 -rotate-90" aria-hidden="true">
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="#e0e7ff" stroke-width="6"/>
+                    <circle cx="32" cy="32" r="26" fill="none"
+                      stroke="#6366f1" stroke-width="6"
+                      stroke-linecap="round"
+                      :stroke-dasharray="`${Math.min((totalSessionsToday / 10), 1) * 163.4} 163.4`"
+                      class="transition-all duration-500"/>
+                  </svg>
+                  <span class="absolute inset-0 flex items-center justify-center text-sm font-bold text-indigo-600">
+                    {{ totalSessionsToday }}
                   </span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-700">Today's Activity</p>
+                  <p class="text-xs text-indigo-500 font-medium mt-0.5">{{ totalXpToday }} xp earned</p>
+                  <p class="text-xs text-gray-400 mt-0.5">
+                    {{ totalSessionsToday === 0 ? 'No activities yet 💪' : `${totalSessionsToday} of 10 sessions` }}
+                  </p>
                 </div>
               </div>
               <!-- Stat pills -->
               <div class="grid grid-cols-3 gap-2">
                 <div class="bg-indigo-50 rounded-xl p-2 text-center">
+                  <div class="flex justify-center mb-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-indigo-500">
+                      <path d="M12.452 3.516a.75.75 0 0 0-1.008.03l-.002.002-.01.01-.04.038a20.24 20.24 0 0 0-.592.625 22.668 22.668 0 0 0-1.382 1.755c-.656.944-1.312 2.12-1.677 3.383-.48 1.676-.328 3.572.875 5.097a.75.75 0 0 0 1.204-.897c-.814-1.093-.967-2.47-.582-3.77.218-.76.602-1.528 1.06-2.218.289.482.527 1.06.617 1.72a.75.75 0 0 0 1.45-.296c-.179-1.307-.771-2.412-1.52-3.271l-.032-.035.006-.01c.38-.6.812-1.154 1.186-1.591a.75.75 0 0 0-.553-1.572ZM10 1.25a.75.75 0 0 1 .624.334l.002.003.009.013.038.056c.033.05.082.124.143.22.122.19.295.468.49.808.39.68.858 1.62 1.178 2.65.643 2.08.58 4.638-1.359 6.977-.575.7-1.294 1.337-2.125 1.81a.75.75 0 0 1-.738-1.303c.648-.367 1.21-.862 1.664-1.437 1.569-1.907 1.637-3.957 1.086-5.73-.27-.875-.682-1.73-1.037-2.356A11.98 11.98 0 0 0 10 2.847a11.98 11.98 0 0 0-.575.448C9.07 3.7 8.66 4.556 8.39 5.431c-.551 1.773-.483 3.823 1.086 5.73.454.575 1.016 1.07 1.664 1.437a.75.75 0 0 1-.738 1.303c-.831-.473-1.55-1.11-2.125-1.81C6.338 9.752 6.275 7.192 6.918 5.113c.32-1.03.788-1.97 1.178-2.65.195-.34.368-.618.49-.809a6.77 6.77 0 0 1 .143-.22l.038-.055.009-.013.003-.004A.75.75 0 0 1 10 1.25Z" />
+                    </svg>
+                  </div>
                   <div class="text-base font-bold text-indigo-600">{{ state.streaks.workout.count }}</div>
                   <div class="text-[10px] text-gray-400 leading-tight mt-0.5">workout<br>streak</div>
                 </div>
                 <div class="bg-orange-50 rounded-xl p-2 text-center">
+                  <div class="flex justify-center mb-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-orange-500">
+                      <path d="M11.983 1.907a.75.75 0 0 0-1.292-.657l-8.5 9.5A.75.75 0 0 0 2.75 12h6.572l-1.305 6.093a.75.75 0 0 0 1.292.657l8.5-9.5A.75.75 0 0 0 17.25 8h-6.572l1.305-6.093Z" />
+                    </svg>
+                  </div>
                   <div class="text-base font-bold text-orange-500">{{ state.calories.eaten }}</div>
                   <div class="text-[10px] text-gray-400 leading-tight mt-0.5">kcal<br>today</div>
                 </div>
                 <div class="bg-emerald-50 rounded-xl p-2 text-center">
+                  <div class="flex justify-center mb-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-emerald-500">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
                   <div class="text-base font-bold text-emerald-600">{{ state.streaks.diet.count }}</div>
                   <div class="text-[10px] text-gray-400 leading-tight mt-0.5">diet<br>streak</div>
                 </div>
@@ -242,6 +302,7 @@
 
         </div>
       </main>
+      </div>
     </div>
 
     <ToastNotification />
@@ -295,6 +356,7 @@ import WeightLog from './components/WeightLog.vue'
 import TodayProgress from './components/TodayProgress.vue'
 import MealLogger from './components/MealLogger.vue'
 
+import MyWorkoutsPreview from './components/MyWorkoutsPreview.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import ProgressDashboard from './components/ProgressDashboard.vue'
 import ReminderSettings from './components/ReminderSettings.vue'
@@ -306,19 +368,27 @@ import { scheduleReminder } from './utils/reminder.js'
 import { canLogRestDay, logRestDay, getRestDaysThisWeek } from './utils/restDay.js'
 import { showWeeklyReport, getThisMonday } from './utils/weeklyReport.js'
 
+const timeGreeting = computed(() => {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+})
+
 const restDaysThisWeek = computed(() => getRestDaysThisWeek(state.restDays))
 const restDayAllowed = computed(() => canLogRestDay(state))
 
-const workoutSessionCounts = computed(() => {
-  const counts = {}
-  for (const wt of state.workoutTypes) counts[wt.name] = 0
-  for (const w of state.workouts) {
-    if (w.type in counts) counts[w.type]++
-  }
-  return counts
-})
-const maxWorkoutSessions = computed(() =>
-  Math.max(...state.workoutTypes.map(wt => workoutSessionCounts.value[wt.name] ?? 0), 1)
+const todayStr = (() => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+})()
+
+const totalSessionsToday = computed(() =>
+  state.workouts.filter(w => w.date === todayStr).length
+)
+
+const totalXpToday = computed(() =>
+  state.workouts.filter(w => w.date === todayStr).reduce((s, w) => s + (w.xp || 0), 0)
 )
 const restLogged = ref(false)
 

@@ -684,3 +684,14 @@ Daily goals: Workouts=3, Habits=5, XP=300
 Today's workout summary: active types + session counts
 Pet motivation nudge: dynamic message based on state
 Local time only — no UTC.
+
+- Step 6 🔲 — Mobile responsive + bottom tab bar
+
+## Mobile layout
+- Sidebar: hidden on mobile (hidden lg:flex)
+- Bottom tab bar: fixed, lg:hidden
+  Items: Tracker / Progress / My Workouts / Profile (placeholder)
+- Masonry: columns-1 on mobile, columns-2 on lg+
+- Right column: stacks below masonry on mobile
+- Header: greeting only on mobile, full on lg+
+- Main content: pb-20 for bottom tab bar clearance

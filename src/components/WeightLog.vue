@@ -104,7 +104,7 @@
       Log your weight to see your trend chart.
     </p>
 
-    <div class="border-t border-gray-100 pt-4 flex flex-col gap-2">
+    <div v-if="showForm" class="border-t border-gray-100 pt-4 flex flex-col gap-2">
       <!-- Weight input -->
       <div class="flex flex-col gap-1">
         <label for="weight-input" class="text-xs font-medium text-gray-500">Today's weight</label>
@@ -141,7 +141,24 @@
       >
         Log Weight
       </button>
+      <button
+        @click="showForm = false"
+        class="w-full text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors py-1 mt-1"
+      >
+        cancel
+      </button>
     </div>
+    <button
+      v-else
+      @click="showForm = true"
+      class="mt-2 text-xs text-indigo-400 hover:text-indigo-600 cursor-pointer transition-colors flex items-center gap-1"
+    >
+      <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      Update weight
+    </button>
 
   </section>
 </template>
@@ -156,6 +173,8 @@ import { todayStr } from '../utils/dates.js'
 const SVG_W = 300
 const SVG_H = 80
 const PAD = 10
+
+const showForm = ref(!state.weightLog.some(w => w.date === todayStr()))
 
 const weightInput = ref(null)
 const goalInput = ref(state.weightGoal)
@@ -173,6 +192,7 @@ function handleLog() {
   logWeight(state, weightInput.value)
   weightInput.value = null
   goalInput.value = ''
+  showForm.value = false
   if (state.weightGoal && currentWeight.value !== null && currentWeight.value <= state.weightGoal) {
     triggerAchievement('weight', '⚖️', 'Weight goal reached!', 'You hit your target weight', `weight-goal-${todayStr()}`)
   }

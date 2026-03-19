@@ -14,7 +14,9 @@
       "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"add button CTA discoverable inviting call-to-action\" --domain ux -n 5)",
       "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"newly created item visibility list filter\" --domain ux -n 5)",
       "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"feedback confirmation action success state\" --domain ux -n 5)",
-      "Bash(python scripts/search.py \"fitness tracker dashboard gamified stats cards premium\" --design-system -p \"Petfit\" -f markdown)"
+      "Bash(python scripts/search.py \"fitness tracker dashboard gamified stats cards premium\" --design-system -p \"Petfit\" -f markdown)",
+      "Bash(python skills/ui-ux-pro-max/scripts/search.py \"gamified fitness tracker virtual pet pastel playful\" --design-system -p \"Petfit\")",
+      "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"gamified fitness tracker virtual pet pastel playful\" --design-system -p \"Petfit\")"
     ]
   },
   "hooks": {

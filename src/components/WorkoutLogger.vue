@@ -1,23 +1,4 @@
 <template>
-  <!-- Day streak banner -->
-  <div class="bg-white rounded-2xl shadow-sm mb-3 px-4 py-3">
-    <div class="flex items-center justify-between">
-      <div>
-        <div class="text-3xl font-bold text-indigo-600 leading-none">{{ state.streaks.workout.count }}</div>
-        <div class="text-xs font-semibold text-gray-700 mt-1">day streak</div>
-        <div class="text-xs text-gray-400 mt-0.5">{{ streakSubtext }}</div>
-      </div>
-      <!-- SVG bar chart: last 7 days activity -->
-      <svg viewBox="0 0 76 36" class="w-20 h-9 shrink-0" aria-hidden="true">
-        <rect
-          v-for="(active, i) in last7Activity" :key="i"
-          :x="i * 11 + 1" :y="active ? 6 : 20" :width="8" :height="active ? 30 : 16"
-          :fill="active ? '#6366f1' : '#e0e7ff'" rx="2"
-        />
-      </svg>
-    </div>
-  </div>
-
   <!-- Tip banner -->
   <div class="bg-indigo-50 rounded-2xl mb-4 px-4 py-3 flex items-start gap-3">
     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-500 mt-0.5 shrink-0" viewBox="0 0 24 24"
@@ -425,24 +406,6 @@ const sessionCounts = computed(() => {
   return counts
 })
 
-const last7Activity = computed(() => {
-  const base = new Date(today)
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(base)
-    d.setDate(d.getDate() - (6 - i))
-    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-    return state.workouts.some(w => w.date === dateStr)
-  })
-})
-
-const streakSubtext = computed(() => {
-  const c = state.streaks.workout.count
-  if (c === 0) return 'log a workout to start!'
-  if (c < 3) return 'building momentum!'
-  if (c < 7) return 'great consistency!'
-  if (c < 14) return "you're on fire!"
-  return 'legendary streak!'
-})
 
 const todaySessionCount = computed(() =>
   state.workouts.filter(w => w.date === today).length
