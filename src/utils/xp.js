@@ -3,16 +3,6 @@ import { todayStr } from './dates.js'
 
 export const XP_PER_LEVEL = 100
 
-export const WORKOUT_TYPES = ['Strength', 'Walking', 'Boxing', 'Tennis', 'Custom']
-
-export const WORKOUT_XP = {
-  Strength: 30,
-  Walking:  15,
-  Boxing:   30,
-  Tennis:   20,
-  Custom:   15,
-}
-
 export const WORKOUT_SUBTYPES = {
   Strength: [
     { label: 'bodyweight', xp: 20 },

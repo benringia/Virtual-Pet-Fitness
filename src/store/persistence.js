@@ -7,6 +7,12 @@ const defaultState = {
   xp: 0,
   level: 1,
   workouts: [],
+  workoutTypes: [
+    { id: 'strength', name: 'Strength', color: '#f472b6', sessions: [] },
+    { id: 'walking',  name: 'Walking',  color: '#60a5fa', sessions: [] },
+    { id: 'boxing',   name: 'Boxing',   color: '#f87171', sessions: [] },
+    { id: 'tennis',   name: 'Tennis',   color: '#4ade80', sessions: [] },
+  ],
   dietHabits: {},
   calories: { eaten: 0, burned: 0, burnedManual: [], goal: 2000, date: null },
   streaks: {
@@ -65,6 +71,12 @@ export function resetState(state) {
     xp: 0,
     level: 1,
     workouts: [],
+    workoutTypes: [
+      { id: 'strength', name: 'Strength', color: '#f472b6', sessions: [] },
+      { id: 'walking',  name: 'Walking',  color: '#60a5fa', sessions: [] },
+      { id: 'boxing',   name: 'Boxing',   color: '#f87171', sessions: [] },
+      { id: 'tennis',   name: 'Tennis',   color: '#4ade80', sessions: [] },
+    ],
     dietHabits: {},
     calories: { eaten: 0, burned: 0, burnedManual: [], goal: 2000, date: today },
     streaks: {

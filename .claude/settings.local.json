@@ -7,7 +7,8 @@
       "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"gamified fitness tracker activity logger pastel\" --design-system -p \"Petfit\" -f markdown)",
       "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"accessibility touch interaction\" --domain ux)",
       "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"gamified fitness app sidebar playful clean indigo pastel\" --design-system -p \"Petfit\" -f markdown)",
-      "Bash(python skills/ui-ux-pro-max/scripts/search.py \"fitness tracker gamified dashboard workout accordion pastel indigo\" --design-system -p \"Petfit\")"
+      "Bash(python skills/ui-ux-pro-max/scripts/search.py \"fitness tracker gamified dashboard workout accordion pastel indigo\" --design-system -p \"Petfit\")",
+      "Bash(npm run:*)"
     ]
   },
   "hooks": {

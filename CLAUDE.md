@@ -520,3 +520,122 @@ Report covers last Mon–Sun:
 
 Style: center modal, white + indigo, scrollable on mobile.
 Follows same pattern as EvolutionModal.vue.
+
+### Workout Types — Dynamic Structure (Step 1 of refactor)
+State is being migrated from fixed workout keys to dynamic array.
+
+Current state has BOTH during migration:
+- `workouts` (old fixed keys — do not remove until Step 2)
+- `workoutTypes` (new dynamic array — source of truth going forward)
+
+New structure:
+workoutTypes: [
+  { id: 'strength', name: 'Strength', color: '#f472b6', sessions: [] },
+  { id: 'walking',  name: 'Walking',  color: '#60a5fa', sessions: [] },
+  { id: 'boxing',   name: 'Boxing',   color: '#f87171', sessions: [] },
+  { id: 'tennis',   name: 'Tennis',   color: '#4ade80', sessions: [] },
+]
+
+DO NOT delete `workouts` (old) until Step 2 migration is complete.
+DO NOT add external libraries.
+localStorage key: `flarepup-v5` — never change.
+
+
+### Workout Types — Dynamic Structure (Step 2 of refactor)
+Migration complete. All files now use `state.workoutTypes` instead 
+of hardcoded type names.
+
+## Current state of refactor
+- Step 1 ✅ — `workoutTypes` array added to state/persistence.js
+- Step 2 ✅ — All references migrated to dynamic workoutTypes
+- Step 3 🔲 — Add/Delete workout types UI
+- Step 4 🔲 — Custom subtypes per user-defined type
+- Step 5 🔲 — Fix weekly report + predictions for dynamic types
+- Step 6 🔲 — Polish + mute 0-session accordions
+
+## Key decisions made in Step 2
+- Workout entries keep `type: 'Strength'` shape (matches workoutType.name)
+- `openWorkout` ref uses `wt.id` (lowercase slug) not name string
+- WORKOUT_SUBTYPES and WORKOUT_META stay in xp.js as source of truth
+  for the 4 default types only
+- User-defined types will NOT have subtypes until Step 4
+- streaks.js, predictions.js, calories.js were NOT changed — 
+  they are type-agnostic
+
+## workoutTypes structure
+workoutTypes: [
+  { id: 'strength', name: 'Strength', color: '#f472b6', sessions: [] },
+  { id: 'walking',  name: 'Walking',  color: '#60a5fa', sessions: [] },
+  { id: 'boxing',   name: 'Boxing',   color: '#f87171', sessions: [] },
+  { id: 'tennis',   name: 'Tennis',   color: '#4ade80', sessions: [] },
+]
+
+## DO NOT
+- Delete `workouts` flat array (session history)
+- Change localStorage key `flarepup-v5`
+- Add external libraries
+- Hardcode type names anywhere — always loop state.workoutTypes
+
+
+### Workout Types — Dynamic Structure (Step 3 of refactor)
+Add/Delete custom workout types UI complete.
+
+## Current state of refactor
+- Step 1 ✅ — `workoutTypes` array added to state/persistence.js
+- Step 2 ✅ — All references migrated to dynamic workoutTypes
+- Step 3 ✅ — Add/Delete workout types UI
+- Step 4 🔲 — Custom subtypes per user-defined type
+- Step 5 🔲 — Fix weekly report + predictions for dynamic types
+- Step 6 🔲 — Polish + mute 0-session accordions
+
+## Add workout type
+- "+" button below last accordion
+- Inline form: name input + 6 color swatches
+- Preset colors: #f472b6, #60a5fa, #f87171, #4ade80, #fb923c, #a78bfa
+- slugify: name.toLowerCase().replace(/\s+/g, '-')
+- Validates: name required, no duplicates (case-insensitive)
+- Awards +5 XP on add
+- New type shape: { id, name, color, sessions: [] }
+
+## Delete workout type
+- Trash icon on accordion header, right side before chevron
+- Only visible on user-defined types (not default 4)
+- Default 4 (Strength/Walking/Boxing/Tennis) cannot be deleted
+- Inline confirmation: "Remove [name]? Past sessions are kept."
+- On confirm: removes from state.workoutTypes only
+- state.workouts history is NEVER deleted
+
+## Key rules
+- Do NOT delete `workouts` flat array (session history)
+- Do NOT change localStorage key `flarepup-v5`
+- Do not add external libraries
+- Always loop state.workoutTypes — never hardcode type names
+
+
+### Workout Types — Dynamic Structure (Step 4 of refactor)
+- Step 4 🔲 — Custom subtypes per user-defined type
+
+## Custom subtypes (user-defined types only)
+State shape: { id, name, color, sessions: [], subtypes: [] }
+subtypes: [{ label, xp }]
+Default 4 types still use WORKOUT_SUBTYPES from xp.js — never 
+add subtypes array to default types in workoutTypes.
+Max XP per subtype: 5–80.
+Duplicate subtype names not allowed (case-insensitive, per type).
+
+- Step 4 ✅ — Custom subtypes per user-defined type complete and verified
+
+
+- Step 5 🔲 — Fix weekly report + predictions for dynamic types
+
+## Weekly report + predictions (Step 5)
+Both weeklyReport.js and predictions.js updated to derive 
+workout types from state.workoutTypes dynamically.
+No hardcoded type names anywhere in either file.
+
+- Step 6 ✅ — Polish + mute 0-session accordions complete
+
+## Refactor complete ✅
+All 6 steps of dynamic workout types refactor done.
+Workout types are fully dynamic — users can add/delete types 
+and subtypes. Default 4 types unchanged.

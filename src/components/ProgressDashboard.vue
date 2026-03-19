@@ -280,7 +280,9 @@ function workoutLabel(entry) {
 }
 
 function workoutMeta(entry) {
-  return WORKOUT_META[entry.type] ?? { emoji: '🏃', abbr: entry.type }
+  if (WORKOUT_META[entry.type]) return WORKOUT_META[entry.type]
+  const wt = state.workoutTypes.find(t => t.name === entry.type)
+  return { emoji: '🏃', abbr: entry.type, dot: '', color: wt?.color }
 }
 
 function formatDate(dateStr) {
