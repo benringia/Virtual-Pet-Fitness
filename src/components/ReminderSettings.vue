@@ -61,13 +61,13 @@ onUnmounted(() => clearInterval(countdownInterval))
 </script>
 
 <template>
-  <div class="mx-2 mb-3 bg-indigo-50 rounded-2xl px-4 py-3 border border-indigo-100">
-    <div class="flex items-center justify-between mb-2">
+  <div class="bg-white/60 rounded-xl px-4 py-3 mx-2">
+    <div class="flex items-center justify-between min-h-11 mb-2">
       <span class="text-xs font-semibold text-indigo-700">Daily reminder</span>
       <button
         @click="onToggle"
         :class="state.reminder.enabled ? 'bg-indigo-500' : 'bg-gray-200'"
-        class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500"
+        class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500 cursor-pointer"
         role="switch"
         :aria-checked="state.reminder.enabled"
         aria-label="Enable daily reminder"
@@ -83,17 +83,17 @@ onUnmounted(() => clearInterval(countdownInterval))
       <input
         v-model="state.reminder.time"
         type="time"
-        class="w-full text-xs rounded-xl border border-indigo-200 bg-white px-3 py-1.5 text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+        class="w-full text-xs rounded-xl border border-indigo-200 bg-white px-3 py-2.5 text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
         aria-label="Reminder time"
       />
 
-      <p class="text-xs text-indigo-400">We'll remind you to log before the day resets</p>
-      <p v-if="state.currentDate !== null" class="text-xs text-indigo-300">{{ resetCountdown }}</p>
+      <p class="text-xs text-indigo-600">We'll remind you to log before the day resets</p>
+      <p v-if="state.currentDate !== null" class="text-xs text-indigo-600">{{ resetCountdown }}</p>
 
       <button
         v-if="permission === 'default'"
         @click="onRequestPermission"
-        class="w-full text-xs bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl py-1.5 transition-colors"
+        class="w-full text-xs bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl py-2.5 transition-colors cursor-pointer"
       >
         Request notification permission
       </button>

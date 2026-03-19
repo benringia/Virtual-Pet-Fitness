@@ -28,11 +28,11 @@
   >
     <!-- Section header -->
     <button
-      class="w-full flex items-center px-4 py-3 transition-colors duration-200"
+      class="w-full flex items-center px-4 py-3 min-h-11 transition-colors duration-200 cursor-pointer"
       :class="showCustom ? 'bg-indigo-50' : 'bg-white'"
       @click="showCustom = !showCustom"
     >
-      <span class="text-sm font-semibold text-gray-700">Activities</span>
+      <span class="text-sm font-semibold text-gray-700">⚡ Quick Log</span>
       <svg
         class="w-4 h-4 text-gray-400 ml-auto transition-transform duration-200"
         :class="{ 'rotate-180': showCustom }"
@@ -47,7 +47,7 @@
       <CaloriesBurned>
         <!-- Activity Logger -->
         <div class="bg-indigo-50 rounded-xl p-4">
-          <p class="text-xs text-indigo-500 uppercase tracking-widest mb-2">What did you do today?</p>
+          <p class="text-xs text-indigo-500 uppercase tracking-widest mb-2">Log any activity</p>
           <input
             v-model="activityName"
             type="text"
@@ -60,7 +60,7 @@
               v-for="sub in CUSTOM_SUBTYPES"
               :key="sub.label"
               @click="selectedCustom = sub"
-              class="text-xs px-3 py-1.5 rounded-full border transition-colors"
+              class="text-xs px-3 py-2 min-h-11 rounded-full border transition-colors cursor-pointer"
               :class="selectedCustom?.label === sub.label
                 ? 'bg-indigo-600 text-white border-transparent'
                 : 'bg-white border-indigo-200 text-indigo-400 hover:border-indigo-400'"
@@ -71,8 +71,8 @@
             <button
               @click="logCustom"
               :disabled="!activityName.trim()"
-              class="px-4 py-1.5 bg-indigo-600 text-white rounded-full text-sm font-medium transition-all duration-150 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed"
-              :class="logged ? 'scale-95 bg-indigo-700' : ''"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-150 text-white cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              :class="logged ? 'scale-95 bg-green-500' : 'bg-indigo-600 hover:bg-indigo-700'"
             >
               {{ logged ? '✓' : '+ log' }}
             </button>
@@ -82,23 +82,32 @@
     </div>
   </div>
 
+  <!-- Structured workouts section label -->
+  <div class="mb-1.5 mt-1 flex items-center gap-2 px-1">
+    <span class="text-[10px] font-semibold uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full">
+      Structured Workouts
+    </span>
+    <span class="text-[10px] text-gray-400">bonus XP for specific training</span>
+  </div>
+
   <!-- Workout type accordions -->
   <div class="space-y-2 mb-4">
     <div
       v-for="type in MAIN_TYPES"
       :key="type"
-      class="rounded-2xl shadow-sm overflow-hidden border transition-colors duration-200"
-      :class="openWorkout === type ? 'border-indigo-200' : 'border-transparent'"
+      class="rounded-2xl shadow-sm overflow-hidden border transition-all duration-200"
+      :class="openWorkout === type ? 'border border-indigo-100 border-l-4' : 'border border-transparent'"
+      :style="openWorkout === type ? { borderLeftColor: WORKOUT_ACCENT[type] } : {}"
     >
       <!-- Accordion header -->
       <button
-        class="w-full flex items-center gap-2 px-4 py-3 transition-colors duration-200"
+        class="w-full flex items-center gap-2 px-4 py-3 min-h-11 transition-colors duration-200 cursor-pointer"
         :class="openWorkout === type ? 'bg-indigo-50' : 'bg-white'"
         @click="openWorkout = openWorkout === type ? null : type"
       >
         <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="WORKOUT_META[type].dot" />
         <span class="text-sm font-semibold text-gray-700">{{ type }}</span>
-        <span class="text-xs text-gray-300 ml-1">{{ sessionCounts[type] }} sessions</span>
+        <span class="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium ml-1">{{ sessionCounts[type] }}</span>
         <svg
           class="w-4 h-4 text-gray-400 ml-auto transition-transform duration-200"
           :class="{ 'rotate-180': openWorkout === type }"
@@ -109,29 +118,30 @@
       </button>
 
       <!-- Accordion body -->
-      <div v-if="openWorkout === type" class="bg-white px-4 pb-3">
+      <div v-if="openWorkout === type" class="bg-white px-4 pb-3 border-t border-indigo-100">
         <!-- XP progress bar -->
-        <div class="mb-2">
-          <div class="flex justify-between text-xs text-gray-400 mb-1">
-            <span>{{ todayXP[type] }} / {{ WORKOUT_CAP }} xp today</span>
+        <div class="mb-3 mt-1">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-medium text-gray-500">XP today</span>
+            <span class="text-xs font-semibold text-indigo-600">{{ todayXP[type] }}<span class="text-gray-400 font-normal"> / {{ WORKOUT_CAP }}</span></span>
           </div>
-          <div class="w-full bg-indigo-100 rounded-full h-1">
+          <div class="w-full bg-indigo-100 rounded-full h-2">
             <div
-              class="bg-indigo-500 h-1 rounded-full transition-all duration-300"
+              class="bg-indigo-500 h-2 rounded-full transition-all duration-300"
               :style="{ width: Math.min((todayXP[type] / WORKOUT_CAP) * 100, 100) + '%' }"
             />
           </div>
         </div>
 
         <!-- Sub-type pills -->
-        <div class="flex flex-wrap gap-1">
+        <div class="flex flex-wrap gap-1.5">
           <button
             v-for="sub in WORKOUT_SUBTYPES[type]"
             :key="sub.label"
             @click="logWorkout(type, sub)"
-            class="text-xs px-2 py-1 rounded-full bg-indigo-50 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
+            class="text-xs px-3 py-2 min-h-11 rounded-full bg-white border border-indigo-100 shadow-sm text-gray-700 hover:border-indigo-400 hover:text-indigo-600 transition-colors cursor-pointer"
           >
-            {{ sub.label }} <span class="text-indigo-500">+{{ sub.xp }}</span>
+            {{ sub.label }} <span class="text-indigo-500 font-medium">+{{ sub.xp }}</span>
           </button>
         </div>
       </div>
@@ -157,6 +167,13 @@ const STREAK_MESSAGES = { 7: 'One week of consistency', 14: 'Two weeks strong', 
 const STREAK_EMOJIS = { 7: '🔥', 14: '💫', 30: '👑' }
 
 const MAIN_TYPES = ['Strength', 'Walking', 'Boxing', 'Tennis']
+
+const WORKOUT_ACCENT = {
+  Strength: '#f472b6',
+  Walking:  '#60a5fa',
+  Boxing:   '#f87171',
+  Tennis:   '#4ade80',
+}
 
 const CUSTOM_SUBTYPES = [
   { label: 'Easy',     xp: 15 },

@@ -1,12 +1,12 @@
 <template>
   <!-- Journey card -->
-  <div class="bg-white rounded-2xl shadow-sm mb-4 px-4 py-4">
+  <div class="bg-white/80 rounded-xl px-4 py-3 mx-2 mb-2">
     <div class="flex items-center gap-2 mb-1">
       <span class="text-base">🗓️</span>
       <h2 class="font-semibold text-gray-700">Your journey</h2>
     </div>
     <template v-if="formattedStart">
-      <p class="text-xs text-gray-400">Started: {{ formattedStart }}</p>
+      <p class="text-xs text-gray-600">Started: {{ formattedStart }}</p>
       <p class="text-sm font-bold text-indigo-500 mt-1">Day {{ dayNumber }}</p>
     </template>
     <p v-else class="text-xs text-gray-400">Log your first activity to start your journey 🌸</p>
@@ -15,14 +15,15 @@
   <slot />
 
   <!-- Reset button -->
+  <div class="border-t border-indigo-100/60 my-2 mx-2" />
   <div class="text-center mb-6">
     <button
       @click="showResetModal = true"
-      class="w-full py-2.5 rounded-xl bg-red-100 hover:bg-red-200 text-red-600 text-sm transition-colors"
+      class="text-xs text-red-400 hover:text-red-500 transition-colors hover:underline underline-offset-2 cursor-pointer"
     >
       🌸 reset pet &amp; start over
     </button>
-    <p class="text-xs text-indigo-400 mt-1">fresh start!</p>
+    <p class="text-xs text-indigo-600 mt-1">fresh start!</p>
   </div>
 
   <!-- Reset confirmation modal -->

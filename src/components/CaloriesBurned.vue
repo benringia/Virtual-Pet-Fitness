@@ -103,6 +103,7 @@ import { ref, computed, watch } from 'vue'
 import { state } from '../store/state.js'
 import { getTodayBurned } from '../utils/calories.js'
 import { getTodayDate } from '../utils/dates.js'
+import { addXP } from '../utils/xp.js'
 
 // Migrate old formats (null or array of numbers) to array of { label, kcal }
 if (!Array.isArray(state.calories.burnedManual)) {
@@ -134,6 +135,7 @@ watch(totalBurned, val => { state.calories.burned = val }, { immediate: true })
 function addManualEntry() {
   if (!canAddEntry.value) return
   state.calories.burnedManual.push({ label: labelInput.value.trim(), kcal: +kcalInput.value })
+  addXP(state, 5)
   labelInput.value = ''
   kcalInput.value = ''
 }
