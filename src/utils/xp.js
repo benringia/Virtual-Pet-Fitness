@@ -30,7 +30,7 @@ export const WORKOUT_SUBTYPES = {
   ],
 }
 
-export const WORKOUT_CAP = 150
+export const WORKOUT_CAP = 120
 
 export const WORKOUT_META = {
   Strength: { dot: 'bg-pink-400',  emoji: '💪', abbr: 'STR' },

@@ -1,67 +1,62 @@
 <template>
-  <!-- Journey card -->
-  <div class="bg-white/80 rounded-xl px-4 py-3 mx-2 mb-2">
-    <div class="flex items-center gap-2 mb-1">
-      <span class="text-base">🗓️</span>
-      <h2 class="font-semibold text-gray-700">Your journey</h2>
-    </div>
-    <template v-if="formattedStart">
-      <p class="text-xs text-gray-600">Started: {{ formattedStart }}</p>
-      <p class="text-sm font-bold text-indigo-500 mt-1">Day {{ dayNumber }}</p>
-    </template>
-    <p v-else class="text-xs text-gray-400">Log your first activity to start your journey 🌸</p>
-  </div>
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
 
-  <slot />
-
-  <!-- Reset button -->
-  <div class="border-t border-indigo-100/60 my-2 mx-2" />
-  <div class="text-center mb-6">
-    <button
-      @click="showResetModal = true"
-      class="text-xs text-red-400 hover:text-red-500 transition-colors hover:underline underline-offset-2 cursor-pointer"
-    >
-      🌸 reset pet &amp; start over
-    </button>
-    <p class="text-xs text-indigo-600 mt-1">fresh start!</p>
-  </div>
-
-  <!-- Reset confirmation modal -->
-  <Teleport to="body">
-    <div
-      v-if="showResetModal"
-      class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
-      @click.self="showResetModal = false"
-    >
-      <div class="bg-white rounded-2xl p-6 shadow-lg max-w-sm w-full mx-4">
-        <h2 class="font-medium text-gray-800 mb-2">Reset everything?</h2>
-        <p class="text-sm text-gray-500 mb-6">This will erase all your progress, workouts, and data. This cannot be undone.</p>
-        <div class="flex gap-3 justify-end">
-          <button
-            @click="showResetModal = false"
-            class="bg-indigo-50 text-indigo-600 rounded-xl px-5 py-2 text-sm font-medium hover:bg-indigo-100 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            @click="handleReset"
-            class="bg-red-100 text-red-600 rounded-xl px-5 py-2 text-sm font-medium hover:bg-red-200 transition-colors"
-          >
-            Reset
-          </button>
-        </div>
+    <!-- Header row -->
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-xs text-indigo-400 uppercase tracking-wider font-medium">Your Journey</p>
+        <h2 class="text-xl font-bold text-gray-800 mt-0.5">{{ state.petName || 'Flarepup' }}</h2>
+      </div>
+      <div class="bg-indigo-50 rounded-xl p-2">
+        <svg class="w-5 h-5" viewBox="10 8 96 86" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g transform="translate(10, 5)">
+            <circle cx="35" cy="18" r="10" fill="#6366f1"/>
+            <circle cx="62" cy="18" r="10" fill="#6366f1"/>
+            <circle cx="14" cy="30" r="8" fill="#6366f1"/>
+            <circle cx="83" cy="30" r="8" fill="#6366f1"/>
+            <circle cx="48" cy="52" r="32" fill="#a5b4fc"/>
+            <circle cx="38" cy="46" r="6" fill="#6366f1"/>
+            <circle cx="58" cy="46" r="6" fill="#6366f1"/>
+            <circle cx="48" cy="62" r="6" fill="#6366f1"/>
+          </g>
+        </svg>
       </div>
     </div>
-  </Teleport>
+
+    <!-- Stats grid -->
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="bg-indigo-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Day</p>
+        <p class="text-2xl font-bold text-indigo-600">{{ dayNumber ?? '—' }}</p>
+      </div>
+      <div class="bg-indigo-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Streak</p>
+        <p class="text-2xl font-bold text-indigo-600">{{ state.streaks.workout.count }}</p>
+      </div>
+    </div>
+
+    <!-- 7-segment streak bar -->
+    <div class="flex gap-1 mb-3" aria-hidden="true">
+      <div
+        v-for="i in 7"
+        :key="i"
+        :class="i <= Math.min(state.streaks.workout.count, 7) ? 'bg-indigo-500' : 'bg-indigo-100'"
+        class="h-1.5 flex-1 rounded-full transition-colors"
+      />
+    </div>
+
+    <!-- Start date -->
+    <p v-if="formattedStart" class="text-xs text-gray-400">Started {{ formattedStart }}</p>
+    <p v-else class="text-xs text-gray-400">Log your first activity to begin</p>
+
+  </div>
+  <slot />
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { state } from '../store/state.js'
-import { resetState } from '../store/persistence.js'
 import { getTodayDate, daysBetween, formatDate } from '../utils/dates.js'
-
-const showResetModal = ref(false)
 
 const dayNumber = computed(() =>
   state.startDate ? daysBetween(state.startDate, getTodayDate()) + 1 : null
@@ -69,9 +64,4 @@ const dayNumber = computed(() =>
 const formattedStart = computed(() =>
   state.startDate ? formatDate(state.startDate) : null
 )
-
-function handleReset() {
-  resetState(state)
-  showResetModal.value = false
-}
 </script>

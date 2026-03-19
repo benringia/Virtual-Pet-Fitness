@@ -1,49 +1,57 @@
 <template>
   <!-- Day streak banner -->
-  <div class="bg-white rounded-2xl shadow-sm mb-3 px-4 py-3 flex items-center gap-3">
-    <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-lg shrink-0">
-      {{ state.streaks.workout.count }}
-    </div>
-    <div>
-      <div class="text-sm font-semibold text-gray-700">day streak 🔥</div>
-      <div class="text-xs text-gray-400">
-        {{ state.streaks.workout.count > 0 ? 'keep it up!' : 'log a workout to start!' }}
+  <div class="bg-white rounded-2xl shadow-sm mb-3 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-3xl font-bold text-indigo-600 leading-none">{{ state.streaks.workout.count }}</div>
+        <div class="text-xs font-semibold text-gray-700 mt-1">day streak</div>
+        <div class="text-xs text-gray-400 mt-0.5">{{ streakSubtext }}</div>
       </div>
+      <!-- SVG bar chart: last 7 days activity -->
+      <svg viewBox="0 0 76 36" class="w-20 h-9 shrink-0" aria-hidden="true">
+        <rect
+          v-for="(active, i) in last7Activity" :key="i"
+          :x="i * 11 + 1" :y="active ? 6 : 20" :width="8" :height="active ? 30 : 16"
+          :fill="active ? '#6366f1' : '#e0e7ff'" rx="2"
+        />
+      </svg>
     </div>
   </div>
 
   <!-- Tip banner -->
-  <div class="border-l-4 border-indigo-300 bg-white rounded-r-2xl shadow-sm mb-4 px-4 py-2.5">
+  <div class="bg-indigo-50 rounded-2xl mb-4 px-4 py-3 flex items-start gap-3">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-500 mt-0.5 shrink-0" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+      <path d="M9 18h6"/><path d="M10 22h4"/>
+    </svg>
     <Transition name="tip-fade" mode="out-in">
-      <p :key="tipIndex" class="text-xs text-gray-500 italic">
-        <span class="text-indigo-500 font-semibold not-italic">tip:</span> {{ TIPS[tipIndex % TIPS.length] }}
+      <p :key="tipIndex" class="text-xs text-gray-700 leading-relaxed">
+        <span class="text-indigo-600 font-semibold">Tip: </span>{{ TIPS[tipIndex % TIPS.length] }}
       </p>
     </Transition>
   </div>
 
-  <!-- Custom & Recent collapsible -->
-  <div
-    class="rounded-2xl shadow-sm overflow-hidden border mb-4 transition-colors duration-200"
-    :class="showCustom ? 'border-indigo-200' : 'border-transparent'"
-  >
-    <!-- Section header -->
-    <button
-      class="w-full flex items-center px-4 py-3 min-h-11 transition-colors duration-200 cursor-pointer"
-      :class="showCustom ? 'bg-indigo-50' : 'bg-white'"
-      @click="showCustom = !showCustom"
-    >
-      <span class="text-sm font-semibold text-gray-700">⚡ Quick Log</span>
-      <svg
-        class="w-4 h-4 text-gray-400 ml-auto transition-transform duration-200"
-        :class="{ 'rotate-180': showCustom }"
-        viewBox="0 0 20 20" fill="currentColor"
-      >
-        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-      </svg>
-    </button>
-
-    <!-- Section body -->
-    <div v-show="showCustom" class="bg-white px-4 pt-3 pb-4">
+  <!-- Quick Log — always open -->
+  <div class="rounded-2xl shadow-sm overflow-hidden border border-indigo-100 mb-4">
+    <!-- Header: title + donut arc -->
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-b border-indigo-50">
+      <span class="text-sm font-semibold text-gray-700">Quick Log</span>
+      <!-- Donut arc: today sessions / goal 3 — r=12, circumference≈75.4 -->
+      <div class="relative flex items-center justify-center w-8 h-8">
+        <svg viewBox="0 0 32 32" class="w-8 h-8 -rotate-90" aria-hidden="true">
+          <circle cx="16" cy="16" r="12" fill="none" stroke="#e0e7ff" stroke-width="3.5"/>
+          <circle cx="16" cy="16" r="12" fill="none" stroke="#6366f1" stroke-width="3.5"
+            :stroke-dasharray="`${Math.min(todaySessionCount / 3, 1) * 75.4} 75.4`"
+            stroke-linecap="round"/>
+        </svg>
+        <span class="absolute text-[9px] font-bold text-indigo-600 leading-none">
+          {{ todaySessionCount }}
+        </span>
+      </div>
+    </div>
+    <!-- Body -->
+    <div class="bg-white px-4 pt-3 pb-4">
       <CaloriesBurned>
         <!-- Activity Logger -->
         <div class="bg-indigo-50 rounded-xl p-4">
@@ -60,12 +68,12 @@
               v-for="sub in CUSTOM_SUBTYPES"
               :key="sub.label"
               @click="selectedCustom = sub"
-              class="text-xs px-3 py-2 min-h-11 rounded-full border transition-colors cursor-pointer"
+              class="text-xs px-3 py-2 min-h-11 rounded-full border transition-colors cursor-pointer font-medium"
               :class="selectedCustom?.label === sub.label
                 ? 'bg-indigo-600 text-white border-transparent'
-                : 'bg-white border-indigo-200 text-indigo-400 hover:border-indigo-400'"
+                : 'bg-white border-indigo-200 text-indigo-500 hover:border-indigo-400'"
             >
-              {{ sub.label }} <span :class="selectedCustom?.label === sub.label ? 'text-white' : 'text-indigo-500'">+{{ sub.xp }}</span>
+              {{ sub.label }} <span :class="selectedCustom?.label === sub.label ? 'text-indigo-200' : 'text-indigo-400'">+{{ sub.xp }}</span>
             </button>
             <div class="flex-1" />
             <button
@@ -83,22 +91,34 @@
   </div>
 
   <!-- Structured workouts section label -->
-  <div class="mb-1.5 mt-1 flex items-center gap-2 px-1">
-    <span class="text-[10px] font-semibold uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full">
-      Structured Workouts
+  <div class="mb-2 mt-1 flex items-center gap-2 px-1">
+    <div class="flex items-center gap-1.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-500 shrink-0" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span class="text-[10px] font-semibold uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full">
+        Structured Workouts
+      </span>
+    </div>
+    <span v-if="todaySessionCount > 0" class="text-[10px] text-gray-400 ml-auto whitespace-nowrap">
+      {{ activeTypesToday }} type{{ activeTypesToday !== 1 ? 's' : '' }} · {{ todaySessionCount }} session{{ todaySessionCount !== 1 ? 's' : '' }} today
     </span>
-    <span class="text-[10px] text-gray-400">bonus XP for specific training</span>
+    <span v-else class="text-[10px] text-gray-400 ml-auto">bonus XP for specific training</span>
   </div>
 
   <!-- Workout type accordions -->
   <div class="space-y-2 mb-4">
     <div
-      v-for="wt in state.workoutTypes"
+      v-for="wt in visibleTypes"
       :key="wt.id"
-      class="rounded-2xl shadow-sm overflow-hidden border transition-all duration-200"
+      class="rounded-2xl shadow-sm hover:shadow-md overflow-hidden border transition-all duration-500"
       :class="[
         openWorkout === wt.id ? 'border border-indigo-100 border-l-4' : 'border border-transparent',
-        sessionCounts[wt.name] === 0 && openWorkout !== wt.id ? 'opacity-60' : 'opacity-100'
+        sessionCounts[wt.name] === 0 && openWorkout !== wt.id ? 'opacity-60' : 'opacity-100',
+        recentlyAddedId === wt.id ? 'ring-2 ring-indigo-400 ring-offset-1' : ''
       ]"
       :style="openWorkout === wt.id ? { borderLeftColor: wt.color } : {}"
     >
@@ -113,7 +133,7 @@
             :class="WORKOUT_META[wt.name]?.dot"
             :style="!WORKOUT_META[wt.name] ? { backgroundColor: wt.color } : {}"
           />
-          <span class="text-sm font-semibold text-gray-700">{{ wt.name }}</span>
+          <span class="text-sm font-semibold text-gray-700 capitalize">{{ wt.name }}</span>
           <span class="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium ml-1">{{ sessionCounts[wt.name] }}</span>
           <svg
             class="w-4 h-4 text-gray-400 ml-auto transition-transform duration-200"
@@ -145,8 +165,8 @@
 
       <!-- Accordion body -->
       <div v-if="openWorkout === wt.id" class="bg-white px-4 pb-3 border-t border-indigo-100">
-        <!-- XP progress bar -->
-        <div v-show="todayXP[wt.name] > 0" class="mb-3 mt-1">
+        <!-- XP progress bar — default types -->
+        <div v-if="DEFAULT_TYPE_IDS.includes(wt.id)" v-show="todayXP[wt.name] > 0" class="mb-3 mt-1">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-xs font-medium text-gray-500">XP today</span>
             <span class="text-xs font-semibold text-indigo-600">{{ todayXP[wt.name] }}<span class="text-gray-400 font-normal"> / {{ WORKOUT_CAP }}</span></span>
@@ -173,16 +193,29 @@
 
         <!-- Sub-type pills + add form — user-defined types -->
         <template v-else>
-          <p v-if="(wt.subtypes ?? []).length === 0" class="text-xs text-gray-400 italic py-2">No subtypes yet — add one below</p>
-          <div class="flex flex-wrap gap-1.5 mb-3">
+          <!-- XP progress bar — user-defined types with at least one subtype -->
+          <div v-if="(wt.subtypes ?? []).length > 0" class="mb-3 mt-1">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-medium text-gray-500">XP today</span>
+              <span class="text-xs font-semibold text-indigo-600">{{ todayXP[wt.name] ?? 0 }}<span class="text-gray-400 font-normal"> / {{ WORKOUT_CAP }}</span></span>
+            </div>
+            <div class="w-full bg-indigo-100 rounded-full h-2">
+              <div
+                class="bg-indigo-500 h-2 rounded-full transition-all duration-300"
+                :style="{ width: Math.min(((todayXP[wt.name] ?? 0) / WORKOUT_CAP) * 100, 100) + '%' }"
+              />
+            </div>
+          </div>
+          <p v-if="(wt.subtypes ?? []).length === 0 && showSubForm !== wt.id" class="text-xs text-gray-400 italic py-2">No subtypes yet — add one below</p>
+          <div class="flex flex-wrap gap-1.5 mt-3 mb-3">
             <div
               v-for="sub in (wt.subtypes ?? [])"
               :key="sub.label"
-              class="flex items-center text-xs rounded-full bg-white border border-indigo-100 shadow-sm hover:border-indigo-400 transition-colors"
+              class="inline-flex items-center text-xs rounded-full bg-white border border-indigo-100 shadow-sm hover:border-indigo-400 transition-colors"
             >
               <button
                 @click="logWorkout(wt.name, sub)"
-                class="px-3 py-2 min-h-11 text-gray-700 hover:text-indigo-600 cursor-pointer"
+                class="px-3 py-1.5 text-gray-700 hover:text-indigo-600 cursor-pointer"
               >
                 {{ sub.label }} <span class="text-indigo-500 font-medium">+{{ sub.xp }}</span>
               </button>
@@ -193,41 +226,71 @@
               >×</button>
             </div>
           </div>
+          <p v-if="(wt.subtypes ?? []).length >= 8" class="text-xs text-gray-400 mt-2">Max 8 subtypes reached</p>
           <!-- Add subtype form -->
-          <div class="flex items-center gap-2 pt-2 border-t border-indigo-50">
-            <input
-              v-model="newSubName"
-              @keydown.enter="addSubtype(wt)"
-              type="text"
-              maxlength="30"
-              placeholder="subtype name"
-              class="flex-1 text-xs border border-indigo-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300"
-            />
-            <input
-              v-model.number="newSubXp"
-              type="number"
-              min="5"
-              max="80"
-              class="w-16 text-xs border border-indigo-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300"
-            />
+          <div v-if="showSubForm === wt.id" class="mt-2 flex items-end gap-2">
+            <div class="flex flex-col flex-1">
+              <label class="text-xs text-indigo-400 uppercase tracking-wide mb-1 block">Subtype name</label>
+              <input
+                v-model="newSubName"
+                @keydown.enter="addSubtype(wt)"
+                type="text"
+                maxlength="30"
+                placeholder="subtype name"
+                class="text-xs border border-indigo-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+              />
+            </div>
+            <div class="flex flex-col">
+              <label class="text-xs text-indigo-400 uppercase tracking-wide mb-1 block">XP</label>
+              <input
+                v-model.number="newSubXp"
+                type="number"
+                min="5"
+                max="80"
+                class="w-16 text-xs border border-indigo-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+              />
+            </div>
             <button
               @click="addSubtype(wt)"
-              class="text-xs px-3 py-1.5 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer"
+              class="bg-indigo-600 text-white text-xs font-medium px-4 py-1.5 rounded-full hover:bg-indigo-700 transition-colors cursor-pointer"
             >Add</button>
           </div>
-          <p v-if="subError" class="text-xs text-red-500 mt-1">{{ subError }}</p>
+          <p v-if="subError && showSubForm === wt.id" class="text-xs text-red-500 mt-1">{{ subError }}</p>
+          <!-- Toggle button -->
+          <button
+            v-if="(wt.subtypes ?? []).length < 8"
+            @click="toggleSubForm(wt.id)"
+            class="mt-2 text-xs text-gray-400 hover:text-red-400 transition-colors cursor-pointer underline-offset-2 hover:underline"
+          >
+            <span v-if="showSubForm !== wt.id">+ add subtype</span>
+            <span v-else>cancel</span>
+          </button>
         </template>
       </div>
     </div>
   </div>
 
+  <!-- Show/hide inactive types toggle -->
+  <div v-if="inactiveTypeCount > 0" class="mb-2">
+    <button
+      @click="showAllTypes = !showAllTypes"
+      class="w-full text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 cursor-pointer transition-colors px-4 py-2 rounded-full text-center"
+    >
+      <span v-if="!showAllTypes">Show {{ inactiveTypeCount }} more ▾</span>
+      <span v-else>Hide inactive types ▴</span>
+    </button>
+  </div>
+
   <!-- Add workout type button -->
-  <div v-if="!showAddForm" class="flex justify-end mb-2">
+  <div v-if="!showAddForm" class="mb-2">
     <button
       @click="showAddForm = true"
-      class="text-sm px-3 py-1.5 rounded-full border border-indigo-300 text-indigo-500 hover:bg-indigo-50 transition-colors cursor-pointer"
+      class="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl border-2 border-dashed border-indigo-200 text-indigo-400 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 cursor-pointer"
     >
-      + type
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      <span class="text-sm font-medium">Add a custom workout type</span>
     </button>
   </div>
 
@@ -314,7 +377,6 @@ const selectedCustom = ref(CUSTOM_SUBTYPES[0])
 const activityName = ref('')
 const logged = ref(false)
 const openWorkout = ref(null)
-const showCustom = ref(true)
 
 const showAddForm = ref(false)
 const newTypeName = ref('')
@@ -325,6 +387,7 @@ const confirmDeleteId = ref(null)
 const newSubName = ref('')
 const newSubXp = ref(20)
 const subError = ref('')
+const showSubForm = ref(null)
 
 const tipIndex = ref(0)
 let tipTimer = null
@@ -334,7 +397,13 @@ onMounted(() => {
   tipTimer = setInterval(() => { tipIndex.value++ }, 10000)
 })
 
-onUnmounted(() => clearInterval(tipTimer))
+const recentlyAddedId = ref(null)
+let recentlyAddedTimer = null
+
+onUnmounted(() => {
+  clearInterval(tipTimer)
+  clearTimeout(recentlyAddedTimer)
+})
 
 const today = todayStr()
 
@@ -356,6 +425,46 @@ const sessionCounts = computed(() => {
   return counts
 })
 
+const last7Activity = computed(() => {
+  const base = new Date(today)
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(base)
+    d.setDate(d.getDate() - (6 - i))
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+    return state.workouts.some(w => w.date === dateStr)
+  })
+})
+
+const streakSubtext = computed(() => {
+  const c = state.streaks.workout.count
+  if (c === 0) return 'log a workout to start!'
+  if (c < 3) return 'building momentum!'
+  if (c < 7) return 'great consistency!'
+  if (c < 14) return "you're on fire!"
+  return 'legendary streak!'
+})
+
+const todaySessionCount = computed(() =>
+  state.workouts.filter(w => w.date === today).length
+)
+
+const activeTypesToday = computed(() =>
+  new Set(state.workouts.filter(w => w.date === today).map(w => w.type)).size
+)
+
+const showAllTypes = ref(false)
+const inactiveTypeCount = computed(() =>
+  state.workoutTypes.filter(wt =>
+    DEFAULT_TYPE_IDS.includes(wt.id) && sessionCounts.value[wt.name] === 0
+  ).length
+)
+const visibleTypes = computed(() => {
+  if (showAllTypes.value) return state.workoutTypes
+  return state.workoutTypes.filter(wt =>
+    !DEFAULT_TYPE_IDS.includes(wt.id) || sessionCounts.value[wt.name] > 0
+  )
+})
+
 function fireWorkoutToasts() {
   if (state.workouts.length === 1) {
     triggerAchievement('workout', '🏋️', 'First workout!', 'Your journey begins', 'workout-first')
@@ -369,8 +478,10 @@ function fireWorkoutToasts() {
 function logWorkout(type, sub) {
   subError.value = ''
   maybeSetStartDate(state)
-  state.workouts.push({ type, name: `${type} – ${sub.label}`, xp: sub.xp, date: today })
-  addXP(state, sub.xp)
+  const remaining = Math.max(0, WORKOUT_CAP - todayXP.value[type])
+  const xpToAward = Math.min(sub.xp, remaining)
+  state.workouts.push({ type, name: `${type} – ${sub.label}`, xp: xpToAward, date: today })
+  if (xpToAward > 0) addXP(state, xpToAward)
   const broke = willStreakBreak(state)
   updateWorkoutStreak(state)
   fireWorkoutToasts()
@@ -387,7 +498,12 @@ function addWorkoutType() {
   if (!name) { addError.value = 'Name is required'; return }
   const duplicate = state.workoutTypes.some(wt => wt.name.toLowerCase() === name.toLowerCase())
   if (duplicate) { addError.value = 'Type already exists'; return }
-  state.workoutTypes.push({ id: slugify(name), name, color: newTypeColor.value, sessions: [] })
+  const newId = slugify(name)
+  state.workoutTypes.push({ id: newId, name, color: newTypeColor.value, sessions: [] })
+  showAllTypes.value = true
+  recentlyAddedId.value = newId
+  clearTimeout(recentlyAddedTimer)
+  recentlyAddedTimer = setTimeout(() => { recentlyAddedId.value = null }, 5000)
   addXP(state, 5)
   newTypeName.value = ''
   newTypeColor.value = '#f472b6'
@@ -410,6 +526,8 @@ function removeWorkoutType(id) {
 
 function toggleAccordion(id) {
   openWorkout.value = openWorkout.value === id ? null : id
+  showSubForm.value = null
+  subError.value = ''
   newSubName.value = ''
   newSubXp.value = 20
   subError.value = ''
@@ -421,6 +539,7 @@ function addSubtype(wt) {
   if (!name) { subError.value = 'Name is required'; return }
   if (xp < 5 || xp > 80) { subError.value = 'XP must be 5–80'; return }
   const existing = wt.subtypes ?? []
+  if (existing.length >= 8) { subError.value = 'Maximum 8 subtypes reached'; return }
   if (existing.some(s => s.label.toLowerCase() === name.toLowerCase())) {
     subError.value = 'Already exists'
     return
@@ -429,6 +548,12 @@ function addSubtype(wt) {
   newSubName.value = ''
   newSubXp.value = 20
   subError.value = ''
+  showSubForm.value = null
+}
+
+function toggleSubForm(id) {
+  showSubForm.value = showSubForm.value === id ? null : id
+  if (showSubForm.value === null) subError.value = ''
 }
 
 function removeSubtype(wt, label) {

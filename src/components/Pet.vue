@@ -56,34 +56,17 @@
 
     <!-- Row 3: XP bar -->
     <div>
-      <div class="flex justify-between text-xs text-gray-400 mb-1">
+      <div class="flex justify-between text-xs text-gray-400 mb-1.5">
         <span>xp to next level</span>
-        <span>{{ xpProgress }} / {{ XP_PER_LEVEL }}</span>
+        <span class="font-semibold text-indigo-500">{{ xpProgress }} / {{ XP_PER_LEVEL }}</span>
       </div>
-      <div class="w-full bg-indigo-100 rounded-full h-2">
+      <div class="w-full bg-indigo-100 rounded-full h-3 overflow-hidden">
         <div
-          class="bg-indigo-500 h-2 rounded-full transition-all duration-500"
+          class="h-3 rounded-full transition-all duration-500 bg-linear-to-r from-indigo-400 to-indigo-600"
           :style="{ width: xpPct + '%' }"
         />
       </div>
-    </div>
-  </div>
-
-  <!-- Stats bubbles row -->
-  <div class="flex justify-between gap-2 mb-4">
-    <!-- Level -->
-    <div class="flex-1 bg-white rounded-2xl shadow-sm py-2 text-center">
-      <div class="text-base font-bold text-indigo-500">{{ state.level }}</div>
-      <div class="text-xs text-gray-400 uppercase tracking-wide">level</div>
-    </div>
-    <!-- Per-type session counts -->
-    <div
-      v-for="(meta, type) in WORKOUT_META"
-      :key="type"
-      class="flex-1 bg-white rounded-2xl shadow-sm py-2 text-center"
-    >
-      <div class="text-base font-bold text-gray-700">{{ sessionCounts[type] }}</div>
-      <div class="text-xs text-gray-400 uppercase tracking-wide">{{ meta.abbr }}</div>
+      <div class="text-right text-[10px] text-indigo-400 mt-1">{{ Math.round(xpPct) }}%</div>
     </div>
   </div>
 </template>
@@ -91,7 +74,7 @@
 <script setup>
 import { computed, ref, nextTick, watch } from 'vue'
 import { state } from '../store/state.js'
-import { getStageFromLevel, WORKOUT_META, XP_PER_LEVEL } from '../utils/xp.js'
+import { getStageFromLevel, XP_PER_LEVEL } from '../utils/xp.js'
 import { mood } from '../utils/pet.js'
 import { MOOD_MESSAGES } from '../utils/mood.js'
 import { triggerEvolution } from '../utils/achievements.js'
@@ -143,13 +126,6 @@ watch(() => state.level, (newLevel, oldLevel) => {
   if (newStage !== oldStage) triggerEvolution(oldStage, newStage)
 })
 
-const sessionCounts = computed(() => {
-  const counts = { Strength: 0, Walking: 0, Boxing: 0, Tennis: 0 }
-  for (const w of state.workouts) {
-    if (w.type in counts) counts[w.type]++
-  }
-  return counts
-})
 </script>
 
 <style scoped>

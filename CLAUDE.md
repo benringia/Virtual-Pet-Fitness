@@ -639,3 +639,48 @@ No hardcoded type names anywhere in either file.
 All 6 steps of dynamic workout types refactor done.
 Workout types are fully dynamic — users can add/delete types 
 and subtypes. Default 4 types unchanged.
+
+
+### Sidebar Redesign — Collapsible Rail Nav (Step 1 of redesign)
+- Step 1 🔲 — Rail nav shell
+- Step 2 🔲 — Clean sidebar (non-nav items removed)
+- Step 3 🔲 — Masonry content area
+- Step 4 🔲 — Weight Log, Reminder, Rest Day in masonry
+- Step 5 🔲 — Today's Progress card
+- Step 6 🔲 — Polish + mobile bottom nav
+
+## Rail nav specs
+- Collapsed: w-16 (64px), icons only
+- Expanded: w-60 (240px), icons + labels
+- Trigger: @mouseenter / @mouseleave
+- Transition: transition-all duration-300 ease-in-out
+- Top: Petfit logo (paw only collapsed, paw + wordmark expanded)
+- Nav: Tracker (Home), Progress (ChartBar), My Workouts (Fire)
+- Bottom: Logout placeholder + Reset text-link (visible expanded only)
+- Icons: Heroicons inline SVG only, 20px stroke-2
+- bg-indigo-50/50 border-r border-indigo-100
+- Mobile: unchanged (lg:flex hidden on mobile)
+- Step 1 ✅ — Rail nav shell complete
+- Step 2 🔲 — Clean sidebar (non-nav items removed)
+
+- Step 2 ✅ — Sidebar cleaned
+- Step 3 🔲 — Masonry content area
+
+- Step 3 ✅ — Masonry content area complete
+- Step 4 🔲 — Real components in masonry
+
+## Masonry layout
+CSS columns-based (no JS, no libs)
+Container: columns-1 lg:columns-2 gap-4
+Each card: break-inside-avoid mb-4 w-full
+
+- Step 4 ✅ — Real components in masonry complete
+- Step 5 🔲 — Today's Progress card
+
+## TodayProgress.vue
+Component: src/components/TodayProgress.vue
+3 SVG donut rings: Workouts (indigo) / Habits (emerald) / XP (amber)
+Daily goals: Workouts=3, Habits=5, XP=300
+Today's workout summary: active types + session counts
+Pet motivation nudge: dynamic message based on state
+Local time only — no UTC.

@@ -34,9 +34,9 @@
       <template v-if="autoResult.items.length">
         <hr class="border-gray-100 my-3" />
         <p class="text-xs uppercase tracking-wide text-gray-400 mb-2">Recent Activities</p>
-        <div class="space-y-1 max-h-48 overflow-y-auto">
+        <div class="space-y-1">
           <div
-            v-for="(item, i) in autoResult.items"
+            v-for="(item, i) in autoResult.items.slice(0, 3)"
             :key="i"
             class="flex justify-between text-xs text-gray-500 py-1 border-b border-indigo-50 last:border-0"
           >
@@ -44,6 +44,7 @@
             <span class="text-indigo-400 font-medium">{{ item.kcal }} kcal <span class="text-gray-400 font-normal">est.</span></span>
           </div>
         </div>
+        <p v-if="autoResult.items.length > 3" class="text-xs text-gray-400 mt-1">+ {{ autoResult.items.length - 3 }} more today</p>
       </template>
     </div>
 

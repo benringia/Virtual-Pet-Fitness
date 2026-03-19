@@ -48,7 +48,7 @@ const resetCountdown = computed(() => {
   const total = minsUntilReset.value
   const hrs = Math.floor(total / 60)
   const mins = total % 60
-  return hrs > 0 ? `${hrs} hrs ${mins} mins until reset` : `${mins} mins until reset`
+  return hrs > 0 ? `${hrs}h ${mins}m until reset` : `${mins}m until reset`
 })
 
 let countdownInterval = null
@@ -61,49 +61,64 @@ onUnmounted(() => clearInterval(countdownInterval))
 </script>
 
 <template>
-  <div class="bg-white/60 rounded-xl px-4 py-3 mx-2">
-    <div class="flex items-center justify-between min-h-11 mb-2">
-      <span class="text-xs font-semibold text-indigo-700">Daily reminder</span>
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+
+    <!-- Header + toggle row -->
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-xs text-indigo-400 uppercase tracking-wider font-medium">Daily Reset</p>
+        <h2 class="text-base font-semibold text-gray-800 mt-0.5">Reminder</h2>
+      </div>
       <button
         @click="onToggle"
-        :class="state.reminder.enabled ? 'bg-indigo-500' : 'bg-gray-200'"
-        class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500 cursor-pointer"
         role="switch"
         :aria-checked="state.reminder.enabled"
         aria-label="Enable daily reminder"
+        :class="state.reminder.enabled ? 'bg-indigo-500' : 'bg-gray-200'"
+        class="relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-indigo-400 cursor-pointer"
       >
         <span
-          :class="state.reminder.enabled ? 'translate-x-4' : 'translate-x-0.5'"
-          class="inline-block h-4 w-4 mt-0.5 rounded-full bg-white shadow transition-transform"
+          :class="state.reminder.enabled ? 'translate-x-5' : 'translate-x-0.5'"
+          class="inline-block h-5 w-5 mt-0.5 rounded-full bg-white shadow transition-transform"
         />
       </button>
     </div>
 
-    <div v-if="state.reminder.enabled" class="mt-2 space-y-2">
+    <!-- Enabled state -->
+    <div v-if="state.reminder.enabled" class="space-y-3">
+
+      <!-- Time input -->
       <input
         v-model="state.reminder.time"
         type="time"
-        class="w-full text-xs rounded-xl border border-indigo-200 bg-white px-3 py-2.5 text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
         aria-label="Reminder time"
+        class="w-full bg-white border border-indigo-200 rounded-xl px-4 py-3 text-gray-800 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 transition-shadow"
       />
 
-      <p class="text-xs text-indigo-600">We'll remind you to log before the day resets</p>
-      <p v-if="state.currentDate !== null" class="text-xs text-indigo-600">{{ resetCountdown }}</p>
+      <!-- Countdown block -->
+      <div v-if="state.currentDate !== null" class="bg-indigo-50 rounded-xl px-4 py-3">
+        <p class="text-xs text-gray-400 mb-0.5">Until daily reset</p>
+        <p class="text-lg font-bold text-gray-800">{{ resetCountdown }}</p>
+      </div>
+
+      <p class="text-xs text-gray-400">We'll remind you to log before the day resets</p>
 
       <button
         v-if="permission === 'default'"
         @click="onRequestPermission"
-        class="w-full text-xs bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl py-2.5 transition-colors cursor-pointer"
+        class="w-full text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl py-2.5 transition-colors cursor-pointer font-medium"
       >
-        Request notification permission
+        Allow notifications
       </button>
 
-      <p
-        v-if="permission === 'denied'"
-        class="text-xs text-red-400"
-      >
-        Notifications blocked. Enable them in your browser settings.
+      <p v-if="permission === 'denied'" class="text-xs text-red-400">
+        Notifications blocked. Enable in browser settings.
       </p>
+
     </div>
+
+    <!-- Disabled state hint -->
+    <p v-else class="text-xs text-gray-400">Enable to get a daily log reminder</p>
+
   </div>
 </template>
