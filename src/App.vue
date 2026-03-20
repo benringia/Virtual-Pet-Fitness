@@ -59,9 +59,12 @@
               <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Progress</span>
             </button>
 
-            <!-- My Workouts (placeholder) -->
+            <!-- My Workouts -->
             <button
-              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl text-white hover:bg-white/10 transition-colors duration-200 cursor-pointer"
+              @click="activeView = 'workouts'"
+              :aria-current="activeView === 'workouts' ? 'page' : undefined"
+              :class="activeView === 'workouts' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
+              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
               title="My Workouts"
             >
               <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -139,6 +142,11 @@
         <!-- Progress view -->
         <div v-if="activeView === 'progress'" class="p-4 lg:p-6">
           <ProgressDashboard />
+        </div>
+
+        <!-- Workouts view -->
+        <div v-if="activeView === 'workouts'">
+          <WorkoutsView />
         </div>
 
         <!-- Tracker view -->
@@ -402,6 +410,7 @@ import MealLogger from './components/MealLogger.vue'
 import MyWorkoutsPreview from './components/MyWorkoutsPreview.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import ProgressDashboard from './components/ProgressDashboard.vue'
+import WorkoutsView from './components/WorkoutsView.vue'
 import ReminderSettings from './components/ReminderSettings.vue'
 import WeeklyReportModal from './components/WeeklyReportModal.vue'
 import { state } from './store/state.js'
@@ -410,6 +419,7 @@ import { checkDayRollover } from './utils/dates.js'
 import { scheduleReminder } from './utils/reminder.js'
 import { canLogRestDay, logRestDay, getRestDaysThisWeek } from './utils/restDay.js'
 import { showWeeklyReport, getThisMonday } from './utils/weeklyReport.js'
+import { activeView } from './composables/useActiveView.js'
 
 const timeGreeting = computed(() => {
   const hour = new Date().getHours()
@@ -456,7 +466,7 @@ onMounted(() => {
   }
 })
 
-const activeView = ref('tracker')
+// activeView is imported from composables/useActiveView.js (shared with MyWorkoutsPreview)
 const activeRightTab = ref('diet')
 const railExpanded = ref(false)
 const showResetModal = ref(false)

@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { state } from '../store/state.js'
+import { activeView } from '../composables/useActiveView.js'
 
 const todayStr = (() => {
   const d = new Date()
@@ -95,6 +96,7 @@ const activeSummary = computed(() => {
 
     <!-- CTA button -->
     <button
+      @click="activeView = 'workouts'"
       class="w-full flex items-center justify-center gap-2
         py-2 rounded-xl border border-indigo-200
         text-indigo-500 text-xs font-medium

@@ -31,6 +31,10 @@ const defaultState = {
   restDays: [],
   todayIsRestDay: false,
   lastWeeklyReportShown: null,
+  workoutSets: [],
+  workoutSessions: [],
+  trainingCategory: 'bodybuilding',
+  workoutPrograms: {},
 }
 
 export function loadState() {
@@ -91,6 +95,10 @@ export function resetState(state) {
     meals: [],
     restDays: [],
     todayIsRestDay: false,
+    workoutSets: [],
+    workoutSessions: [],
+    trainingCategory: 'bodybuilding',
+    workoutPrograms: {},
   })
   saveState(state)
   console.log('[resetState] after:', JSON.stringify({

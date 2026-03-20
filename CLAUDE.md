@@ -697,3 +697,27 @@ Local time only — no UTC.
 - Right column: stacks below masonry on mobile
 - Header: greeting only on mobile, full on lg+
 - Main content: pb-20 for bottom tab bar clearance
+
+## Project Structure
+- `src/components/WorkoutsView.vue`: Main training dashboard. Remove 'Add Set' from individual Strength accordions.
+- `src/components/WorkoutCalendar.vue`: Must be a compact, modern horizontal mini-scroller or high-density grid.
+
+## Data Schema
+- `workoutSessions`: Array of `{ id, date, label, exercises: [] }`.
+- Exercise Object: `{ name, weight, sets, reps, oneRM }`.
+- Session Logger: Required fields: Session Label, Exercise Name, Weight, Sets, Reps.
+
+## Training Rules
+- 1RM fires immediately on session completion using the Epley formula: `w * (1 + r / 30)`.
+
+## Navigation Rules
+- `activeView` supports 'tracker', 'progress', and 'workouts'.
+- Default view remains 'tracker'.
+
+## In Progress
+- Build My Workouts view
+
+## Next Steps
+*(Empty)*
+
+> **GUARDRAIL:** The localStorage key MUST remain `flarepup-v5`. No exceptions.
