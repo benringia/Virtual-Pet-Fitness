@@ -56,9 +56,9 @@
       </div>
     </div>
 
-    <!-- Mini chart (last 7 entries) -->
-    <div v-if="last7.length >= 2" class="mb-4 bg-gray-50 rounded-xl p-3">
-      <p class="text-xs text-gray-400 mb-2">Last {{ last7.length }} entries</p>
+    <!-- Mini chart (1+ entries) -->
+    <div v-if="last7.length >= 1" class="mb-4 bg-gray-50 rounded-xl p-3">
+      <p class="text-xs text-gray-400 mb-2">Last {{ last7.length }} {{ last7.length === 1 ? 'entry' : 'entries' }}</p>
       <svg :viewBox="`0 0 ${SVG_W} ${SVG_H}`" class="w-full h-14" aria-hidden="true">
         <!-- Goal line -->
         <line
@@ -78,14 +78,20 @@
           :points="areaPoints"
           fill="url(#weight-fill)"
         />
-        <!-- Trend line -->
+        <!-- Trend line (2+ points) or horizontal placeholder (1 point) -->
         <polyline
+          v-if="chartCoords.length >= 2"
           :points="chartPoints"
           fill="none"
           stroke="#6366f1"
           stroke-width="2"
           stroke-linejoin="round"
           stroke-linecap="round"
+        />
+        <line
+          v-else-if="chartCoords.length === 1"
+          :x1="PAD" :y1="SVG_H / 2" :x2="SVG_W - PAD" :y2="SVG_H / 2"
+          stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"
         />
         <!-- Data dots -->
         <circle
@@ -94,71 +100,81 @@
           :cx="pt.x" :cy="pt.y" r="3"
           fill="#6366f1"
         />
-        <!-- Min / max labels -->
-        <text :x="SVG_W - 2" :y="minY + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ chartMin }}</text>
-        <text :x="SVG_W - 2" :y="maxY + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ chartMax }}</text>
+        <!-- Min / max labels (only meaningful with 2+ entries) -->
+        <template v-if="chartCoords.length >= 2">
+          <text :x="SVG_W - 2" :y="minY + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ chartMin }}</text>
+          <text :x="SVG_W - 2" :y="maxY + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ chartMax }}</text>
+        </template>
       </svg>
     </div>
 
-    <p v-else-if="!last7.length" class="text-xs text-gray-400 text-center py-2 mb-4">
+    <p v-else class="text-xs text-gray-400 text-center py-2 mb-4">
       Log your weight to see your trend chart.
     </p>
 
-    <div v-if="showForm" class="border-t border-gray-100 pt-4 flex flex-col gap-2">
-      <!-- Weight input -->
-      <div class="flex flex-col gap-1">
-        <label for="weight-input" class="text-xs font-medium text-gray-500">Today's weight</label>
-        <input
-          id="weight-input"
-          v-model.number="weightInput"
-          type="number"
-          min="1"
-          step="0.1"
-          :placeholder="`e.g. 72.5 ${state.weightUnit}`"
-          class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-shadow"
-        />
-      </div>
-      <!-- Goal input -->
-      <div class="flex flex-col gap-1">
-        <label for="goal-input" class="text-xs font-medium text-gray-500">
-          Goal weight <span class="font-normal text-gray-400">(optional)</span>
-        </label>
-        <input
-          id="goal-input"
-          v-model.number="goalInput"
-          type="number"
-          min="1"
-          step="0.1"
-          :placeholder="`e.g. 68 ${state.weightUnit}`"
-          @change="saveGoal"
-          class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-shadow"
-        />
+    <template v-if="!hasLoggedToday">
+      <div v-if="showForm" class="border-t border-gray-100 pt-4 flex flex-col gap-2">
+        <!-- Weight input -->
+        <div class="flex flex-col gap-1">
+          <label for="weight-input" class="text-xs font-medium text-gray-500">Today's weight</label>
+          <input
+            id="weight-input"
+            v-model.number="weightInput"
+            type="number"
+            min="1"
+            step="0.1"
+            :placeholder="`e.g. 72.5 ${state.weightUnit}`"
+            class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-shadow"
+          />
+        </div>
+        <!-- Goal input -->
+        <div class="flex flex-col gap-1">
+          <label for="goal-input" class="text-xs font-medium text-gray-500">
+            Goal weight <span class="font-normal text-gray-400">(optional)</span>
+          </label>
+          <input
+            id="goal-input"
+            v-model.number="goalInput"
+            type="number"
+            min="1"
+            step="0.1"
+            :placeholder="`e.g. 68 ${state.weightUnit}`"
+            @change="saveGoal"
+            class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-shadow"
+          />
+        </div>
+        <button
+          @click="handleLog"
+          :disabled="!weightInput || weightInput <= 0"
+          class="w-full bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-white rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-indigo-600 active:bg-indigo-700 transition-colors"
+        >
+          Log Weight
+        </button>
+        <button
+          @click="showForm = false"
+          class="w-full text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors py-1 mt-1"
+        >
+          cancel
+        </button>
       </div>
       <button
-        @click="handleLog"
-        :disabled="!weightInput || weightInput <= 0"
-        class="w-full bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-white rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-indigo-600 active:bg-indigo-700 transition-colors"
+        v-else
+        @click="showForm = true"
+        class="mt-2 text-xs text-indigo-400 hover:text-indigo-600 cursor-pointer transition-colors flex items-center gap-1"
       >
-        Log Weight
+        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Update weight
       </button>
-      <button
-        @click="showForm = false"
-        class="w-full text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors py-1 mt-1"
-      >
-        cancel
-      </button>
-    </div>
-    <button
-      v-else
-      @click="showForm = true"
-      class="mt-2 text-xs text-indigo-400 hover:text-indigo-600 cursor-pointer transition-colors flex items-center gap-1"
-    >
-      <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </template>
+    <div v-else class="border-t border-gray-100 pt-4 flex items-center gap-2 text-xs text-emerald-600">
+      <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5"/>
       </svg>
-      Update weight
-    </button>
+      Daily log complete
+    </div>
 
   </section>
 </template>
@@ -174,7 +190,11 @@ const SVG_W = 300
 const SVG_H = 80
 const PAD = 10
 
-const showForm = ref(!state.weightLog.some(w => w.date === todayStr()))
+const hasLoggedToday = computed(() =>
+  state.weightLog.some(w => w.date === todayStr())
+)
+
+const showForm = ref(true)
 
 const weightInput = ref(null)
 const goalInput = ref(state.weightGoal)
@@ -213,15 +233,27 @@ const diff = computed(() => {
 })
 const diffPositive = computed(() => diff.value !== null && diff.value > 0)
 
-const chartMin = computed(() => Math.min(...last7.value.map(e => e.weight)))
-const chartMax = computed(() => Math.max(...last7.value.map(e => e.weight)))
+const chartMin = computed(() => {
+  if (!last7.value.length) return 0
+  const raw = Math.min(...last7.value.map(e => e.weight))
+  const rawMax = Math.max(...last7.value.map(e => e.weight))
+  return raw === rawMax ? raw - 1 : raw
+})
+
+const chartMax = computed(() => {
+  if (!last7.value.length) return 0
+  const raw = Math.max(...last7.value.map(e => e.weight))
+  const rawMin = Math.min(...last7.value.map(e => e.weight))
+  return raw === rawMin ? raw + 1 : raw
+})
 
 const chartCoords = computed(() => {
-  if (last7.value.length < 2) return []
+  const n = last7.value.length
+  if (n === 0) return []
+  if (n === 1) return [{ x: SVG_W / 2, y: SVG_H / 2 }]
   const min = chartMin.value
   const max = chartMax.value
-  const range = max - min || 1
-  const n = last7.value.length
+  const range = max - min
   return last7.value.map((e, i) => ({
     x: PAD + (i / (n - 1)) * (SVG_W - PAD * 2),
     y: PAD + (1 - (e.weight - min) / range) * (SVG_H - PAD * 2),
@@ -249,10 +281,10 @@ const maxY = computed(() => {
 })
 
 const goalY = computed(() => {
-  if (!state.weightGoal || last7.value.length < 2) return null
+  if (!state.weightGoal || !last7.value.length) return null
   const min = chartMin.value
   const max = chartMax.value
-  const range = max - min || 1
+  const range = max - min
   const y = PAD + (1 - (state.weightGoal - min) / range) * (SVG_H - PAD * 2)
   return y < PAD ? PAD : y > SVG_H - PAD ? SVG_H - PAD : y
 })

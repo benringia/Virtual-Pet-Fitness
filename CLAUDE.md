@@ -304,6 +304,8 @@ Behavior:
 - logging again on the same day updates the existing entry
 - XP awarded via existing xp.js util
 - persisted through existing localStorage autosave
+- if an entry exists for today in state.weightLog, hide the weight input form and 'Log Weight' button
+- when hidden, show a "Weight logged for today ✓" message and display the chart/current weight summary only
 
 Placement in App.vue: between CaloriesTracker and StatsPanel
 
