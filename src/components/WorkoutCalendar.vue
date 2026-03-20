@@ -48,7 +48,7 @@ function select(d) { if (d) selectedDate.value = d }
 </script>
 
 <template>
-  <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-3 mb-3">
+  <div class="bg-transparent">
     <!-- Month nav -->
     <div class="flex items-center justify-between mb-2">
       <button @click="prevMonth" class="p-1 rounded hover:bg-gray-50 text-gray-400 hover:text-gray-700 cursor-pointer transition-colors" aria-label="Previous month">
@@ -71,17 +71,17 @@ function select(d) { if (d) selectedDate.value = d }
       <div v-for="(dateStr, idx) in days" :key="idx"
         @click="select(dateStr)"
         :class="[
-          'relative flex flex-col items-center justify-center rounded-full h-7 w-7 mx-auto text-[11px] transition-all',
+          'relative flex flex-col items-center justify-center rounded-full h-8 w-8 mx-auto text-[11px] transition-all',
           dateStr ? 'cursor-pointer' : '',
-          dateStr === selectedDate ? 'bg-indigo-600 text-white font-bold shadow-sm' :
-          dateStr === today ? 'bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100' :
-          dateStr ? 'text-gray-500 hover:bg-gray-50' : '',
+          dateStr === selectedDate ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30' :
+          dateStr === today ? 'bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100/80' :
+          dateStr ? 'text-slate-400 hover:bg-slate-100/50' : '',
         ]"
       >
         <span v-if="dateStr">{{ Number(dateStr.slice(8)) }}</span>
         <span v-if="dateStr && datesWithActivity.has(dateStr)"
-          class="absolute bottom-0.5 w-1 h-1 rounded-full"
-          :class="dateStr === selectedDate ? 'bg-white/60' : 'bg-indigo-400'"
+          class="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-400 shadow-[0_0_6px_rgba(129,140,248,0.8)]"
+          :class="dateStr === selectedDate ? 'bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]' : ''"
         />
       </div>
     </div>

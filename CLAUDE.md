@@ -699,25 +699,109 @@ Local time only — no UTC.
 - Main content: pb-20 for bottom tab bar clearance
 
 ## Project Structure
-- `src/components/WorkoutsView.vue`: Main training dashboard. Remove 'Add Set' from individual Strength accordions.
-- `src/components/WorkoutCalendar.vue`: Must be a compact, modern horizontal mini-scroller or high-density grid.
+- `src/components/PetMiniWidget.vue`: New compact, horizontal pet status for the training hub.
+- `src/components/WorkoutsView.vue`: Refactored into a 12-column responsive grid (7/5 split).
+- `src/utils/workoutMath.js`: Centralized Epley 1RM and Volume calculations.
+- `src/components/DailyBrief.vue`: Unified right-column glassmorphism view for the horizontal calendar and daily sessions.
 
-## Data Schema
-- `workoutSessions`: Array of `{ id, date, label, exercises: [] }`.
+**Deprecated Components (Do Not Use):**
+- 'Workout Types' accordions and 'New Workout Type' forms have been fully deprecated. Focus is purely on Session-First logging with Exercise-level 1RM tracking.
+- Standalone 'WorkoutCalendar' and nested un-encapsulated history loops.
+
+## UI Standards (Premium Redesign)
+- **Visual Language:** Use dynamic mesh gradients (`bg-[radial-gradient(...)]`) with Indigo/Slate tones.
+- **Surfaces:** Use Glassmorphism (white/70, backdrop-blur-2xl, rounded-3xl, shadow-xl). Inner elements (Exercise inputs/rows) use `rounded-xl`.
+- **Typography:** Tracking-tight, font-semibold at most for headers. **STRICT RULE: No font-bold, font-extrabold, or font-black in history/brief views.**
+- **Scaling & Density:** All history cards must be remarkably compact. Internal padding is `p-5`. Left accent bars must be subtle `w-[3px]` gradients and strictly match the height of the current session content, not the card wrapper.
+- **Action Colors:**
+  - Body Building: Indigo-600 (Electric Indigo) for buttons/badges.
+  - Calisthenics: Amber-500 (Flame Orange) for icons/borders.
+- **Animation & Interaction:**
+  - Save Button: Scale-102 on hover, gradient-to-r.
+  - History Cards: Subtle `hover:-translate-y-1` and shadow depth increases on hover.
+  - Success State: Trigger `isCelebrating` on PetMiniWidget for 3.5s.
+
+## Core Layout (7/5 Split)
+- **Left Column (Col 7-8, Hero):** Houses `PetMiniWidget` (Hero Header) and `LogNewSession` card.
+- **Right Column (Col 4-5, Reference):** Houses `DailyBrief`. 
+- **Sticky Logic:** The Right Column must be `lg:sticky lg:top-8` for constant reference.
+
+## Daily Brief Component & Editing Flow
+- **Container**: Glassmorphism (`bg-white/70`, `backdrop-blur-2xl`, `rounded-3xl`).
+- **Header**: Horizontal week-slider for date selection. Selected date has an indigo glow. Maintain `selectedDate` as the single source of truth.
+- **Typography**: 
+  - Session Title: `text-sm font-semibold capitalize`.
+  - Exercise Name: `text-[13px] font-medium capitalize`.
+  - Stats: `text-[10px] uppercase tracking-wide` using `•` separators.
+- **Inline Editing Logic**:
+  - **State**: Use a reactive `editDraft` object to clone the session for editing.
+  - **Triggers**: Enter via Pencil icon (`text-slate-300 hover:text-indigo-400`); Exit via 'Cancel' text button (clears `editDraft`).
+  - **Persistence**: Emit `update-session` only upon clicking 'Save Changes'. Ensure `1RM` and `Volume` recalculate automatically within `editDraft` as the user types.
+  - **Input Styling**: 
+    - Inputs must match read-only font sizes exactly (Title: `text-sm font-semibold`, Exercise: `text-[13px] font-medium`, Stats: `text-[11px] font-normal uppercase`). 
+    - **Labels**: Each input (Weight, Sets, Reps) requires a tiny header label: `text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1`.
+    - Use `border-slate-100` and `bg-white/50` for inputs to maintain glassmorphism transparency.
+  - **Editor Layout**: 
+    - Use "Ghost" buttons (transparent backgrounds, thin dashed borders) for `+ Add Exercise` and `X` (Remove) during edit mode. 
+    - **Initialization**: New rows via '+ Add Exercise' start with empty strings/null for values. Placeholders: Name: "e.g. Pull Ups", Weight: "kg", Sets: "0", Reps: "0".
+    - **Primary Action**: 'Save Changes' must be a small indigo/violet gradient pill (`text-[12px]`, `py-2`). **Disable button** if any row has an empty Name, 0 Reps, or if `activeExerciseCount` is 0.
+
+## Workout Logging Logic
+- **Active Exercise Counting**: 
+  - Do not display a count based solely on array length.
+  - **Logic**: Use a computed property `activeExerciseCount` that filters for exercises where `name.trim() !== ''`.
+  - **Visibility**: If `activeExerciseCount === 0`, do not show the "X exercises" badge in the 'Log New Session' header.
+- **Log New Session Initialization**: 
+  - Maintain the default empty row on mount, but ensure the UI treats it as "Pending," not "Logged."
+  - **Guardrails**: Do not let the placeholder "e.g. Bench Press" count as a value. Ensure the 'Save Session' button remains disabled while `activeExerciseCount` is 0.
+
+## Daily Brief Scaling & Scrollable Content
+- **Constraint**: The `DailyBrief` content area must display exactly **one session at a time** as the primary focus.
+- **Adaptive Logic**: 
+  - If `sessions.length === 1`: The card must use `h-auto` (hug content).
+  - If `sessions.length > 1`: Apply `max-h-[450px] overflow-y-auto snap-y snap-proximity`.
+- **Scrolling**: Use a scroll-snap container to allow vertical swiping between multiple sessions on the same date. Style scrollbar as a thin, subtle line (`scrollbar-thin scrollbar-thumb-slate-200`). Ensure 'Edit Mode' locks scrolling while editing.
+- **Padding**: Ensure `pb-6` is consistent so content doesn't touch the rounded edge.
+- **Visual Indicators**:
+  - **Pagination**: If `sessionsForSelectedDate.length > 1`, display small navigation dots at the bottom of the card.
+- **Scroll Hint**: Use a subtle fade-out effect at the bottom of the active session to indicate more content below.
+- **Guardrails**: Do not remove sessions; they must all be accessible via the vertical scroll. Do not let card collapse to zero height; maintain base padding.
+
+## Daily Brief Header Alignment
+- **Session Header Layout**: 
+  - **Structure**: Use a flex container (`flex justify-between items-center`) for the session title row.
+  - **Left Side**: Session Name (e.g., 'Push') in `text-sm font-semibold`.
+  - **Right Side**: The Stats Ribbon (Category, Volume/Reps, Count). 
+  - **Spacing**: Ensure a minimum gap between the title and the ribbon to prevent overlapping on mobile.
+- **Ribbon Styling**: Scale down the ribbon to `py-1 px-3` and `text-[9px]`. Remove the ribbon's solid background; use a subtle border instead to prevent heavy visual weighting.
+- **Guardrails**: Do not let the Trash/Edit icons interfere with the ribbon. Icons must remain in the far top-right corner, anchored cleanly above or within the fluid flex row constraints.
+## Data Schema & Logic
+- `workoutSessions`: Array of `{ id, date, label, category, exercises: [] }`.
 - Exercise Object: `{ name, weight, sets, reps, oneRM }`.
-- Session Logger: Required fields: Session Label, Exercise Name, Weight, Sets, Reps.
+- `category`: 'bodybuilding' or 'calisthenics' (determines UI logic and math).
+- `selectedDate`: Controlled by `useSelectedDate.js` (ephemeral UI state).
+- **Session Filtering:** The UI must natively filter and show ONLY sessions matching `selectedDate`.
+- **Historical Protection & Session Locking**: 
+  - If `selectedDate` is NOT today, hide the 'Log New Session' form entirely and render a "Back to Today" shortcut.
+  - **Data Integrity**: All workout sessions belonging to a date strictly before `today` must be read-only. Hide Edit (Pencil) and Trash (Delete) icons for any session where `selectedDate < today`.
+  - **Visuals**: Locked cards keep the top-right empty for a cleaner "archived" look. Disable all 'Save Changes' logic entirely for past dates.
+- `workoutSets`: Existing legacy array in state kept for backward compatibility (Read-only).
 
-## Training Rules
-- 1RM fires immediately on session completion using the Epley formula: `w * (1 + r / 30)`.
+## Pet Integration & Animation Rules
+- Mini-Status: The Training Hub must display a `PetMiniWidget` at the top of the Left Column (above the Logger) to provide immediate feedback.
+- Session Victory Logic: Upon calling `saveSession()`, the `PetMiniWidget` triggers a 3-second `isCelebrating` state.
+- Feedback Loop: If a New PR is detected (calculated vs. history): Display "NEW RECORD! 🏆". Standard Success: Display "Session Saved! +XP".
+- Visuals: Widget uses `animate-bounce` or `scale-110` pulse during celebration.
+
+## Math Standards
+- 1RM: `(weight * (1 + reps / 30))`.
+- Volume: `Σ (weight * reps)` for the session exercises.
 
 ## Navigation Rules
 - `activeView` supports 'tracker', 'progress', and 'workouts'.
 - Default view remains 'tracker'.
 
-## In Progress
-- Build My Workouts view
-
-## Next Steps
-*(Empty)*
-
-> **GUARDRAIL:** The localStorage key MUST remain `flarepup-v5`. No exceptions.
+> **GUARDRAILS:** 
+> - The localStorage key MUST remain `flarepup-v5`. No exceptions.
+> - Do not duplicate pet logic; use the shared store state for XP and Level.
+> - Ensure the 'speech bubble' text is high-contrast for readability.
