@@ -804,4 +804,4 @@ Local time only — no UTC.
 > **GUARDRAILS:** 
 > - The localStorage key MUST remain `flarepup-v5`. No exceptions.
 > - Do not duplicate pet logic; use the shared store state for XP and Level.
-> - Ensure the 'speech bubble' text is high-contrast for readability.
+> - Ensure the 'speech bubble' text is high-contrast for readability. 
