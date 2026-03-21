@@ -35,6 +35,7 @@ const defaultState = {
   workoutSessions: [],
   trainingCategory: 'bodybuilding',
   workoutPrograms: {},
+  hiddenLabels: [],
 }
 
 export function loadState() {
@@ -99,6 +100,7 @@ export function resetState(state) {
     workoutSessions: [],
     trainingCategory: 'bodybuilding',
     workoutPrograms: {},
+    hiddenLabels: [],
   })
   saveState(state)
   console.log('[resetState] after:', JSON.stringify({

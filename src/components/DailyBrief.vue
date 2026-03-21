@@ -101,12 +101,20 @@
             class="block flex-1 text-sm font-semibold capitalize bg-white/50 border border-slate-100 rounded-xl px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-300 text-slate-900 min-w-0"/>
           
           <!-- Ribbon (Stats) -->
-          <div class="flex items-center gap-1.5 shrink-0 border border-slate-100/50 bg-transparent px-3 py-1 rounded-xl">
-            <span class="text-[9px] font-semibold uppercase tracking-wider" :class="getCategory(sess) === 'calisthenics' ? 'text-amber-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
+          <div class="flex items-center gap-1.5 shrink-0 px-3 py-1 rounded-xl shadow-sm border backdrop-blur-sm"
+            :class="getCategory(sess) === 'calisthenics' ? 'bg-amber-50/80 border-amber-100/50' : getCategory(sess) === 'cardio' ? 'bg-rose-50/80 border-rose-100/50' : 'bg-indigo-50/80 border-indigo-100/50'">
+            
+            <span class="text-[9px] font-semibold uppercase tracking-wider flex items-center gap-1" 
+              :class="getCategory(sess) === 'calisthenics' ? 'text-amber-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
+              <span v-if="(editingSessionId === sess.id ? editDraft.exercises : sess.exercises).some(e => e.isPR)" class="text-[10px] text-emerald-500" title="Contains Personal Records!">👑</span>
               {{ getCategory(sess) === 'calisthenics' ? '🤸 Cali' : getCategory(sess) === 'cardio' ? '🏃 Cardio' : '🏋️ BB' }}
             </span>
-            <span class="w-1 h-1 rounded-full bg-slate-200"></span>
-            <span class="text-[9px] font-semibold uppercase tracking-wider text-slate-500">
+            
+            <span class="w-1 h-1 rounded-full opacity-40" 
+              :class="getCategory(sess) === 'calisthenics' ? 'bg-amber-600' : getCategory(sess) === 'cardio' ? 'bg-rose-600' : 'bg-indigo-600'"></span>
+            
+            <span class="text-[9px] font-semibold uppercase tracking-wider"
+              :class="getCategory(sess) === 'calisthenics' ? 'text-amber-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
               <template v-if="getCategory(sess) === 'cardio'">
                 {{ (editingSessionId === sess.id ? editDraft : sess).exercises.reduce((acc, e) => acc + Number(e.duration || 0), 0) }} MINS
                 <template v-if="(editingSessionId === sess.id ? editDraft : sess).exercises.find(e => e.incline)">
@@ -117,17 +125,16 @@
                 </template>
               </template>
               <template v-else>
-                <template v-if="editingSessionId === sess.id">
-                  {{ getCategory(sess) === 'bodybuilding' ? `Vol: ${editDraft.exercises.reduce((acc, e) => acc + ((Number(e.weight)||0) * Number(e.reps) * Number(e.sets)), 0)} KG` : `Reps: ${editDraft.exercises.reduce((acc, e) => acc + (Number(e.reps) * Number(e.sets)), 0)}` }}
-                </template>
-                <template v-else>
-                  {{ getCategory(sess) === 'bodybuilding' ? `Vol: ${sess.exercises.reduce((acc, e) => acc + (e.weight * Number(e.reps) * Number(e.sets)), 0)} KG` : `Reps: ${sess.exercises.reduce((acc, e) => acc + (Number(e.reps) * Number(e.sets)), 0)}` }}
-                </template>
+                {{ editingSessionId === sess.id ? getSessionSummary(editDraft) : getSessionSummary(sess) }}
               </template>
             </span>
-            <span class="w-1 h-1 rounded-full bg-slate-200"></span>
-            <span class="text-[9px] font-semibold uppercase tracking-wider text-slate-500">
-              {{ editingSessionId === sess.id ? editDraft.exercises.length : sess.exercises.length }} EX
+            
+            <span class="w-1 h-1 rounded-full opacity-40"
+              :class="getCategory(sess) === 'calisthenics' ? 'bg-amber-600' : getCategory(sess) === 'cardio' ? 'bg-rose-600' : 'bg-indigo-600'"></span>
+            
+            <span class="text-[9px] font-semibold uppercase tracking-wider"
+              :class="getCategory(sess) === 'calisthenics' ? 'text-amber-500' : getCategory(sess) === 'cardio' ? 'text-rose-500' : 'text-indigo-500'">
+              {{ (editingSessionId === sess.id ? editDraft : sess).exercises.length }} EX
             </span>
           </div>
         </div>
@@ -141,8 +148,19 @@
                 <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
               </button>
 
-              <input v-model="ex.name" type="text" placeholder="e.g. Pull Ups"
-                class="block w-full text-[13px] text-slate-700 font-medium capitalize bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300"/>
+              <div class="flex items-center justify-between mb-1 gap-2">
+                <select v-if="getCategory(editDraft) === 'bodybuilding'" v-model="ex.bodyPart"
+                  class="text-[11px] font-bold text-slate-500 uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-1.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300 w-24 shrink-0">
+                  <option v-for="p in ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Abs']" :key="p" :value="p">{{ p }}</option>
+                </select>
+                <input v-model="ex.name" type="text" placeholder="e.g. Pull Ups"
+                  class="flex-1 text-[13px] text-slate-700 font-medium capitalize bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1"
+                  :class="getCategory(editDraft) === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
+                <label v-if="getCategory(editDraft) === 'calisthenics'" class="flex items-center gap-1 ml-2 cursor-pointer shrink-0">
+                  <input type="checkbox" v-model="ex.isWeighted" @change="ex.isWeighted ? null : ex.weight = 0" class="w-3.5 h-3.5 accent-amber-500 rounded border-gray-300 focus:ring-amber-500" />
+                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Weighted</span>
+                </label>
+              </div>
               
               <template v-if="getCategory(editDraft) === 'cardio'">
                 <div class="grid gap-2 mt-1 pr-1" :class="['Running', 'Walking', 'Cycling', 'running', 'walking', 'cycling'].includes(ex.name) ? 'grid-cols-3' : 'grid-cols-2'">
@@ -166,18 +184,29 @@
                 </div>
               </template>
               <template v-else>
-                <div class="grid grid-cols-3 gap-2 mt-1 pr-1">
-                  <div v-if="getCategory(editDraft) === 'bodybuilding'" class="flex flex-col">
+                <div class="grid gap-2 mt-1 pr-1" :class="getCategory(editDraft) === 'calisthenics' ? (ex.isWeighted ? 'grid-cols-3' : 'grid-cols-2') : 'grid-cols-3'">
+                  <div v-if="getCategory(editDraft) === 'bodybuilding' || (getCategory(editDraft) === 'calisthenics' && ex.isWeighted)" class="flex flex-col">
                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">WEIGHT</span>
-                    <input v-model="ex.weight" type="number" placeholder="kg" class="w-full text-[11px] font-normal uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300 text-center"/>
+                    <input v-model="ex.weight" type="number" placeholder="kg" class="w-full text-[11px] font-normal uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 text-center"
+                      :class="getCategory(editDraft) === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
                   </div>
                   <div class="flex flex-col">
                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">SETS</span>
-                    <input v-model="ex.sets" type="number" placeholder="0" class="w-full text-[11px] font-normal uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300 text-center"/>
+                    <input v-model="ex.sets" type="number" placeholder="0" class="w-full text-[11px] font-normal uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 text-center"
+                      :class="getCategory(editDraft) === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">REPS</span>
-                    <input v-model="ex.reps" type="number" placeholder="0" class="w-full text-[11px] font-normal uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300 text-center"/>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-center">
+                      {{ STATIC_HOLDS.includes(ex.name) ? 'HOLD (SEC)' : 'REPS' }}
+                    </span>
+                    <div class="relative w-full">
+                      <input v-model.number="ex.reps" type="number" :placeholder="STATIC_HOLDS.includes(ex.name) ? '15' : '10'" class="h-11 w-full text-[13px] font-normal bg-slate-50/50 border border-slate-100 rounded-xl py-1.5 focus:outline-none focus:ring-1 text-center"
+                        :class="[STATIC_HOLDS.includes(ex.name) ? 'pl-2 pr-10' : 'px-2', getCategory(editDraft) === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300']"/>
+                      <span v-if="STATIC_HOLDS.includes(ex.name)" class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold pointer-events-none"
+                        :class="getCategory(editDraft) === 'calisthenics' ? 'text-amber-500' : 'text-slate-400'">
+                        {{ Number(ex.reps) === 1 ? 'sec' : 'secs' }}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div class="mt-0.5 flex justify-end">
@@ -203,9 +232,17 @@
 
           <template v-else>
             <!-- NON-EDITING LIST -->
-            <div v-for="ex in sess.exercises" :key="ex.name" class="flex flex-col gap-0.5">
+            <div v-for="ex in sess.exercises" :key="ex.name" 
+              class="flex flex-col gap-0.5 transition-all"
+              :class="ex.isPR ? 'bg-emerald-50/40 border-l-4 border-emerald-400 -ml-2 pl-3 py-1.5 rounded-r-xl shadow-sm' : ''">
+              
+              <div v-if="ex.isPR" class="text-emerald-600 font-bold text-[8px] uppercase tracking-widest pl-0.5 mb-0.5">NEW PR</div>
+
               <div class="flex items-center justify-between">
-                <span class="text-[13px] font-medium text-slate-700 capitalize line-clamp-1 pr-2">{{ ex.name }}</span>
+                <span class="text-[13px] font-medium text-slate-700 capitalize line-clamp-1 pr-2" :class="ex.isPR ? 'text-slate-900' : ''">
+                  <span v-if="ex.bodyPart" class="text-[9px] text-slate-400 font-bold mr-1.5 opacity-80 uppercase tracking-tighter">{{ ex.bodyPart }}</span>
+                  {{ ex.name }}
+                </span>
                 <span v-if="ex.oneRM > 0 && getCategory(sess) !== 'cardio'" class="text-[9px] font-semibold text-indigo-500 bg-white px-2 py-0.5 rounded-lg border border-slate-100 shadow-sm shrink-0">
                   1RM <span class="text-[9px] font-normal opacity-70">~</span>{{ Math.round(ex.oneRM) }}KG
                 </span>
@@ -216,12 +253,21 @@
                   <template v-if="ex.incline"> • {{ ex.incline }}°</template>
                 </template>
                 <template v-else-if="getCategory(sess) === 'calisthenics'">
-                  <template v-if="ex.weight > 0">{{ ex.weight }}KG • {{ ex.sets }} SETS • {{ ex.reps }} REPS</template>
-                  <template v-else-if="ex.sets > 1">{{ ex.sets }} SETS • {{ ex.reps }} REPS</template>
-                  <template v-else>{{ ex.reps }} REPS</template>
+                  <template v-if="STATIC_HOLDS.includes(ex.name)">
+                    <span v-if="ex.weight === 0 || !ex.isWeighted" class="text-slate-400 font-bold">BODYWEIGHT</span>
+                    <template v-else>{{ ex.weight }}kg</template>
+                    <span v-if="ex.isPR" class="text-[12px] text-emerald-500 ml-1" title="Personal Record!">👑</span>
+                    • {{ ex.sets }} sets • {{ ex.holdTime || ex.reps || 0 }}s
+                  </template>
+                  <template v-else>
+                    <span v-if="ex.weight === 0 || !ex.isWeighted" class="text-slate-400 font-bold">BODYWEIGHT</span>
+                    <template v-else>{{ ex.weight }}kg</template>
+                    <span v-if="ex.isPR" class="text-[12px] text-emerald-500 ml-1" title="Personal Record!">👑</span>
+                    • {{ ex.sets }} sets • {{ ex.reps }} REPS
+                  </template>
                 </template>
                 <template v-else>
-                  {{ ex.weight || 0 }}KG • {{ ex.sets }} SETS • {{ ex.reps }} REPS
+                  {{ ex.weight || 0 }}KG <span v-if="ex.isPR" class="text-[12px] text-emerald-500 ml-1" title="Personal Record!">👑</span> • {{ ex.sets }} SETS • {{ ex.reps }} REPS
                 </template>
               </span>
             </div>
@@ -251,6 +297,8 @@ import { selectedDate } from '../composables/useSelectedDate.js'
 import { todayStr } from '../utils/dates.js'
 import { calc1RM } from '../utils/workoutMath.js'
 
+const STATIC_HOLDS = ['Handstand', 'Planche', 'L-Sit', 'Front Lever', 'Back Lever', 'Human Flag']
+
 const props = defineProps({
   sessionsForSelectedDate: { type: Array, required: true },
   workoutSessions: { type: Array, required: true },
@@ -269,6 +317,32 @@ const formatLongDate = (dateString) => {
   const date = new Date(y, m - 1, d)
   const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   return formatter.format(date)
+}
+
+const getSessionSummary = (sess) => {
+  const cat = getCategory(sess)
+  if (cat === 'cardio') {
+    const mainEx = sess.exercises[0]
+    if (!mainEx) return 'CARDIO SESSION'
+    return `${mainEx.duration || 0} MINS • ${mainEx.intensity || 'LOW'}`
+  }
+  
+  if (cat === 'bodybuilding') {
+    const vol = sess.exercises.reduce((acc, e) => acc + ((Number(e.weight)||0) * Number(e.reps) * Number(e.sets)), 0)
+    return isNaN(vol) ? 'STRENGTH SESSION' : `Vol: ${vol} KG`
+  }
+  
+  if (cat === 'calisthenics') {
+    const hasSkills = sess.exercises.some(e => STATIC_HOLDS.includes(e.name))
+    const totalReps = sess.exercises.reduce((acc, e) => acc + (Number(e.reps) || 0) * (Number(e.sets) || 1), 0)
+    
+    if (isNaN(totalReps)) return 'CALISTHENICS'
+    if (hasSkills && totalReps === 0) return 'SKILL SESSION'
+    if (hasSkills && totalReps > 0) return `Mixed Reps: ${totalReps}`
+    return `Reps: ${totalReps}`
+  }
+  
+  return cat.toUpperCase()
 }
 
 const datesWithActivity = computed(() => {
@@ -313,6 +387,14 @@ function startEdit(sess) {
   editError.value = ''
   editingSessionId.value = sess.id
   editDraft.value = JSON.parse(JSON.stringify(sess)) // Deep clone array of exercises
+  
+  if (getCategory(editDraft.value) === 'calisthenics') {
+    editDraft.value.exercises.forEach(ex => {
+      if (STATIC_HOLDS.includes(ex.name) && ex.holdTime) {
+        ex.reps = ex.holdTime // map for editing UI
+      }
+    })
+  }
 }
 
 function cancelEdit() {
@@ -375,10 +457,18 @@ function saveEdit() {
     })
   } else {
     editDraft.value.exercises.forEach(e => {
-      e.weight = Number(e.weight) || 0
+      e.weight = (getCategory(editDraft.value) === 'calisthenics' && !e.isWeighted) ? 0 : (Number(e.weight) || 0)
       e.sets = Number(e.sets) || 1
       e.reps = Number(e.reps) || 0
-      e.oneRM = e.weight ? calc1RM(e.weight, e.reps) : 0
+      
+      if (getCategory(editDraft.value) === 'calisthenics' && STATIC_HOLDS.includes(e.name)) {
+        e.holdTime = e.reps
+        e.reps = 0
+        e.oneRM = 0
+      } else {
+        e.oneRM = e.weight ? calc1RM(e.weight, e.reps) : 0
+        delete e.holdTime
+      }
     })
   }
 

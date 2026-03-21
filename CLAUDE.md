@@ -797,6 +797,42 @@ Local time only — no UTC.
 - **Stats Display**: If `incline > 0`, append `• [INCLINE]°` or `• [INCLINE]%` to the ribbon.
 - **Guardrails**: Synchronize headers (Duration, Incline, Intensity) at the top of the row. Use `rounded-xl` and `bg-white/50 backdrop-blur`. No incline for `Swimming` or `Rowing`.
 
+## Cardio Duration
+- **Duration Column Alignment**: 
+  - **Container**: `w-32` fixed width, `flex flex-col items-center`.
+  - **Stepper Row**: `flex items-center justify-between w-full h-11 h-full bg-white/50 border border-slate-100 rounded-xl p-1`. 
+  - **Input Style**: Centered, `w-12`, `bg-transparent border-none focus:ring-0`.
+- **Duration Stepper Component**: 
+  - **Structure**: Horizontal group: Minus `-` button (subtracts 5 mins), Centered Input, Plus `+` button (adds 5 mins).
+  - **Unit Indicator**: Add an uneditable `text-[10px] text-slate-400` indicator inside the stepper container.
+    - **Pluralization**: Display "min" if `duration === 1`, else "mins". Template: `{{ ex.duration === 1 ? 'min' : 'mins' }}`.
+- **Validation**: Default to `1` for new cardio exercises. Minimum duration: 1. Increment/Decrement: 5 mins.
+- **Guardrails**: Buttons: `w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center`. Disable or block the minus button if `duration <= 1`. Containers must match Exercise/Intensity dropdown heights. Label remains centered. Use fixed width for unit span to prevent jitter.
+
+## Secondary Action Buttons
+- **'Add Another Exercise' Button**:
+  - **Logic**: Use a solid `rounded-xl` container with balanced category accents.
+  - **Styling**: `bg-[ACCENT]-50 text-[ACCENT]-600 border border-[ACCENT]-100` (Indigo for Body Building, Amber for Calisthenics, Rose for Cardio).
+  - **Typography**: `font-medium`, `text-sm`, centered alignment.
+  - **Visuals**: Maintain `+` icon. Hover: Increase background opacity or shift to `0` to `50` to `100` variants slightly for feedback.
+  - **Guardrails**: Must remain distinct from and less dominant than the primary "Save Session" button.
+
+## Calisthenics & Skills
+- **Pre-defined List**: ['Pull Ups', 'Push Ups', 'Dips', 'Muscle Ups', 'Handstand Push Ups', 'Chin Ups', 'Leg Raises', 'Plank', 'Custom...'].
+- **Weighted & Hold Toggles**: 
+  - **Logic**: Add 'Weighted' and 'Hold Time' boolean toggles in the exercise header.
+  - **Visibility (Weight)**: 'Weighted' toggle is ALWAYS visible. Weight input only appears if true.
+  - **Visibility (Hold Time)**: 'Hold Time' toggle is ONLY visible when `name === 'Custom...'`.
+  - **Skill UI Trigger**: Trigger Skill UI (REPS -> HOLD (SEC) + 'sec') if 'Hold Time' is true OR the exercise is in `STATIC_HOLDS`.
+  - **Auto-Logic**: If an exercise from `STATIC_HOLDS` is picked, trigger Skill UI automatically. If a user switches from 'Custom' (with Hold checked) to a standard exercise (e.g., Push Ups), reset `isHold` to false.
+  - **Data Integrity**: If 'Weighted' is toggled OFF, clear the weight value to 0 before saving.
+- **Horizontal Alignment**: 
+  - **Layout**: All calisthenics inputs (Exercise, Weight?, Sets, Reps/Hold) sit on a single horizontal row.
+  - **Sizing**: Exercise: `flex-1` (growth factor). Weight/Sets/Reps: `w-20` (fixed/compact).
+  - **Logic**: If weight is hidden, the Exercise name expands to maintain a 3-column rhythm (Exercise, Sets, Reps).
+  - **Verticality**: Use `items-start` for labels. `gap-3` or `gap-4` between columns.
+- **Guardrails**: Bodybuilding weight is ALWAYS visible. Amber-500 theme for toggle/focus. No wrapping unless `< 320px`. Hold/Reps swap/Weight toggle must not break the horizontal row.
+
 ## Cardio Session Labeling
 - **Auto-Populate**: If `trainingCategory === 'cardio'` and `sessionLabel` matches the previous auto-generated value (or is empty), set label to `[Selected Exercise] Session`.
 - **Manual Override**: Track `isLabelManuallyEdited`. If the user manually edits the `sessionLabel`, stop auto-populating.
@@ -807,10 +843,84 @@ Local time only — no UTC.
 - **Accent Bar**: Use a Rose-500 vertical gradient for cardio entries.
 - **Guardrails**: Do not attempt to calculate 'Total Volume' for cardio. Maintain 'Compact-Pro' typographic scale (13px/10px) for stats.
 
+## Body Building Features
+- **Quick-Label Pills**: 
+  - **Logic**: Extract the top 3 most frequent `sessionLabels` from last 30 Body Building sessions to find non-blacklisted unique entries.
+  - **Exclusion**: Strictly filter out any labels in the persistent `state.hiddenLabels` blacklist.
+  - **Category Filtering**: Proposed labels must be strictly filtered for the `bodybuilding` category only.
+  - **UI (Glass-morphism)**: Small indigo pills (`text-[10px]`) with `bg-opacity-50`. Clicking a pill fills the input field.
+  - **Management**: Include a dedicated delete button ('×') inside each pill.
+  - **Interaction**: Position the '×' with `ml-1.5`. Use `@click.stop` to ensure clicking '×' DOES NOT populate the input. The '×' must highlight as `text-red-500` on hover for clear destructive feedback.
+- **PR (Personal Record) Detection & Celebration**: 
+  - **Detection**: Trigger if current `weight > historicalMaxWeight` OR (`weight === historicalMaxWeight` AND `reps > historicalMaxReps`).
+  - **Interaction**: Display a `text-emerald-500` (Victory Green) crown icon next to the Weight input with a subtle `animate-pulse` when a PR is detected.
+  - **Celebration Trigger**: If any exercise in a session is a PR, trigger a 1.5s visual animation (e.g., emerald-500 confetti or scale effect) upon clicking "Save Session".
+  - **Daily Brief PR Highlighting**: Any exercise row hit as a PR must be distinct with `bg-emerald-50/40` and left-accent `border-l-4 border-emerald-400`. Added small `text-emerald-600 font-bold text-[8px]` badge: "NEW PR".
+  - **Daily Brief Stats Ribbon (Category Badge)**:
+    - **Background**: Category-specific light tints with `backdrop-blur-sm`:
+        - Body Building: `bg-indigo-50/80 border border-indigo-100/50`
+        - Calisthenics: `bg-amber-50/80 border border-amber-100/50`
+        - Cardio: `bg-rose-50/80 border border-rose-100/50`
+    - **Visuals**: Primary category color for text/icons (e.g., `text-indigo-600`).
+    - **PR Crown**: Within the tinted pill, the 👑 should be `text-emerald-500` (Victory Green).
+  - **Guardrails**: Do not change the Amber theme for the Calisthenics category tab. Confetti/Animation must not block the database save transaction (fire and forget). Ensure the 👑 icon and styling persist correctly alongside `BODYWEIGHT` for Calisthenics skills.
+
+- **Body Building Filtered Exercise Library**:
+  - **Mapping**: Maintain a comprehensive reactive mapping of `Body Part -> Exercise List`.
+  - **Sample Library**:
+    - **Chest**: `['Bench Press', 'Incline DB Press', 'Chest Flyes', 'Dips', 'Custom...']`
+    - **Back**: `['Pull Ups', 'Bent Over Rows', 'Lat Pulldowns', 'Deadlifts', 'Custom...']`
+    - **Shoulders**: `['Overhead Press', 'Lateral Raises', 'Face Pulls', 'Custom...']`
+    - **Quads/Hamstrings/Glutes/Calves/Abs**: Each should have specific common exercises and always include `Custom...` as the final option.
+  - **Reactive Filtering & Flow**:
+    - **Default Values**: Specifically initialize both `bodyPart` and `exerciseName` to `''` for all new Body Building entries.
+    - **Dropdown Interactivity**: The **Exercise** dropdown must remain strictly `disabled` until a valid `bodyPart` is chosen from the first selector.
+    - **State Reset**: Changing the `bodyPart` selection must immediately reset the `exerciseName` back to `''` (the placeholder state).
+    - **Placeholders**: Use "Select Part..." and "Select Exercise..." as the initial unselected states. These must be marked as `disabled` and `selected` in the HTML to prevent invalid logs.
+  - **UI Layout**: 
+    - Position the 'PART' dropdown to the immediate left of the 'EXERCISE' input.
+    - Widths: `w-28` (or `flex-[1]`) for Body Part; `flex-[2]` for Exercise Name.
+    - Labeling: Vertical alignment of 'PART' and 'EXERCISE' labels is critical.
+    - Custom Input: If `exerciseName === 'Custom...'`, display a text input field for the custom name.
+    - Visibility: Only show this mapping for the `bodybuilding` category; keep it hidden for Calisthenics and Cardio.
+
+- **Frictionless Workout Logging**:
+  - **Quick-Stepper Controls**: 
+    - **Weight**: Integrate `-` and `+` buttons for quick adjustments in `2.5kg` or `5kg` increments.
+    - **Sets/Reps**: Integrate `-` and `+` buttons for increments of `1`.
+    - **Styling**: Small, circular, low-profile gray buttons positioned inside or immediately adjacent to inputs.
+  - **Smart Persistence**: When "Add Another Exercise" is clicked, the new row must automatically inherit the `weight` and `sets` values from the exercise immediately preceding it.
+  - **Auto-Focus Logic**: Upon selecting a `bodyPart` or `exerciseName` from a dropdown, the UI must automatically move the cursor focus to the `weight` (or first relevant numeric) input field.
+  - **Numeric Keyboard (Mobile Ops)**: All numeric inputs (Weight, Sets, Reps, Duration) MUST utilize `inputmode="decimal"` or `type="number"` to ensure the numeric keypad is forced on mobile devices.
+  - **Stepper UI Standards**: 
+    - **Weight Input**: Minimum width `w-24` (or `min-w-[90px]`) to ensure 3-digit decimals (e.g., 102.5) remain fully visible.
+    - **Sets/Reps (Calisthenics)**: Enforce a minimum width of `min-w-[48px]` (or `w-14`) for the numeric input field, ensuring a compact but legible display.
+    - **Text Alignment**: Use `text-center` for all numeric inputs to keep values balanced between steppers.
+    - **Padding & Clipping**: Minimize horizontal padding (`px-0.5`) within inputs to maximize digit visibility. Set `overflow-visible` on parent containers.
+    - **Flex Integrity**: The input/stepper container must use `gap-1`. The main Exercise dropdown requires `min-w-0` and `flex-shrink` to protect the layout on small screens.
+  - **Guardrails**: 
+    - Strictly prohibit negative values for Weight, Sets, or Reps.
+    - Maintain the 'Victory Green' (emerald-500) PR icon placement next to the weight input.
+    - Use 'amber-500' accent colors for all steppers and interactive elements in the Calisthenics tab.
+    - Do not allow the "Weighted" checkbox or increased widths to push entry rows onto a second line on mobile devices.
+- **Typography**: The primary title uses `font-semibold` (weight 600).
+- **Styling**: 
+  - **Text**: Category name in the title uses its specific accent: `text-indigo-600` (Body Building), `text-amber-500` (Calisthenics), or `text-rose-500` (Cardio).
+  - **Icon**: The `+` icon background color matches the category: `bg-indigo-500`, `bg-amber-500`, or `bg-rose-500`. Add `duration-300` for color shifts.
+- **Guardrails**: The plus sign remains white. Do not shift the chevron or the '1 exercise' badge.
+
+## Daily Brief Display (Calisthenics)
+- **Weight Labeling**: If weight is `0` or `isWeighted` is false, hide the KG value and display `BODYWEIGHT` in the stats ribbon.
+- **Stats Ribbon**: 
+  - Weighted: `[WEIGHT]kg • [SETS] sets • [REPS]REPS/s`
+  - Bodyweight: `BODYWEIGHT • [SETS] sets • [REPS]REPS/s`
+- **Session Header Bug (NaN Fix)**: In any session header badge (Daily Brief or Logs), ensure the total output doesn't render `NaN`. If calculations fail or for pure Skill/Cali flows, fallback to displaying the primary activity type (e.g. `🤸 CALISTHENICS` or `🏃 CARDIO`) instead of broken rep counts.
+- **Accent Bar**: Amber-500 theme.
+
 ## Data Schema & Logic
 - `workoutSessions`: Array of `{ id, date, label, category, exercises: [], cardioDetails? }`.
 - Exercise Object (Strength/Cali): `{ name, weight, sets, reps, oneRM }`.
-- Exercise Object (Cardio): `{ name, duration, intensity }`.
+- Exercise Object (Cardio): `{ name, duration (defaults to 1), intensity }`.
 - `CardioSession`: `{ id, date, name, duration, intensity, category: 'cardio' }`.
 - `category`: 'bodybuilding', 'calisthenics', or 'cardio' (determines UI logic and math).
 - **XP Logic**: Sessions grant base XP; intensity/duration multipliers to be defined in future pet-evolution rules.
