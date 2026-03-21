@@ -2,27 +2,36 @@
   <div class="p-4 lg:p-6 pb-20 max-w-6xl mx-auto bg-[radial-gradient(at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white min-h-screen">
 
     <!-- Header -->
-    <div class="flex items-center justify-between mb-5">
-      <div>
-        <h2 class="text-xl font-extrabold tracking-tight text-slate-900">My Training</h2>
-        <p class="text-xs text-gray-400 mt-0.5">
-          <span v-if="allSessions.length">{{ allSessions.length }} session{{ allSessions.length !== 1 ? 's' : '' }} logged</span>
-          <span v-else>No sessions yet — start below</span>
-        </p>
-      </div>
-      <button @click="activeView = 'tracker'"
-        class="flex items-center gap-1.5 text-xs font-medium text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl transition-colors cursor-pointer">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
-        Back to Tracker
+    <div class="mb-2 flex flex-col gap-2">
+      <button @click="activeView = 'overview'"
+        class="flex items-center gap-1 text-[10px] uppercase font-bold tracking-[0.2em] text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer group w-fit">
+        <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+        Back to Overview
       </button>
+
+      <div>
+        <div class="flex items-center mb-1">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">⚡ My Training</h2>
+          <span v-if="allSessions.length" class="text-[11px] bg-slate-100 text-slate-500 opacity-50 px-2 py-0.5 rounded-full ml-2 font-medium select-none">
+            {{ allSessions.length }} session{{ allSessions.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+        
+        <!-- Motivational Tip -->
+        <div class="bg-slate-50 border-l-4 border-indigo-500 p-3 rounded-r-xl shadow-sm mt-4 md:mt-5 mb-10">
+          <p class="text-[13px] text-slate-600 italic font-medium">
+            "{{ activeTip }}"
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Category toggle -->
-    <div class="flex gap-2 mb-5">
+    <div class="flex gap-2 mb-6">
       <button v-for="cat in CATEGORIES" :key="cat.id"
         @click="state.trainingCategory = cat.id"
         :class="state.trainingCategory === cat.id
-          ? (cat.id === 'calisthenics' ? 'bg-amber-600 text-white shadow-md border-amber-600 border' 
+          ? (cat.id === 'calisthenics' ? 'bg-orange-600 text-white shadow-md border-orange-600 border' 
              : cat.id === 'cardio' ? 'bg-rose-500 text-white shadow-md border-rose-500 border' 
              : 'bg-indigo-600 text-white shadow-md border-indigo-600 border')
           : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
@@ -119,30 +128,54 @@
                 </template>
                 <template v-else-if="state.trainingCategory === 'calisthenics'">
                   <div class="flex flex-col gap-2">
-                    <select v-model="ex.name" @change="ex.isHold = STATIC_HOLDS.includes(ex.name)"
-                      class="text-[13px] font-medium border border-gray-200 rounded-xl px-2.5 h-11 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white/50 w-full">
-                      <option disabled value="">Select exercise</option>
-                      <option v-for="opt in COMMON_CALISTHENICS_EXERCISES" :key="opt" :value="opt">
-                        {{ STATIC_HOLDS.includes(opt) ? '⚡ ' : '' }}{{ opt }}
-                      </option>
-                    </select>
+                    <!-- Calisthenics Exercise Select -->
+                    <div class="relative w-full">
+                      <select v-model="ex.name" @change="ex.isHold = STATIC_HOLDS.includes(ex.name)"
+                        class="text-[13px] font-medium border border-gray-200 rounded-xl px-2.5 pr-10 h-11 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white/50 w-full appearance-none">
+                        <option disabled value="">Select exercise</option>
+                        <option v-for="opt in COMMON_CALISTHENICS_EXERCISES" :key="opt" :value="opt">
+                          {{ STATIC_HOLDS.includes(opt) ? '⚡ ' : '' }}{{ opt }}
+                        </option>
+                      </select>
+                      <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                     <input v-if="ex.name === 'Custom...'" v-model="ex.customName" type="text" maxlength="30" placeholder="e.g. Pistol Squats"
                       class="text-sm border border-gray-200 rounded-xl px-2.5 h-11 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white w-full"/>
                   </div>
                 </template>
                 <template v-else>
                   <div class="flex flex-col gap-2">
+                    <!-- Body Building Selects -->
                     <div class="flex gap-2">
-                      <select v-model="ex.bodyPart" @change="ex.name = ''; focusWeight(i)"
-                        class="text-[13px] font-medium border border-gray-200 rounded-lg px-2 h-11 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white w-28 shrink-0">
-                        <option value="" disabled selected>Select Part...</option>
-                        <option v-for="p in BODY_PARTS" :key="p" :value="p">{{ p }}</option>
-                      </select>
-                      <select v-model="ex.name" @change="focusWeight(i)" :disabled="!ex.bodyPart"
-                        class="text-[13px] font-medium border border-gray-200 rounded-lg px-2.5 h-11 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <option value="" disabled selected>Select Exercise...</option>
-                        <option v-for="name in getFilteredExercises(ex.bodyPart)" :key="name" :value="name">{{ name }}</option>
-                      </select>
+                      <div class="relative w-28 shrink-0">
+                        <select v-model="ex.bodyPart" @change="ex.name = ''; focusWeight(i)"
+                          class="text-[13px] font-medium border border-gray-200 rounded-lg px-2 pr-8 h-11 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white w-full appearance-none">
+                          <option value="" disabled selected>Select Part...</option>
+                          <option v-for="p in BODY_PARTS" :key="p" :value="p">{{ p }}</option>
+                        </select>
+                        <div class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      <div class="relative flex-1">
+                        <select v-model="ex.name" @change="focusWeight(i)" :disabled="!ex.bodyPart"
+                          class="text-[13px] font-medium border border-gray-200 rounded-lg px-2.5 pr-10 h-11 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white w-full appearance-none disabled:opacity-50 disabled:cursor-not-allowed">
+                          <option value="" disabled selected>Select Exercise...</option>
+                          <option v-for="name in getFilteredExercises(ex.bodyPart)" :key="name" :value="name">{{ name }}</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
                     </div>
                     <input v-if="ex.name === 'Custom...'" v-model="ex.customName" type="text" maxlength="30" placeholder="e.g. Pec Deck"
                       class="text-sm border border-gray-200 rounded-lg px-2.5 h-11 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white w-full"/>
@@ -507,6 +540,12 @@ import PetMiniWidget from './PetMiniWidget.vue'
 import DailyBrief from './DailyBrief.vue'
 
 // ── Constants ──
+const TIPS = [
+  "Consistency is the only 'secret' to progress.",
+  "Your only competition is who you were yesterday.",
+  "Slow progress is still progress.",
+  "Don't stop until you're proud."
+]
 const DEFAULT_TYPE_IDS = ['strength', 'walking', 'boxing', 'tennis']
 const COLOR_SWATCHES   = ['#f472b6', '#60a5fa', '#f87171', '#4ade80', '#fb923c', '#a78bfa']
 const CATEGORIES = [
@@ -558,6 +597,7 @@ const openWorkout     = ref(null)
 const showAddForm     = ref(false)
 const showConfetti    = ref(false)
 const weightInputs    = ref([])
+const activeTip       = ref(TIPS[Math.floor(Math.random() * TIPS.length)])
 const newTypeName     = ref('')
 const newTypeColor    = ref('#f472b6')
 const addError        = ref('')
@@ -618,7 +658,7 @@ function handleCardioExerciseSelect(e, ex) {
 const activeCategoryInfo = computed(() => {
   switch (state.trainingCategory) {
     case 'bodybuilding': return { label: 'Body Building', color: 'text-indigo-600', bg: 'bg-indigo-500' }
-    case 'calisthenics': return { label: 'Calisthenics',  color: 'text-amber-500',  bg: 'bg-amber-500' }
+    case 'calisthenics': return { label: 'Calisthenics',  color: 'text-orange-500', bg: 'bg-orange-500' }
     case 'cardio':       return { label: 'Cardio',        color: 'text-rose-500',   bg: 'bg-rose-500' }
     default:             return { label: 'New',           color: 'text-slate-800',  bg: 'bg-indigo-600' }
   }
@@ -627,7 +667,7 @@ const activeCategoryInfo = computed(() => {
 const addBtnClasses = computed(() => {
   switch (state.trainingCategory) {
     case 'bodybuilding': return 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100'
-    case 'calisthenics': return 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100'
+    case 'calisthenics': return 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-100'
     case 'cardio':       return 'bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100'
     default:             return 'bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100'
   }

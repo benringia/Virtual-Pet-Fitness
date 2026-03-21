@@ -8,106 +8,60 @@ const todayStr = (() => {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 })()
 
-const structuredToday = computed(() =>
-  state.workouts.filter(w =>
-    w.date === todayStr &&
-    w.type !== 'Custom' &&
-    state.workoutTypes.some(wt => wt.name === w.type)
-  )
-)
+const CATEGORIES = [
+  { id: 'bodybuilding', label: 'Body Building', emoji: '🏋️', color: 'text-indigo-600', bg: 'bg-indigo-50/50' },
+  { id: 'calisthenics', label: 'Calisthenics',  emoji: '🤸', color: 'text-orange-600', bg: 'bg-orange-50/50' },
+  { id: 'cardio',       label: 'Cardio',        emoji: '🏃', color: 'text-rose-600',   bg: 'bg-rose-50/50' },
+]
 
-const structuredXpToday = computed(() =>
-  structuredToday.value.reduce((s, w) => s + (w.xp || 0), 0)
-)
-
-const activeTypesToday = computed(() => {
-  const counts = {}
-  for (const w of structuredToday.value) {
-    counts[w.type] = (counts[w.type] || 0) + 1
-  }
-  return Object.entries(counts).map(([name, count]) => {
-    const wt = state.workoutTypes.find(t => t.name === name)
-    return { name, count, color: wt?.color ?? '#6366f1' }
+const categoryStatus = computed(() => {
+  return CATEGORIES.map(cat => {
+    const isComplete = state.workoutSessions.some(s => s.date === todayStr && s.category === cat.id)
+    return { ...cat, isComplete }
   })
 })
 
-const activeSummary = computed(() => {
-  const total = structuredToday.value.length
-  return total === 0
-    ? 'No sessions yet today'
-    : `${total} session${total !== 1 ? 's' : ''} today`
-})
+function navigateToCategory(catId) {
+  state.trainingCategory = catId
+  activeView.value = 'workouts'
+}
 </script>
 
 <template>
   <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-
-    <!-- Header row -->
-    <div class="flex items-center justify-between mb-4">
-      <div>
-        <h3 class="text-sm font-semibold text-gray-700">
-          Structured Workouts
-        </h3>
-        <p class="text-xs text-gray-400 mt-0.5">
-          {{ activeSummary }}
-        </p>
-      </div>
-      <!-- XP badge -->
-      <div v-if="structuredXpToday > 0"
-        class="bg-indigo-50 rounded-xl px-3 py-1.5 text-center">
-        <p class="text-xs text-indigo-400">XP today</p>
-        <p class="text-sm font-bold text-indigo-600">
-          +{{ structuredXpToday }}
-        </p>
-      </div>
+    <div class="mb-6">
+      <h3 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 mb-1">
+        <span class="text-2xl">⚡</span> Daily Training
+      </h3>
+      <p class="text-sm text-slate-400">Track your progress for today</p>
     </div>
 
-    <!-- Active types list -->
-    <div v-if="activeTypesToday.length > 0"
-      class="space-y-2 mb-4">
-      <div
-        v-for="item in activeTypesToday.slice(0, 3)"
-        :key="item.name"
-        class="flex items-center gap-2 text-xs text-gray-600"
-      >
-        <span class="w-2 h-2 rounded-full shrink-0"
-          :style="{ backgroundColor: item.color }"/>
-        <span>{{ item.name }}</span>
-        <span class="text-gray-400 ml-auto">
-          {{ item.count }} session{{ item.count !== 1 ? 's' : '' }}
-        </span>
+    <div class="space-y-2">
+      <div v-for="cat in categoryStatus" :key="cat.id"
+        @click="navigateToCategory(cat.id)"
+        class="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:shadow-md hover:border-slate-100 transition-all cursor-pointer group"
+        :class="cat.isComplete ? cat.bg : 'bg-white'">
+        
+        <div class="flex items-center gap-3">
+          <span class="text-xl">{{ cat.emoji }}</span>
+          <div>
+            <p class="text-[13px] font-semibold text-slate-700">{{ cat.label }}</p>
+            <p v-if="cat.isComplete" class="text-[10px] text-emerald-600 font-medium">✅ Session Logged</p>
+            <p v-else class="text-[10px] text-slate-400">No session yet today • +XP</p>
+          </div>
+        </div>
+
+        <div v-if="!cat.isComplete" 
+          class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider bg-indigo-50 px-2 py-1 rounded-lg group-hover:bg-indigo-100 transition-colors">
+          + Log
+        </div>
+        <div v-else class="text-emerald-500">
+          <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
       </div>
-      <p v-if="activeTypesToday.length > 3"
-        class="text-[11px] text-gray-400 pl-4">
-        + {{ activeTypesToday.length - 3 }} more
-      </p>
     </div>
-
-    <!-- Empty state -->
-    <div v-else
-      class="bg-indigo-50 rounded-xl p-3 mb-4 text-center">
-      <p class="text-xs text-indigo-500">
-        No structured workouts yet today
-      </p>
-      <p class="text-[11px] text-gray-400 mt-0.5">
-        Log specific training for bonus XP
-      </p>
-    </div>
-
-    <!-- CTA button -->
-    <button
-      @click="activeView = 'workouts'"
-      class="w-full flex items-center justify-center gap-2
-        py-2 rounded-xl border border-indigo-200
-        text-indigo-500 text-xs font-medium
-        hover:bg-indigo-50 transition-colors cursor-pointer"
-    >
-      View My Workouts
-      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
-    </button>
-
   </section>
 </template>
+

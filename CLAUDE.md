@@ -938,15 +938,165 @@ Local time only — no UTC.
 - Feedback Loop: If a New PR is detected (calculated vs. history): Display "NEW RECORD! 🏆". Standard Success: Display "Session Saved! +XP".
 - Visuals: Widget uses `animate-bounce` or `scale-110` pulse during celebration.
 
+## UI Layout & Component Standards
+### Page Headers
+- **Hero Title**: Use `text-3xl font-extrabold tracking-tight text-slate-900`. Prepend with a ⚡ (Bolt) icon (e.g., "⚡ My Training"). Stack vertically above category selection with `mb-2`.
+- **Navigation (Back Button)**: Use a 'Ghost' style (transparent background, `text-slate-500`, `hover:text-indigo-600`). Always position at the top-left (breadcrumb layout) above the Title.
+- **Session Counters**: Display count as a subtle pill badge next to the title: `text-[11px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full ml-2`.
+
+### Motivational Component
+- **Style**: Slim, full-width banner positioned below the header and above the logger/tabs. Maintain a `mt-4` gap between the Title and Tip, and a `mb-10` separation between the Tip and interaction categories.
+- **Visuals**: `bg-slate-50 border-l-4 border-indigo-500 py-3 px-4 rounded-r-xl shadow-sm`.
+- **Text**: `text-[13px] text-slate-600 italic font-medium`.
+- **Logic**: Tips must be dynamically rotated or randomized from a `MOTIVATIONAL_TIPS` array stored in a dedicated utility.
+- **Guardrails**: Ensure no more than 2 lines of text on mobile (< 375px). Prevent element overlap during viewport resizing. Keep in document flow (do not use absolute positioning for Tip spacing).
+### Tracker Dashboard Teasers
+- **Components**: Replace any generic "Structured Workouts" entry with a list of active training category teasers (**BB**, **Cali**, **Cardio**). 
+- **Section Header**: Use **`text-xl font-bold text-slate-900 tracking-tight`** for the title ("⚡ Daily Training"). Prepend title with ⚡.
+- **Sub-text**: Use `text-sm text-slate-400` for the descriptive text immediately below the title (e.g., "Track your progress for today").
+- **Status State Logic**:
+  - *Incomplete*: Display "No [Category] yet today" with a themed/gray icon and a subtle XP bonus mention.
+  - *Complete*: Display "✅ [Category] Session Logged" with a Green/themed accent and higher saturation.
+- **Interactivity & Navigation**: Clicking a teaser Card must:
+  1.  Switch the `activeView` to 'workouts'.
+  2.  Automatically set the `state.trainingCategory` to match the specific teaser selected.
+- **Styling**: Compact card layout with `border border-slate-100` and category-specific hover backgrounds (e.g., `bg-indigo-50/50`).
+- **Guardrails**: Ensure teasers are small and horizontally aligned to avoid dashboard clutter. Preserve any 'Locked' state visuals for past-day tracking.
+### Tracker Dashboard Hierarchy
+- **Tier 1 (Priority)**: Top—PETFIT Virtual Pet Status & Primary Progress/XP Bars.
+- **Tier 2 (Core)**: Middle—Training Hub (Daily Training).
+- **Tier 3 (Utility)**: Bottom—Misc Movement Library.
+- **Compact Layout**: Prioritize a tighter vertical stack to keep both core sections "above the fold" on most mobile devices. Use **`mb-6`** (24px) below training cards, and a tighter **`mt-4`** (16px) gap for the Misc Movement section. Do NOT use larger separators like mt-12.
+
+### Dashboard Column Layout
+- **Masonry Columns & Spacing**:
+  - **Requirement**: Cards in the Overview/Tracker view MUST stack vertically without leaving large gaps between uneven heights.
+  - **Implementation**: Utilize Tailwind's **`columns-1 md:columns-2 lg:columns-3`** for a true masonry effect. Ensure each card is wrapped in a container that uses **`break-inside-avoid mb-6 w-full`** to maintain clean column breaks.
+- **Intrinsic Height Management**:
+  - **Requirement**: Side-by-side cards (when using standard Flex/Grid instead of Masonry) must NOT stretch to match the height of their tallest neighbor.
+  - **Alignment**: Configure parent containers with **`items-start`** (for Flex) or specify **`items-start`** on grid layouts to ensure top-alignment without vertical stretching.
+- **Specific Constraints**:
+  - **Daily Reset Card**: This component should never expand vertically. Use **`h-fit`** or wrap in an `items-start` wrapper to maintain its minimal footprint.
+- **Guardrails**:
+  - **No Fixed Heights**: Never use hardcoded pixel heights (e.g., `h-64`) for dashboard cards; allow them to grow naturally with their data.
+  - **Bottom Clipping**: Ensure 'Today's Progress' or other core cards are never cut off during column breaks by properly applying `break-inside-avoid`.
+
+### Quick Log (Misc Movement Library)
+- **Library**: Provide a pre-set list for un-structured movement: `['Walking', 'Cleaning/Chores', 'Grocery Shopping', 'Biking (Commute)', 'Stretching/Yoga', 'Hiking', 'Custom...']`.
+- **Default Intensity Mapping**: 
+  - *Walking / Groceries*: Default to 'Easy'.
+  - *Cleaning / Yoga*: Default to 'Moderate'.
+  - *Hiking / Biking*: Default to 'Intense'.
+- **UI Logic**: Use a `<select>` dropdown for the library. The 'Custom' text input must ONLY appear if 'Custom...' is selected.
+- **Branding & Palette**:
+  - **Accent Color**: Use **Orange** accents (e.g., `text-orange-600`, `bg-orange-500`, `border-orange-100`) for all Misc Movement UI elements.
+  - **Intensity Pill-Toggles**: 
+    - *Inactive*: `bg-slate-50 text-slate-500`. 
+    - *Active*: `bg-orange-500 text-white shadow-md hover:bg-orange-600`.
+  - **Action Button**: Use a solid **`bg-orange-600 text-white hover:bg-orange-700`** for the primary **`+ LOG`** button.
+- **Header Style**: Use identical style to Daily Training: `text-xl font-bold text-slate-900 tracking-tight`. Prepend with 🚲 (Bicycle) or 🧹 (Broom) icon.
+- **Guardrails**:
+  - Do NOT change the colors of the primary Daily Training hub; keep the orange palette exclusive to the un-structured movement card.
+  - Keep XP rewards lower (+5 to +15 XP). 
+  - Section must sit closely beneath the training hub with standard **`mt-4`** whitespace.
+
+### Color Grouping & Semantic Palettes
+- **Orange Theme Group (Lifestyle & Body Weight)**:
+  - **Categories**: **Calisthenics** & **Misc Movement**.
+  - **Primary Accents**: `text-orange-600`, `bg-orange-600`.
+  - **Soft Accents**: `bg-orange-50/50`, `border-orange-100/50`.
+  - **Focus States**: `focus:ring-orange-500`.
+- **Blue Theme Group (Traditional Strength)**:
+  - **Categories**: **Body Building**.
+  - **Primary Accents**: `text-indigo-600`, `bg-indigo-600`.
+  - **Soft Accents**: `bg-indigo-50/50`, `border-indigo-100/50`.
+- **Completion & Success**:
+  - **Visual Indicator**: Always use **`text-emerald-500` (Victory Green)** for success text and "✅ Session Logged" states across ALL sections.
+
+- **Guardrails**:
+  - Do NOT change the **Blue** palette for Body Building. 
+  - Do NOT change the **Indigo/Red** palette for Cardio. 
+  - Ensure **Misc Movement** and **Calisthenics** are aesthetically linked through the Shared Orange palette.
+
+### Weight Log (Lifestyle Progress)
+- **Header Synchronization**: Match the "Daily Training" and "Misc Movement" hubs—use **`text-xl font-bold text-slate-900 tracking-tight`**.
+- **Iconography**: Prepend the header with a **⚖️ (Balance Scale)** icon.
+- **Layout**: Use **`flex items-center gap-2 mb-4`** for the title container.
+- **Spacing**: Maintain a standard **`mt-8` or `mt-12`** vertical gap from the Misc Movement section to ensure lifestyle groups are distinct.
+- **Goal Logic**:
+  - **Success Math**:
+    - **Loss Mode**: SUCCESS if `currentWeight <= goalWeight`.
+    - **Gain Mode**: SUCCESS if `currentWeight >= goalWeight`.
+    - **Maintain Mode**: SUCCESS if `Math.abs(currentWeight - goalWeight) <= 0.5`.
+  - **Dynamic Vocabulary**: 
+    - Feedback must change by mode: `[x] [unit] to lose`, `[x] [unit] to gain`, or `On track` (for Maintain).
+  - **Color Strategy**: Apply **`text-emerald-500` (Victory Green)** ONLY when the Success Math for the active goal type evaluates to TRUE.
+  - **Projection Analytics**:
+    - **Goal Forecast**: Estimate completion date using the slope of the last **3 entries**. 
+    - **Math**: `DaysToGoal = (RemainingWeight / AverageDailyChange)`.
+    - **Display**: Show as italicized sub-label (`text-[11px] text-slate-400`) below goal status.
+    - **Fallback**: Display "Needs more data" if entries < 3 or "Stable/Trend away" if moving away from goal.
+  - **Celebration Logic**:
+    - **Event**: Trigger **`confetti()`** when `isSuccess` state flips from `false` to `true`.
+    - **Persistence**: Store **`hasCelebratedGoal`** in weight state to prevent duplicate triggers on reload.
+- **Input Layout**: Implement Goal Type selectors as a horizontal 'Pill' toggle (e.g., bg-gray-100 wrapper) positioned directly above the Goal Weight text input.
+
+### Unit Conversions & Display
+- **Global Unit State**: Use centralized **`state.weightUnit`** ('kg' or 'lbs') to drive all UI elements.
+- **Base Storage Requirement**: ALWAYS store weights in the database/JSON in **KG** (the Base Value). Convert only for display and input to prevent cumulative rounding errors.
+- **Math**: 
+  - $lbs = kg \times 2.20462$
+  - $kg = lbs / 2.20462$
+- **Reactive UI**: 
+  - **Formatting**: Weights must pass through a formatter that applies conversion and appends the unit label.
+  - **Inputs**: Update `placeholder` and `value` dynamically when unit is toggled.
+  - **Thresholds**: The 0.5kg "Maintain" range must scale to **~1.1 lbs** in LBS mode.
+
+  - Keep 'Goal Weight' as an optional input.
+
+### Weight Log Standards (Emotional Design)
+- **Stat Hero Section**:
+  - **Dominant Metric**: Display current weight using **`text-5xl font-extrabold text-slate-900`**.
+  - **Unit Label**: Complement with **`text-lg text-slate-400 font-medium`**.
+  - **Atmosphere**: Use a **`bg-gradient-to-br from-white to-indigo-50/30`** backdrop to elevate the section's visual quality.
+- **Feedback & Status Badges**:
+  - **The Streak Pill**: Format daily streaks in a rounded pill using **`bg-orange-100 text-orange-700`** with a subtle pulse animation.
+  - **Semantic Feedback**: 
+    - Use **`text-emerald-600`** for progress alignment (on-track).
+    - Use **`text-rose-500`** for deviation (off-track) according to selected Goal Type.
+- **Interaction & Action State**:
+  - **Default View**: Maintain high signal-to-noise ratio by showing only Stats, Active Goal Type, and Streak.
+  - **Active Reveal**: Use a smooth transition to reveal weight/goal input fields only when the user triggers the "Update" action.
+- **Navigation & Controls**:
+  - **Glass-morphism**: Style the 'kg/lbs' unit toggle with a modern glass-morphism aesthetic (subtle backdrop blur, thin border).
+  - **Header**: Maintain the **`text-xl font-bold`** header with the **⚖️** icon.
+- **Weight Goal Configuration**:
+  - **Goal Type Selector**: Use the [Loss] [Maintain] [Gain] pill-toggle. 
+  - **Styling**: Active state = **`bg-indigo-600`** with shadow; inactive = **`text-slate-400`**.
+  - **Reactive Feedback**: Ensure the "X kg to gain/lose" text remains fully reactive.
+
+### Form Controls (Custom Selects)
+- **Select Affordance**: All `<select>` elements must feature a visible downward chevron icon on the right to indicate dropdown functionality.
+- **Styling**: 
+  - Use `appearance-none` on the select tag.
+  - Add a background-image chevron or an absolute-positioned icon (e.g., `text-slate-400`).
+  - Ensure **`pr-10`** padding on the select to prevent text from overlapping the icon.
+- **Interaction**: Ensure the icon is `pointer-events-none` so clicking it still opens the native dropdown.
+- **Focus States**: Maintain the 'indigo' border on focus.
+
 ## Math Standards
 - 1RM: `(weight * (1 + reps / 30))`.
 - Volume: `Σ (weight * reps)` for the session exercises.
 
 ## Navigation Rules
-- `activeView` supports 'tracker', 'progress', and 'workouts'.
-- Default view remains 'tracker'.
+- **View Naming**: Rename "Tracker" to **"Overview"** across all UI elements, menus, and breadcrumbs.
+- **Internal State**: Use **`'overview'`** as the `activeView` value. Update all `v-if` and navigation logic accordingly.
+- **Home Icon**: Always use the 'Home' (house) icon for the Overview section.
+- `activeView` supports 'overview', 'progress', and 'workouts'.
+- Default view remains 'overview'.
 
 > **GUARDRAILS:** 
 > - The localStorage key MUST remain `flarepup-v5`. No exceptions.
 > - Do not duplicate pet logic; use the shared store state for XP and Level.
 > - Ensure the 'speech bubble' text is high-contrast for readability. 
+> - Ensure navigation labels (e.g., 'Overview') are perfectly vertically centered in all nav-bars.

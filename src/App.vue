@@ -31,18 +31,18 @@
           </div>
           <!-- Nav items -->
           <nav aria-label="Main navigation" class="flex flex-col gap-1 mt-8">
-            <!-- Tracker -->
+            <!-- Overview -->
             <button
-              @click="activeView = 'tracker'"
-              :aria-current="activeView === 'tracker' ? 'page' : undefined"
-              :class="activeView === 'tracker' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
+              @click="activeView = 'overview'"
+              :aria-current="activeView === 'overview' ? 'page' : undefined"
+              :class="activeView === 'overview' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
               class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
-              title="Tracker"
+              title="Overview"
             >
               <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
               </svg>
-              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Tracker</span>
+              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Overview</span>
             </button>
 
             <!-- Progress -->
@@ -149,74 +149,72 @@
           <WorkoutsView />
         </div>
 
-        <!-- Tracker view -->
-        <div v-if="activeView === 'tracker'" class="flex flex-col lg:flex-row gap-6 p-4 lg:p-6 items-start">
+        <!-- Overview view -->
+        <div v-if="activeView === 'overview'" class="flex flex-col lg:flex-row gap-6 p-4 lg:p-6 items-start">
 
-          <!-- Center column — masonry -->
+          <!-- Main Dashboard Grid -->
           <div class="flex-1 min-w-0">
-            <div class="columns-1 lg:columns-2 gap-4 [column-fill:balance]">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
 
-              <!-- WorkoutLogger -->
-              <div class="break-inside-avoid mb-4 w-full">
-                <WorkoutLogger />
-              </div>
+              <!-- COLUMN 1: Training & Activity -->
+              <div class="flex flex-col gap-6">
+                <!-- MyWorkoutsPreview -->
+                <div class="break-inside-avoid w-full">
+                  <MyWorkoutsPreview />
+                </div>
 
-              <!-- MyWorkoutsPreview -->
-              <div class="break-inside-avoid mb-4 w-full">
-                <MyWorkoutsPreview />
-              </div>
+                <!-- WorkoutLogger (Quick Log) -->
+                <div class="break-inside-avoid w-full">
+                  <WorkoutLogger />
+                </div>
 
-              <!-- StatsPanel (Your Journey) -->
-              <div class="break-inside-avoid mb-4 w-full">
-                <StatsPanel />
-              </div>
-
-              <!-- WeightLog + ReminderSettings side by side -->
-              <div class="break-inside-avoid mb-4 w-full">
-                <div class="grid grid-cols-2 gap-4">
-                  <WeightLog />
-                  <ReminderSettings />
+                <!-- StatsPanel (Your Journey) -->
+                <div class="break-inside-avoid w-full text-slate-400">
+                  <StatsPanel />
                 </div>
               </div>
 
-              <!-- Rest Day + TodayProgress side by side -->
-              <div class="break-inside-avoid mb-4 w-full">
-                <div class="grid grid-cols-2 gap-4">
-                  <!-- Rest Day -->
-                  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                    <div class="flex items-center justify-between mb-4">
-                      <h3 class="text-sm font-semibold text-gray-700">Rest Day</h3>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-400" aria-hidden="true">
-                        <path d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/>
-                      </svg>
-                    </div>
-                    <!-- Usage pill slots -->
-                    <div class="flex gap-2 mb-4">
-                      <div
-                        v-for="i in 2"
-                        :key="i"
-                        :class="i <= restDaysThisWeek
-                          ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                          : 'bg-gray-50 border-gray-200 text-gray-400'"
-                        class="flex-1 rounded-xl border py-2 text-center text-xs font-medium transition-colors"
-                      >{{ i <= restDaysThisWeek ? 'Used' : 'Available' }}</div>
-                    </div>
-                    <!-- Log button -->
-                    <button
-                      @click="handleLogRestDay"
-                      :disabled="!restDayAllowed"
-                      :class="restDayAllowed
-                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white cursor-pointer'
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
-                      class="w-full min-h-11 rounded-xl text-sm font-semibold transition-colors"
-                    >
-                      {{ restLogged ? '✓ Rest day logged' : restDayAllowed ? 'Log Rest Day' : 'Limit reached this week' }}
-                    </button>
+              <!-- COLUMN 2: Weight & Recovery -->
+              <div class="flex flex-col gap-6">
+                <!-- WeightLog -->
+                <div class="break-inside-avoid w-full">
+                  <WeightLog />
+                </div>
+
+                <!-- Rest Day -->
+                <div class="break-inside-avoid w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-gray-700">Rest Day</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-400" aria-hidden="true">
+                      <path d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/>
+                    </svg>
                   </div>
+                  <div class="flex gap-2 mb-4">
+                    <div v-for="i in 2" :key="i"
+                      :class="i <= restDaysThisWeek ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-gray-50 border-gray-200 text-gray-400'"
+                      class="flex-1 rounded-xl border py-2 text-center text-xs font-medium transition-colors"
+                    >{{ i <= restDaysThisWeek ? 'Used' : 'Available' }}</div>
+                  </div>
+                  <button @click="handleLogRestDay" :disabled="!restDayAllowed"
+                    :class="restDayAllowed ? 'bg-emerald-500 hover:bg-emerald-600 text-white cursor-pointer' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
+                    class="w-full min-h-11 rounded-xl text-sm font-semibold transition-colors">
+                    {{ restLogged ? '✓ Rest day logged' : restDayAllowed ? 'Log Rest Day' : 'Limit reached this week' }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- COLUMN 3: Reminders & Progress -->
+              <div class="flex flex-col gap-6">
+                <!-- ReminderSettings -->
+                <div class="break-inside-avoid w-full">
+                  <ReminderSettings class="h-fit" />
+                </div>
+
+                <!-- TodayProgress -->
+                <div class="break-inside-avoid w-full">
                   <TodayProgress />
                 </div>
               </div>
-
 
             </div>
           </div>
@@ -336,17 +334,17 @@
     <!-- Mobile bottom nav (fixed) -->
     <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex z-20" aria-label="Mobile navigation">
 
-      <!-- Tracker -->
+      <!-- Overview -->
       <button
-        @click="activeView = 'tracker'"
-        :class="activeView === 'tracker' ? 'text-indigo-600' : 'text-gray-400'"
+        @click="activeView = 'overview'"
+        :class="activeView === 'overview' ? 'text-indigo-600' : 'text-gray-400'"
         class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
-        aria-label="Tracker"
+        aria-label="Overview"
       >
         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
         </svg>
-        <span>Tracker</span>
+        <span>Overview</span>
       </button>
 
       <!-- Progress -->

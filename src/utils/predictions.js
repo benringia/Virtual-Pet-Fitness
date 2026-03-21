@@ -29,13 +29,13 @@ function computeCaloriePredictions(state) {
   const totalDeficit = entries.reduce((sum, d) => sum + (d.burned - d.eaten), 0)
   const avgDailyDeficit = totalDeficit / daysOfData
   const projected30dDeficit = Math.round(avgDailyDeficit * 30)
-  const weightChangeLbs = Math.round((projected30dDeficit / 3500) * 10) / 10
+  const weightChangeKg = Math.round((projected30dDeficit / 7716) * 10) / 10
 
   return {
     hasData: true,
     avgDailyDeficit: Math.round(avgDailyDeficit),
     projected30dDeficit,
-    weightChangeLbs,
+    weightChangeKg,
     daysOfData,
     confidence: confidenceLabel(daysOfData),
   }

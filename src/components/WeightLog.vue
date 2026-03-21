@@ -1,181 +1,132 @@
 <template>
-  <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-
-    <!-- Header row -->
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-indigo-400 shrink-0" aria-hidden="true">
-          <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-          <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-          <path d="M7 21h10"/>
-          <path d="M12 3v18"/>
-          <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
-        </svg>
-        Weight Log
+  <section class="relative overflow-hidden bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-6">
+    
+    <!-- Header: Glass-morphism Unit Toggle -->
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 mb-1">
+        <span class="text-2xl">⚖️</span> Weight Log
       </h2>
-      <!-- Unit toggle -->
-      <div class="flex bg-gray-100 rounded-lg p-0.5 text-xs font-medium">
+      <div class="flex bg-white/40 backdrop-blur-md border border-white/60 rounded-xl p-1 text-[10px] font-bold shadow-sm">
         <button
           @click="state.weightUnit = 'kg'"
-          :class="state.weightUnit === 'kg' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400'"
-          class="px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+          :class="state.weightUnit === 'kg' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'"
+          class="px-3 py-1.5 rounded-lg transition-all cursor-pointer uppercase"
         >kg</button>
         <button
           @click="state.weightUnit = 'lbs'"
-          :class="state.weightUnit === 'lbs' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400'"
-          class="px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+          :class="state.weightUnit === 'lbs' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'"
+          class="px-3 py-1.5 rounded-lg transition-all cursor-pointer uppercase"
         >lbs</button>
       </div>
     </div>
 
-    <!-- Current weight hero -->
-    <div v-if="currentWeight !== null" class="mb-4">
-      <p class="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Current</p>
-      <div class="flex items-baseline gap-1.5">
-        <span class="text-3xl font-bold text-gray-900">{{ currentWeight }}</span>
-        <span class="text-sm text-gray-400">{{ state.weightUnit }}</span>
-      </div>
-      <!-- Goal progress -->
-      <div class="flex items-center gap-3 mt-2">
-        <div v-if="state.weightGoal" class="text-xs text-gray-400">
-          Goal: <span class="font-semibold text-gray-600">{{ state.weightGoal }} {{ state.weightUnit }}</span>
-        </div>
-        <div v-if="diff !== null" class="text-xs font-medium"
-          :class="diffPositive ? 'text-emerald-500' : 'text-rose-400'"
-        >
-          {{ diff > 0 ? '+' : '' }}{{ diff }} {{ state.weightUnit }} to goal
-        </div>
-      </div>
-      <!-- Streak badge -->
-      <div v-if="streak > 0" class="flex items-center gap-1.5 mt-2">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 text-amber-500 shrink-0" aria-hidden="true">
+    <!-- Hero Section -->
+    <div v-if="currentWeight !== null" class="relative flex flex-col items-center justify-center mb-8 py-4">
+      <!-- Floating Streak Badge -->
+      <div v-if="streak > 0" 
+           class="absolute -top-2 left-1/2 -translate-x-1/2 bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm border border-orange-200 animate-pulse">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3">
           <path fill-rule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071-.136 9.742 9.742 0 00-3.539 6.176 7.547 7.547 0 01-1.705-1.715.75.75 0 00-1.152-.082A9 9 0 1015.68 4.534a7.46 7.46 0 01-2.717-2.248zM15.75 14.25a3.75 3.75 0 11-7.313-1.172c.628.465 1.35.81 2.133 1a5.99 5.99 0 011.925-3.545 3.75 3.75 0 013.255 3.717z" clip-rule="evenodd"/>
         </svg>
-        <span class="text-xs font-semibold text-amber-700">{{ streak }}-day streak</span>
-        <span v-if="streak >= 7" class="text-xs bg-amber-100 text-amber-700 rounded-full px-2 py-0.5 font-bold">+15 XP</span>
+        {{ streak }} Day Streak
+      </div>
+
+      <!-- Main Weight Display -->
+      <div class="flex items-baseline gap-1 mt-2">
+        <span class="text-6xl font-bold text-slate-900 tracking-tighter">{{ displayCurrentWeight }}</span>
+        <span class="text-xl font-medium text-slate-300">{{ state.weightUnit }}</span>
+      </div>
+
+      <!-- Weekly Progress Summary -->
+      <p v-if="weeklyProgressText" class="mt-3 text-[11px] font-bold tracking-tight" :class="weeklyProgressColor">
+        {{ weeklyProgressText }}
+      </p>
+
+      <!-- Goal Info -->
+      <div v-if="state.weightGoal" class="flex items-center gap-2 mt-4 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target:</span>
+        <span class="text-xs font-bold text-slate-700">{{ displayGoalWeight }} {{ state.weightUnit }}</span>
+        <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+        <span class="text-xs font-bold" :class="isSuccess ? 'text-emerald-600' : 'text-rose-500'">{{ diffText }}</span>
       </div>
     </div>
 
-    <!-- Mini chart (1+ entries) -->
-    <div v-if="last7.length >= 1" class="mb-4 bg-gray-50 rounded-xl p-3">
-      <p class="text-xs text-gray-400 mb-2">Last {{ last7.length }} {{ last7.length === 1 ? 'entry' : 'entries' }}</p>
-      <svg :viewBox="`0 0 ${SVG_W} ${SVG_H}`" class="w-full h-14" aria-hidden="true">
-        <!-- Goal line -->
-        <line
-          v-if="state.weightGoal && goalY !== null"
-          :x1="0" :y1="goalY" :x2="SVG_W" :y2="goalY"
-          stroke="#c084fc" stroke-width="1" stroke-dasharray="4 3" opacity="0.7"
-        />
-        <!-- Area fill -->
-        <defs>
-          <linearGradient id="weight-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#6366f1" stop-opacity="0.15"/>
-            <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <polygon
-          v-if="chartCoords.length >= 2"
-          :points="areaPoints"
-          fill="url(#weight-fill)"
-        />
-        <!-- Trend line (2+ points) or horizontal placeholder (1 point) -->
-        <polyline
-          v-if="chartCoords.length >= 2"
-          :points="chartPoints"
-          fill="none"
-          stroke="#6366f1"
-          stroke-width="2"
-          stroke-linejoin="round"
-          stroke-linecap="round"
-        />
-        <line
-          v-else-if="chartCoords.length === 1"
-          :x1="PAD" :y1="SVG_H / 2" :x2="SVG_W - PAD" :y2="SVG_H / 2"
-          stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"
-        />
-        <!-- Data dots -->
-        <circle
-          v-for="(pt, i) in chartCoords"
-          :key="i"
-          :cx="pt.x" :cy="pt.y" r="3"
-          fill="#6366f1"
-        />
-        <!-- Min / max labels (only meaningful with 2+ entries) -->
-        <template v-if="chartCoords.length >= 2">
-          <text :x="SVG_W - 2" :y="minY + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ chartMin }}</text>
-          <text :x="SVG_W - 2" :y="maxY + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ chartMax }}</text>
-        </template>
-      </svg>
-    </div>
-
-    <p v-else class="text-xs text-gray-400 text-center py-2 mb-4">
-      Log your weight to see your trend chart.
-    </p>
-
-    <template v-if="!hasLoggedToday">
-      <div v-if="showForm" class="border-t border-gray-100 pt-4 flex flex-col gap-2">
-        <!-- Weight input -->
-        <div class="flex flex-col gap-1">
-          <label for="weight-input" class="text-xs font-medium text-gray-500">Today's weight</label>
-          <input
-            id="weight-input"
-            v-model.number="weightInput"
-            type="number"
-            min="1"
-            step="0.1"
-            :placeholder="`e.g. 72.5 ${state.weightUnit}`"
-            class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-shadow"
-          />
-        </div>
-        <!-- Goal input -->
-        <div class="flex flex-col gap-1">
-          <label for="goal-input" class="text-xs font-medium text-gray-500">
-            Goal weight <span class="font-normal text-gray-400">(optional)</span>
-          </label>
-          <input
-            id="goal-input"
-            v-model.number="goalInput"
-            type="number"
-            min="1"
-            step="0.1"
-            :placeholder="`e.g. 68 ${state.weightUnit}`"
-            @change="saveGoal"
-            class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-shadow"
-          />
-        </div>
-        <button
-          @click="handleLog"
-          :disabled="!weightInput || weightInput <= 0"
-          class="w-full bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-white rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-indigo-600 active:bg-indigo-700 transition-colors"
+    <!-- Actions & Editing -->
+    <div class="space-y-4">
+      <!-- Edit Mode Toggle -->
+      <div v-if="!isEditing" class="flex flex-col items-center">
+        <button 
+          v-if="!hasLoggedToday"
+          @click="isEditing = true"
+          class="group relative flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-indigo-200/50 hover:bg-indigo-700 active:scale-95 transition-all w-full md:w-auto"
         >
-          Log Weight
+          <span class="text-lg">+</span> Update Weight Log
         </button>
-        <button
-          @click="showForm = false"
-          class="w-full text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors py-1 mt-1"
-        >
-          cancel
-        </button>
+        <div v-else class="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
+          Daily log complete
+        </div>
       </div>
-      <button
-        v-else
-        @click="showForm = true"
-        class="mt-2 text-xs text-indigo-400 hover:text-indigo-600 cursor-pointer transition-colors flex items-center gap-1"
-      >
-        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-        </svg>
-        Update weight
-      </button>
-    </template>
-    <div v-else class="border-t border-gray-100 pt-4 flex items-center gap-2 text-xs text-emerald-600">
-      <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M20 6 9 17l-5-5"/>
-      </svg>
-      Daily log complete
-    </div>
 
+      <!-- Editing Form -->
+      <div v-else class="bg-white/80 backdrop-blur-sm rounded-3xl p-5 border border-white shadow-sm space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <!-- Goal Objective (Mode Selectors) -->
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase mb-3 px-1 tracking-widest">Weight Objective</p>
+          <div class="flex gap-2">
+            <button v-for="type in ['Loss', 'Maintain', 'Gain']" :key="type"
+              @click="state.weightGoalType = type"
+              :class="state.weightGoalType === type ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:text-slate-600'"
+              class="flex-1 py-2 text-[10px] font-black rounded-xl transition-all duration-200 cursor-pointer uppercase tracking-widest">
+              {{ type }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Inputs Row -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Today</label>
+            <input
+              v-model.number="weightInput"
+              type="number"
+              step="0.1"
+              :placeholder="toDisplay(currentWeight) || '--'"
+              class="w-full bg-slate-50/50 border-none rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-100 transition-all outline-none"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Goal</label>
+            <input
+              v-model.number="goalInput"
+              type="number"
+              step="0.1"
+              @change="saveGoal"
+              :placeholder="displayGoalWeight || '--'"
+              class="w-full bg-slate-50/50 border-none rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-100 transition-all outline-none"
+            />
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            @click="handleLog"
+            :disabled="!weightInput"
+            class="flex-1 bg-indigo-600 text-white py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 disabled:opacity-30 transition-all active:scale-95"
+          >
+            Save Record
+          </button>
+          <button
+            @click="isEditing = false"
+            class="px-5 bg-slate-100 text-slate-500 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -185,35 +136,58 @@ import { state } from '../store/state.js'
 import { logWeight, getWeightStreak } from '../utils/weight.js'
 import { triggerAchievement } from '../utils/achievements.js'
 import { todayStr } from '../utils/dates.js'
+import { confetti } from '../utils/confetti.js'
 
-const SVG_W = 300
-const SVG_H = 80
-const PAD = 10
+// Gauge visualization logic removed (SVG-based)
 
 const hasLoggedToday = computed(() =>
   state.weightLog.some(w => w.date === todayStr())
 )
 
-const showForm = ref(true)
+const isEditing = ref(false)
+
+const KG_TO_LBS = 2.20462
+const toDisplay = (kg) => kg === null ? null : (state.weightUnit === 'lbs' ? +(kg * KG_TO_LBS).toFixed(1) : +kg.toFixed(1))
+const fromDisplay = (val) => val === null ? null : (state.weightUnit === 'lbs' ? +(val / KG_TO_LBS).toFixed(3) : +val.toFixed(3))
 
 const weightInput = ref(null)
-const goalInput = ref(state.weightGoal)
+const goalInput = ref(toDisplay(state.weightGoal))
 
 function saveGoal() {
-  state.weightGoal = goalInput.value > 0 ? goalInput.value : null
+  state.weightGoal = goalInput.value > 0 ? fromDisplay(goalInput.value) : null
 }
 
 watch(() => state.weightGoal, (val) => {
   if (val === null) goalInput.value = ''
+  else goalInput.value = toDisplay(val)
+})
+
+watch(() => state.weightUnit, (newUnit, oldUnit) => {
+  if (weightInput.value !== null) {
+    if (newUnit === 'lbs') weightInput.value = +(weightInput.value * KG_TO_LBS).toFixed(1)
+    else weightInput.value = +(weightInput.value / KG_TO_LBS).toFixed(1)
+  }
+  // goalInput is handled by watcher on state.weightGoal or just manually here
+  if (goalInput.value !== null && goalInput.value !== '') {
+    if (newUnit === 'lbs') goalInput.value = +(goalInput.value * KG_TO_LBS).toFixed(1)
+    else goalInput.value = +(goalInput.value / KG_TO_LBS).toFixed(1)
+  }
 })
 
 function handleLog() {
   if (!weightInput.value || weightInput.value <= 0) return
-  logWeight(state, weightInput.value)
+  const kgValue = fromDisplay(weightInput.value)
+  logWeight(state, kgValue)
   weightInput.value = null
-  goalInput.value = ''
-  showForm.value = false
-  if (state.weightGoal && currentWeight.value !== null && currentWeight.value <= state.weightGoal) {
+  isEditing.value = false
+  const goal = state.weightGoal
+  const type = state.weightGoalType
+  const cur = currentWeight.value
+  
+  if (!goal || cur === null) return
+  
+  const reached = type === 'Loss' ? cur <= goal : type === 'Gain' ? cur >= goal : Math.abs(cur - goal) <= 0.5
+  if (reached) {
     triggerAchievement('weight', '⚖️', 'Weight goal reached!', 'You hit your target weight', `weight-goal-${todayStr()}`)
   }
 }
@@ -226,66 +200,111 @@ const last7 = computed(() =>
 
 const streak = computed(() => getWeightStreak(state.weightLog))
 const currentWeight = computed(() => last7.value.at(-1)?.weight ?? null)
+const displayCurrentWeight = computed(() => toDisplay(currentWeight.value))
+const displayGoalWeight = computed(() => toDisplay(state.weightGoal))
 
 const diff = computed(() => {
   if (currentWeight.value === null || !state.weightGoal) return null
-  return +(state.weightGoal - currentWeight.value).toFixed(1)
-})
-const diffPositive = computed(() => diff.value !== null && diff.value > 0)
-
-const chartMin = computed(() => {
-  if (!last7.value.length) return 0
-  const raw = Math.min(...last7.value.map(e => e.weight))
-  const rawMax = Math.max(...last7.value.map(e => e.weight))
-  return raw === rawMax ? raw - 1 : raw
+  return +(state.weightGoal - currentWeight.value).toFixed(2)
 })
 
-const chartMax = computed(() => {
-  if (!last7.value.length) return 0
-  const raw = Math.max(...last7.value.map(e => e.weight))
-  const rawMin = Math.min(...last7.value.map(e => e.weight))
-  return raw === rawMin ? raw + 1 : raw
+const diffText = computed(() => {
+  if (diff.value === null) return ''
+  const unit = state.weightUnit
+  const absKg = Math.abs(diff.value)
+  const displayAbs = unit === 'lbs' ? +(absKg * KG_TO_LBS).toFixed(1) : +absKg.toFixed(1)
+  
+  if (displayAbs === 0) return 'Goal reached!'
+  
+  if (state.weightGoalType === 'Maintain') {
+    return `${displayAbs} ${unit} from target`
+  }
+  const action = state.weightGoalType === 'Loss' ? 'lose' : 'gain'
+  return `${displayAbs} ${unit} to ${action}`
 })
 
-const chartCoords = computed(() => {
-  const n = last7.value.length
-  if (n === 0) return []
-  if (n === 1) return [{ x: SVG_W / 2, y: SVG_H / 2 }]
-  const min = chartMin.value
-  const max = chartMax.value
-  const range = max - min
-  return last7.value.map((e, i) => ({
-    x: PAD + (i / (n - 1)) * (SVG_W - PAD * 2),
-    y: PAD + (1 - (e.weight - min) / range) * (SVG_H - PAD * 2),
-  }))
+const isSuccess = computed(() => {
+  if (currentWeight.value === null || !state.weightGoal) return false
+  const goal = state.weightGoal
+  const type = state.weightGoalType
+  const cur = currentWeight.value
+  return type === 'Loss' ? cur <= goal : type === 'Gain' ? cur >= goal : Math.abs(cur - goal) <= 0.5
 })
 
-const chartPoints = computed(() =>
-  chartCoords.value.map(p => `${p.x},${p.y}`).join(' ')
-)
-
-const areaPoints = computed(() => {
-  if (chartCoords.value.length < 2) return ''
-  const pts = chartCoords.value
-  const top = pts.map(p => `${p.x},${p.y}`).join(' ')
-  return `${top} ${pts.at(-1).x},${SVG_H} ${pts[0].x},${SVG_H}`
+const weeklyProgress = computed(() => {
+  if (state.weightLog.length < 2) return null
+  const current = currentWeight.value
+  const weekAgo = last7.value[0]?.weight
+  if (current === null || weekAgo === undefined) return null
+  return +(current - weekAgo).toFixed(2)
 })
 
-const minY = computed(() => {
-  const coords = chartCoords.value
-  return coords.length ? Math.max(...coords.map(p => p.y)) : SVG_H - PAD
-})
-const maxY = computed(() => {
-  const coords = chartCoords.value
-  return coords.length ? Math.min(...coords.map(p => p.y)) : PAD
+const weeklyProgressText = computed(() => {
+  const p = weeklyProgress.value
+  if (p === null) return null
+  const unit = state.weightUnit
+  const displayAbs = unit === 'lbs' ? +(Math.abs(p) * KG_TO_LBS).toFixed(1) : +Math.abs(p).toFixed(1)
+  const verb = p >= 0 ? 'gained' : 'lost'
+  return `You've ${verb} ${displayAbs}${unit} this week. Keep going!`
 })
 
-const goalY = computed(() => {
-  if (!state.weightGoal || !last7.value.length) return null
-  const min = chartMin.value
-  const max = chartMax.value
-  const range = max - min
-  const y = PAD + (1 - (state.weightGoal - min) / range) * (SVG_H - PAD * 2)
-  return y < PAD ? PAD : y > SVG_H - PAD ? SVG_H - PAD : y
+const weeklyProgressColor = computed(() => {
+  const p = weeklyProgress.value
+  if (p === null) return 'text-slate-500'
+  const type = state.weightGoalType
+  const isGood = type === 'Loss' ? p < 0 : type === 'Gain' ? p > 0 : Math.abs(p) <= 0.2
+  return isGood ? 'text-emerald-500' : 'text-rose-500'
 })
+
+const startWeight = computed(() => state.weightLog[0]?.weight ?? null)
+
+const projectedDate = computed(() => {
+  if (state.weightGoalType === 'Maintain' || !state.weightGoal) return null
+  if (last7.value.length < 3) return null
+  
+  const entries = last7.value.slice(-3)
+  const weights = entries.map(e => e.weight)
+  const dates = entries.map(e => new Date(e.date).getTime())
+  
+  const d1 = (weights[1] - weights[0]) / ((dates[1] - dates[0]) / (1000 * 60 * 60 * 24))
+  const d2 = (weights[2] - weights[1]) / ((dates[2] - dates[1]) / (1000 * 60 * 60 * 24))
+  const avgSlope = (d1 + d2) / 2
+  
+  if (avgSlope === 0) return null
+  
+  const remaining = state.weightGoal - currentWeight.value
+  const days = remaining / avgSlope
+  
+  if (days <= 0) return null
+  
+  const target = new Date()
+  target.setDate(target.getDate() + Math.ceil(days))
+  
+  return target.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+})
+
+const isTrendStrong = computed(() => {
+  if (last7.value.length < 3) return false
+  const entries = last7.value.slice(-3)
+  const d1 = entries[1].weight - entries[0].weight
+  const d2 = entries[2].weight - entries[1].weight
+  return (d1 * d2 > 0) && (Math.abs(d1) > 0.1 || Math.abs(d2) > 0.1)
+})
+
+watch(isSuccess, (val) => {
+  if (val && !state.hasCelebratedGoal) {
+    confetti()
+    state.hasCelebratedGoal = true
+  }
+})
+
+watch([() => state.weightGoal, () => state.weightGoalType], () => {
+  state.hasCelebratedGoal = false
+}, { flush: 'post' })
+
+// Removed old SVG chart coordinate and path logic
 </script>
+
+<style scoped>
+/* Progress Gauge animations and styles removed (SVG pulse dots no longer needed) */
+</style>

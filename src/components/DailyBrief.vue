@@ -51,14 +51,14 @@
         <div v-for="sess in sessionsForSelectedDate" :key="sess.id" class="relative overflow-hidden p-5 pl-6 rounded-3xl border border-white transition-all duration-300 shadow-sm"
           :class="[
             sessionsForSelectedDate.length > 1 ? 'snap-start shrink-0' : '',
-            getCategory(sess) === 'calisthenics' ? 'bg-amber-50/30' : 'bg-indigo-50/30', 
+            getCategory(sess) === 'calisthenics' ? 'bg-orange-50/30' : 'bg-indigo-50/30', 
             editingSessionId === sess.id ? 'ring-2 ring-indigo-200 scale-[1.01]' : ''
           ]">
         
         <!-- Accent Bar -->
         <div class="absolute inset-y-5 left-2.5 w-[3px] rounded-full" 
           :class="[
-            getCategory(sess) === 'calisthenics' ? 'bg-gradient-to-b from-amber-400 to-orange-500' 
+            getCategory(sess) === 'calisthenics' ? 'bg-gradient-to-b from-orange-400 to-orange-500' 
             : getCategory(sess) === 'cardio' ? 'bg-gradient-to-b from-rose-500 to-pink-500' 
             : 'bg-gradient-to-b from-indigo-500 to-violet-500',
             isPastDate ? 'opacity-60' : ''
@@ -102,19 +102,19 @@
           
           <!-- Ribbon (Stats) -->
           <div class="flex items-center gap-1.5 shrink-0 px-3 py-1 rounded-xl shadow-sm border backdrop-blur-sm"
-            :class="getCategory(sess) === 'calisthenics' ? 'bg-amber-50/80 border-amber-100/50' : getCategory(sess) === 'cardio' ? 'bg-rose-50/80 border-rose-100/50' : 'bg-indigo-50/80 border-indigo-100/50'">
+            :class="getCategory(sess) === 'calisthenics' ? 'bg-orange-50/80 border-orange-100/50' : getCategory(sess) === 'cardio' ? 'bg-rose-50/80 border-rose-100/50' : 'bg-indigo-50/80 border-indigo-100/50'">
             
             <span class="text-[9px] font-semibold uppercase tracking-wider flex items-center gap-1" 
-              :class="getCategory(sess) === 'calisthenics' ? 'text-amber-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
+              :class="getCategory(sess) === 'calisthenics' ? 'text-orange-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
               <span v-if="(editingSessionId === sess.id ? editDraft.exercises : sess.exercises).some(e => e.isPR)" class="text-[10px] text-emerald-500" title="Contains Personal Records!">👑</span>
               {{ getCategory(sess) === 'calisthenics' ? '🤸 Cali' : getCategory(sess) === 'cardio' ? '🏃 Cardio' : '🏋️ BB' }}
             </span>
             
             <span class="w-1 h-1 rounded-full opacity-40" 
-              :class="getCategory(sess) === 'calisthenics' ? 'bg-amber-600' : getCategory(sess) === 'cardio' ? 'bg-rose-600' : 'bg-indigo-600'"></span>
+              :class="getCategory(sess) === 'calisthenics' ? 'bg-orange-600' : getCategory(sess) === 'cardio' ? 'bg-rose-600' : 'bg-indigo-600'"></span>
             
             <span class="text-[9px] font-semibold uppercase tracking-wider"
-              :class="getCategory(sess) === 'calisthenics' ? 'text-amber-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
+              :class="getCategory(sess) === 'calisthenics' ? 'text-orange-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
               <template v-if="getCategory(sess) === 'cardio'">
                 {{ (editingSessionId === sess.id ? editDraft : sess).exercises.reduce((acc, e) => acc + Number(e.duration || 0), 0) }} MINS
                 <template v-if="(editingSessionId === sess.id ? editDraft : sess).exercises.find(e => e.incline)">
@@ -188,12 +188,12 @@
                   <div v-if="getCategory(editDraft) === 'bodybuilding' || (getCategory(editDraft) === 'calisthenics' && ex.isWeighted)" class="flex flex-col">
                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">WEIGHT</span>
                     <input v-model="ex.weight" type="number" placeholder="kg" class="w-full text-[11px] font-normal uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 text-center"
-                      :class="getCategory(editDraft) === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
+                      :class="getCategory(editDraft) === 'calisthenics' ? 'focus:ring-orange-500' : 'focus:ring-indigo-300'"/>
                   </div>
                   <div class="flex flex-col">
                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">SETS</span>
                     <input v-model="ex.sets" type="number" placeholder="0" class="w-full text-[11px] font-normal uppercase bg-slate-50/50 border border-slate-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 text-center"
-                      :class="getCategory(editDraft) === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
+                      :class="getCategory(editDraft) === 'calisthenics' ? 'focus:ring-orange-500' : 'focus:ring-indigo-300'"/>
                   </div>
                   <div class="flex flex-col">
                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-center">
@@ -201,9 +201,9 @@
                     </span>
                     <div class="relative w-full">
                       <input v-model.number="ex.reps" type="number" :placeholder="STATIC_HOLDS.includes(ex.name) ? '15' : '10'" class="h-11 w-full text-[13px] font-normal bg-slate-50/50 border border-slate-100 rounded-xl py-1.5 focus:outline-none focus:ring-1 text-center"
-                        :class="[STATIC_HOLDS.includes(ex.name) ? 'pl-2 pr-10' : 'px-2', getCategory(editDraft) === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300']"/>
+                        :class="[STATIC_HOLDS.includes(ex.name) ? 'pl-2 pr-10' : 'px-2', getCategory(editDraft) === 'calisthenics' ? 'focus:ring-orange-500' : 'focus:ring-indigo-300']"/>
                       <span v-if="STATIC_HOLDS.includes(ex.name)" class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold pointer-events-none"
-                        :class="getCategory(editDraft) === 'calisthenics' ? 'text-amber-500' : 'text-slate-400'">
+                        :class="getCategory(editDraft) === 'calisthenics' ? 'text-orange-500' : 'text-slate-400'">
                         {{ Number(ex.reps) === 1 ? 'sec' : 'secs' }}
                       </span>
                     </div>

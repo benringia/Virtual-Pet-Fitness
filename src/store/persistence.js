@@ -23,6 +23,8 @@ const defaultState = {
   calHistory: [],
   weightLog: [],
   weightGoal: null,
+  weightGoalType: 'Maintain',
+  hasCelebratedGoal: false,
   weightUnit: 'kg',
   meals: [],
   proteinActivityLevel: 'active',
@@ -36,6 +38,8 @@ const defaultState = {
   trainingCategory: 'bodybuilding',
   workoutPrograms: {},
   hiddenLabels: [],
+  miscActivity: 'Walking',
+  customMiscName: '',
 }
 
 export function loadState() {
@@ -92,6 +96,8 @@ export function resetState(state) {
     calHistory: [],
     weightLog: [],
     weightGoal: null,
+    weightGoalType: 'Maintain',
+    hasCelebratedGoal: false,
     weightUnit: 'kg',
     meals: [],
     restDays: [],
@@ -101,6 +107,8 @@ export function resetState(state) {
     trainingCategory: 'bodybuilding',
     workoutPrograms: {},
     hiddenLabels: [],
+    miscActivity: 'Walking',
+    customMiscName: '',
   })
   saveState(state)
   console.log('[resetState] after:', JSON.stringify({

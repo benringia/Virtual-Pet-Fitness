@@ -18,16 +18,16 @@
         <div class="flex gap-3 mb-3">
           <div class="flex-1 bg-indigo-50 rounded-xl p-2 text-center">
             <div class="text-xs text-gray-400">Start</div>
-            <div class="font-bold text-gray-700">{{ weightAsc[0].weight }}<span class="text-xs text-gray-400 ml-0.5">{{ state.weightUnit }}</span></div>
+            <div class="font-bold text-gray-700">{{ weightStartDisplay }}<span class="text-xs text-gray-400 ml-0.5">{{ state.weightUnit }}</span></div>
           </div>
           <div class="flex-1 bg-indigo-50 rounded-xl p-2 text-center">
             <div class="text-xs text-gray-400">Current</div>
-            <div class="font-bold text-gray-700">{{ weightAsc.at(-1).weight }}<span class="text-xs text-gray-400 ml-0.5">{{ state.weightUnit }}</span></div>
+            <div class="font-bold text-gray-700">{{ weightCurrentDisplay }}<span class="text-xs text-gray-400 ml-0.5">{{ state.weightUnit }}</span></div>
           </div>
           <div class="flex-1 rounded-xl p-2 text-center" :class="weightChange > 0 ? 'bg-orange-50' : 'bg-green-50'">
             <div class="text-xs text-gray-400">Change</div>
             <div class="font-bold" :class="weightChange > 0 ? 'text-orange-400' : 'text-green-500'">
-              {{ weightChange > 0 ? '+' : '' }}{{ weightChange }}<span class="text-xs ml-0.5">{{ state.weightUnit }}</span>
+              {{ weightChange > 0 ? '+' : '' }}{{ weightChangeDisplay }}<span class="text-xs ml-0.5">{{ state.weightUnit }}</span>
             </div>
           </div>
         </div>
@@ -37,8 +37,8 @@
           <polyline :points="weightPoints" fill="none" stroke="#6366f1" stroke-width="2"
             stroke-linejoin="round" stroke-linecap="round" />
           <circle v-for="(p, i) in weightCoords" :key="i" :cx="p.x" :cy="p.y" r="3" fill="#6366f1" />
-          <text :x="W - 2" :y="weightCoords[0].y + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ weightMin }}</text>
-          <text :x="W - 2" :y="weightCoords.reduce((a, b) => a.y < b.y ? a : b).y + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ weightMax }}</text>
+          <text :x="W - 2" :y="weightCoords[0].y + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ weightMinDisplay }}</text>
+          <text :x="W - 2" :y="weightCoords.reduce((a, b) => a.y < b.y ? a : b).y + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ weightMaxDisplay }}</text>
         </svg>
       </div>
       <p v-else class="text-xs text-gray-400 text-center py-4">Log weight entries to see your trend.</p>
@@ -118,12 +118,12 @@
               <div class="text-lg font-bold text-indigo-500">{{ predictions.calories.projected30dDeficit.toLocaleString() }}</div>
               <div class="text-xs text-gray-400">kcal</div>
             </div>
-            <div class="rounded-xl p-3 text-center" :class="predictions.calories.weightChangeLbs >= 0 ? 'bg-green-50' : 'bg-orange-50'">
+            <div class="rounded-xl p-3 text-center" :class="predictions.calories.weightChangeKg >= 0 ? 'bg-green-50' : 'bg-orange-50'">
               <div class="text-xs text-gray-400 mb-1">est. weight change</div>
-              <div class="text-lg font-bold" :class="predictions.calories.weightChangeLbs >= 0 ? 'text-green-500' : 'text-orange-400'">
-                {{ predictions.calories.weightChangeLbs >= 0 ? '-' : '+' }}{{ Math.abs(predictions.calories.weightChangeLbs) }}
+              <div class="text-lg font-bold" :class="predictions.calories.weightChangeKg >= 0 ? 'text-green-500' : 'text-orange-400'">
+                {{ predictions.calories.weightChangeKg >= 0 ? '-' : '+' }}{{ Math.abs(toDisplay(predictions.calories.weightChangeKg)) }}
               </div>
-              <div class="text-xs text-gray-400">lbs</div>
+              <div class="text-xs text-gray-400">{{ state.weightUnit }}</div>
             </div>
             <div class="bg-gray-50 rounded-xl p-3 text-center">
               <div class="text-xs text-gray-400 mb-1">avg daily deficit</div>
@@ -239,18 +239,26 @@ const H = 100
 const BAR_H = 80
 const PAD = 10
 
-// ── Weight trend ─────────────────────────────────────────────────────────────
+const KG_TO_LBS = 2.20462
+const toDisplay = (kg) => kg === null ? null : (state.weightUnit === 'lbs' ? +(kg * KG_TO_LBS).toFixed(1) : +kg.toFixed(1))
 
 const weightAsc = computed(() =>
   [...state.weightLog].sort((a, b) => a.date.localeCompare(b.date))
 )
 
-const weightMin = computed(() => Math.min(...weightAsc.value.map(e => e.weight)))
-const weightMax = computed(() => Math.max(...weightAsc.value.map(e => e.weight)))
+const weightMin = computed(() => weightAsc.value.length ? Math.min(...weightAsc.value.map(e => e.weight)) : 0)
+const weightMax = computed(() => weightAsc.value.length ? Math.max(...weightAsc.value.map(e => e.weight)) : 0)
+
+const weightMinDisplay = computed(() => toDisplay(weightMin.value))
+const weightMaxDisplay = computed(() => toDisplay(weightMax.value))
+const weightStartDisplay = computed(() => weightAsc.value.length ? toDisplay(weightAsc.value[0].weight) : 0)
+const weightCurrentDisplay = computed(() => weightAsc.value.length ? toDisplay(weightAsc.value.at(-1).weight) : 0)
+
 const weightChange = computed(() => {
   if (weightAsc.value.length < 2) return 0
-  return +(weightAsc.value.at(-1).weight - weightAsc.value[0].weight).toFixed(1)
+  return +(weightAsc.value.at(-1).weight - weightAsc.value[0].weight).toFixed(2)
 })
+const weightChangeDisplay = computed(() => toDisplay(Math.abs(weightChange.value)))
 
 const weightCoords = computed(() => {
   const n = weightAsc.value.length
