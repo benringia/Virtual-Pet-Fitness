@@ -22,7 +22,9 @@
       <button v-for="cat in CATEGORIES" :key="cat.id"
         @click="state.trainingCategory = cat.id"
         :class="state.trainingCategory === cat.id
-          ? (cat.id === 'calisthenics' ? 'bg-amber-600 text-white shadow-md border-amber-600 border' : 'bg-indigo-600 text-white shadow-md border-indigo-600 border')
+          ? (cat.id === 'calisthenics' ? 'bg-amber-600 text-white shadow-md border-amber-600 border' 
+             : cat.id === 'cardio' ? 'bg-rose-500 text-white shadow-md border-rose-500 border' 
+             : 'bg-indigo-600 text-white shadow-md border-indigo-600 border')
           : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
         class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer">
         <span>{{ cat.emoji }}</span><span>{{ cat.label }}</span>
@@ -65,46 +67,92 @@
           <!-- Session label -->
           <div class="mt-4 mb-4">
             <label class="block text-[10px] font-semibold uppercase tracking-widest text-indigo-500 mb-1.5">Session Label</label>
-            <input v-model="draftSession.label" type="text" maxlength="40"
-              :placeholder="state.trainingCategory === 'calisthenics' ? 'e.g. Upper Body Flow' : 'e.g. Push Day · Chest & Triceps'"
+            <input v-model="draftSession.label" @input="isLabelDirty = true" type="text" maxlength="40"
+              :placeholder="state.trainingCategory === 'cardio' ? 'e.g. Morning Run' : (state.trainingCategory === 'calisthenics' ? 'e.g. Upper Body Flow' : 'e.g. Push Day · Chest & Triceps')"
               class="w-full text-sm font-semibold text-gray-800 placeholder-gray-300 border border-indigo-100 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-indigo-50/30"/>
           </div>
 
           <!-- Exercise rows -->
           <div v-if="draftSession.exercises.length" class="mb-4 space-y-3">
             <div v-for="(ex, i) in draftSession.exercises" :key="i"
-              class="grid grid-cols-12 gap-2 items-end bg-slate-50/50 rounded-2xl px-4 py-4 border border-slate-100/50">
+              class="grid grid-cols-12 gap-4 items-start bg-slate-50/50 rounded-2xl px-4 py-4 border border-slate-100/50">
               
               <!-- Exercise Name -->
-              <div :class="state.trainingCategory === 'bodybuilding' ? 'col-span-12 lg:col-span-5' : 'col-span-12 lg:col-span-7'">
+              <div :class="state.trainingCategory === 'bodybuilding' ? 'col-span-12 lg:col-span-5' : (state.trainingCategory === 'cardio' ? (isInclineExercise(ex.selectedName) ? 'col-span-12 lg:col-span-4' : 'col-span-12 lg:col-span-5') : 'col-span-12 lg:col-span-7')">
                 <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1">Exercise</label>
-                <input v-model="ex.name" type="text" maxlength="30" :placeholder="state.trainingCategory === 'calisthenics' ? 'e.g. Muscle Up' : 'e.g. Bench Press'"
-                  class="text-sm border border-gray-200 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white w-full"/>
+                
+                <template v-if="state.trainingCategory === 'cardio'">
+                  <div class="flex flex-col gap-2">
+                    <select v-model="ex.selectedName" @change="e => handleCardioExerciseSelect(e, ex)"
+                      class="text-sm border border-gray-200 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white w-full">
+                      <option disabled value="">Select exercise</option>
+                      <option v-for="opt in CARDIO_EXERCISES" :key="opt" :value="opt">{{ opt }}</option>
+                    </select>
+                    <input v-if="ex.selectedName === 'Custom...'" v-model="ex.name" type="text" maxlength="30" placeholder="e.g. Stairmaster"
+                      class="text-sm border border-gray-200 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white w-full"/>
+                  </div>
+                </template>
+                <template v-else>
+                  <input v-model="ex.name" type="text" maxlength="30" :placeholder="state.trainingCategory === 'calisthenics' ? 'e.g. Muscle Up' : 'e.g. Bench Press'"
+                    class="text-sm border border-gray-200 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white w-full"/>
+                </template>
               </div>
 
-              <!-- Weight -->
-              <div v-if="state.trainingCategory === 'bodybuilding'" class="col-span-4 lg:col-span-2">
-                <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Weight</label>
-                <input v-model="ex.weight" type="number" inputmode="decimal" min="0" step="0.5" placeholder="kg"
-                  class="text-sm border border-gray-200 rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full"/>
-              </div>
+              <template v-if="state.trainingCategory !== 'cardio'">
+                <!-- Weight -->
+                <div v-if="state.trainingCategory === 'bodybuilding'" class="col-span-4 lg:col-span-2">
+                  <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Weight</label>
+                  <input v-model="ex.weight" type="number" inputmode="decimal" min="0" step="0.5" placeholder="kg"
+                    class="text-sm border border-gray-200 rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full"/>
+                </div>
 
-              <!-- Sets -->
-              <div :class="state.trainingCategory === 'bodybuilding' ? 'col-span-3 lg:col-span-2' : 'col-span-5 lg:col-span-2'">
-                <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Sets</label>
-                <input v-model="ex.sets" type="number" inputmode="numeric" min="1" placeholder="3"
-                  class="text-sm border border-gray-200 rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full"/>
-              </div>
+                <!-- Sets -->
+                <div :class="state.trainingCategory === 'bodybuilding' ? 'col-span-3 lg:col-span-2' : 'col-span-5 lg:col-span-2'">
+                  <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Sets</label>
+                  <input v-model="ex.sets" type="number" inputmode="numeric" min="1" placeholder="3"
+                    class="text-sm border border-gray-200 rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full"/>
+                </div>
 
-              <!-- Reps -->
-              <div :class="state.trainingCategory === 'bodybuilding' ? 'col-span-3 lg:col-span-2' : 'col-span-5 lg:col-span-2'">
-                <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Reps</label>
-                <input v-model="ex.reps" type="number" inputmode="numeric" min="0" placeholder="10"
-                  class="text-sm border border-gray-200 rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full"/>
-              </div>
+                <!-- Reps -->
+                <div :class="state.trainingCategory === 'bodybuilding' ? 'col-span-3 lg:col-span-2' : 'col-span-5 lg:col-span-2'">
+                  <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Reps</label>
+                  <input v-model="ex.reps" type="number" inputmode="numeric" min="0" placeholder="10"
+                    class="text-sm border border-gray-200 rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full"/>
+                </div>
+              </template>
+              
+              <template v-if="state.trainingCategory === 'cardio'">
+                <!-- Duration -->
+                <div :class="isInclineExercise(ex.selectedName) ? 'col-span-6 lg:col-span-2' : 'col-span-5 lg:col-span-3'">
+                  <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">DURATION</label>
+                  <input v-model="ex.duration" type="number" inputmode="numeric" min="1" placeholder="mins"
+                    class="h-11 text-sm border border-slate-100 rounded-xl px-2 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white/50 text-center w-full"/>
+                </div>
+
+                <!-- Incline -->
+                <div v-if="isInclineExercise(ex.selectedName)" class="col-span-12 lg:col-span-3 flex justify-center">
+                  <div class="flex flex-col items-center w-24">
+                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">INCLINE (°)</label>
+                    <select v-model="ex.incline"
+                      class="h-11 text-sm border border-slate-100 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white/50 w-full text-center">
+                      <option v-for="val in [0, 1, 2, 3, 4, 5, 8, 10, 12, 15]" :key="val" :value="val">{{ val }}°</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Intensity -->
+                <div :class="isInclineExercise(ex.selectedName) ? 'col-span-6 lg:col-span-2' : 'col-span-5 lg:col-span-3'">
+                  <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">INTENSITY</label>
+                  <select v-model="ex.intensity" 
+                    class="h-11 text-sm border border-slate-100 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white/50 w-full text-center">
+                    <option disabled value="">Select</option>
+                    <option v-for="int in CARDIO_INTENSITIES" :key="int" :value="int">{{ int }}</option>
+                  </select>
+                </div>
+              </template>
 
               <!-- Delete -->
-              <div class="col-span-2 lg:col-span-1 flex justify-center pb-2">
+              <div :class="state.trainingCategory === 'cardio' && isInclineExercise(ex.selectedName) ? 'col-span-12 lg:col-span-1 flex justify-center pb-2 mt-4' : 'col-span-2 lg:col-span-1 flex justify-center pb-2 mt-4'">
                 <button v-if="i > 0" @click="removeExercise(i)" class="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer bg-white rounded-lg border border-gray-200 p-1.5 shadow-sm" aria-label="Remove exercise">
                   <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                 </button>
@@ -126,7 +174,8 @@
           <!-- Save button -->
           <button @click="saveSession"
             :disabled="!isValidSession"
-            class="w-full py-3.5 mt-2 rounded-2xl text-sm font-bold bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:scale-[1.02] hover:shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed shadow-sm">
+            class="w-full py-3.5 mt-2 rounded-2xl text-sm font-bold text-white hover:scale-[1.02] hover:shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed shadow-sm"
+            :class="state.trainingCategory === 'cardio' ? 'bg-gradient-to-r from-rose-500 to-pink-500' : 'bg-gradient-to-r from-indigo-600 to-violet-600'">
             💾 Save Session
           </button>
         </div>
@@ -352,7 +401,12 @@ const COLOR_SWATCHES   = ['#f472b6', '#60a5fa', '#f87171', '#4ade80', '#fb923c',
 const CATEGORIES = [
   { id: 'bodybuilding', label: 'Body Building', emoji: '🏋️' },
   { id: 'calisthenics', label: 'Calisthenics',  emoji: '🤸' },
+  { id: 'cardio',       label: 'Cardio',        emoji: '🏃' },
 ]
+
+const CARDIO_EXERCISES = ['Running', 'Cycling', 'Swimming', 'Walking', 'Rowing', 'Custom...']
+const CARDIO_INTENSITIES = ['Low', 'Moderate', 'High', 'Max']
+
 
 // ── UI State ──
 const sessionFormOpen = ref(true)
@@ -371,14 +425,35 @@ const showAllTypes    = ref(false)
 const saveError       = ref('')
 const petMessage      = ref('')
 const isCelebrating   = ref(false)
+const isLabelDirty    = ref(false)
+const isInclineExercise = (name) => ['Running', 'Walking', 'Cycling'].includes(name)
 let recentlyAddedTimer = null
 onUnmounted(() => clearTimeout(recentlyAddedTimer))
 
 // ── Draft session ──
 const draftSession = ref({ 
   label: '', 
-  exercises: [{ name: '', weight: null, sets: 1, reps: 10 }] 
+  exercises: [{ name: '', selectedName: '', weight: null, sets: 1, reps: 10, duration: null, intensity: '', incline: 0 }] 
 })
+
+function handleCardioExerciseSelect(e, ex) {
+  const val = e.target.value
+  if (val !== 'Custom...') {
+    ex.name = val
+    if (state.trainingCategory === 'cardio' && !isLabelDirty.value && val) {
+      draftSession.value.label = `${val} Session`
+    }
+    // Remove incline if not applicable
+    if (!isInclineExercise(val)) {
+      ex.incline = 0
+    }
+  } else {
+    ex.name = ''
+    if (state.trainingCategory === 'cardio' && !isLabelDirty.value) {
+      draftSession.value.label = `Cardio Session`
+    }
+  }
+}
 
 const activeExerciseCount = computed(() => {
   return draftSession.value.exercises.filter(ex => ex.name && ex.name.trim() !== '').length
@@ -386,11 +461,17 @@ const activeExerciseCount = computed(() => {
 
 const isValidSession = computed(() => {
   if (!draftSession.value.label.trim() || activeExerciseCount.value === 0) return false
+  
+  if (state.trainingCategory === 'cardio') {
+    return draftSession.value.exercises.every(e => 
+      e.name.trim().length > 0 && Number(e.duration) > 0 && e.intensity.trim() !== ''
+    )
+  }
   return draftSession.value.exercises.every(e => e.name.trim().length > 0 && Number(e.reps) > 0)
 })
 
 function addExercise() {
-  draftSession.value.exercises.push({ name: '', weight: null, sets: 1, reps: 10 })
+  draftSession.value.exercises.push({ name: '', selectedName: '', weight: null, sets: 1, reps: 10, duration: null, intensity: '', incline: 0 })
 }
 
 function removeExercise(idx) {
@@ -403,20 +484,36 @@ function saveSession() {
 
   if (!exs.length) { saveError.value = 'Add at least one exercise.'; return }
 
-  const invalid = exs.find(e => e.name.trim().length === 0 || e.reps === '' || e.reps === null)
+  const invalid = state.trainingCategory === 'cardio' 
+    ? exs.find(e => e.name.trim().length === 0 || !e.duration || !e.intensity)
+    : exs.find(e => e.name.trim().length === 0 || e.reps === '' || e.reps === null)
+  
   if (invalid) { 
-    saveError.value = 'Each exercise needs a name and rep count.'
+    saveError.value = state.trainingCategory === 'cardio'
+      ? 'Each exercise needs a name, duration, and intensity.'
+      : 'Each exercise needs a name and rep count.'
     return 
   }
 
-  // Compute 1RM for each exercise
-  const computed = exs.map(e => ({
-    name:   e.name.trim(),
-    weight: Number(e.weight) || 0,
-    sets:   Number(e.sets)   || 1,
-    reps:   Number(e.reps)   || 0,
-    oneRM:  Number(e.weight) ? calc1RM(Number(e.weight), Number(e.reps) || 0) : 0,
-  }))
+  // Map properties based on category
+  const computedExs = exs.map(e => {
+    if (state.trainingCategory === 'cardio') {
+      return {
+        name: e.name.trim(),
+        duration: Number(e.duration),
+        intensity: e.intensity,
+        incline: (isInclineExercise(e.selectedName) && e.incline > 0) ? Number(e.incline) : 0
+      }
+    } else {
+      return {
+        name:   e.name.trim(),
+        weight: Number(e.weight) || 0,
+        sets:   Number(e.sets)   || 1,
+        reps:   Number(e.reps)   || 0,
+        oneRM:  Number(e.weight) ? calc1RM(Number(e.weight), Number(e.reps) || 0) : 0,
+      }
+    }
+  })
 
   const id = typeof crypto !== 'undefined' && crypto.randomUUID
     ? crypto.randomUUID()
@@ -424,12 +521,12 @@ function saveSession() {
 
   state.workoutSessions.push({
     id,
-    type:      'Strength',
+    type:      state.trainingCategory === 'cardio' ? 'Cardio' : 'Strength',
     category:  state.trainingCategory,
     date:      todayStr(),
     timestamp: Date.now(),
     label:     draftSession.value.label.trim() || 'Session',
-    exercises: computed,
+    exercises: computedExs,
   })
 
   // XP & streak (once per session)
@@ -452,22 +549,25 @@ function saveSession() {
 
   draftSession.value = { 
     label: '', 
-    exercises: [{ name: '', weight: null, sets: 1, reps: 10 }] 
+    exercises: [{ name: '', selectedName: '', weight: null, sets: 1, reps: 10, duration: null, intensity: '', incline: 0 }] 
   }
+  isLabelDirty.value = false
   sessionFormOpen.value = false
 
   let isPR = false
-  computed.forEach(c => {
-    if (c.oneRM > 0) {
-      const maxPast = Math.max(0, ...state.workoutSessions
-        .filter(s => s.id !== id)
-        .flatMap(s => s.exercises)
-        .filter(e => e.name.toLowerCase() === c.name.toLowerCase())
-        .map(e => e.oneRM))
-      
-      if (maxPast > 0 && c.oneRM > maxPast) isPR = true
-    }
-  })
+  if (state.trainingCategory !== 'cardio') {
+    computedExs.forEach(c => {
+      if (c.oneRM > 0) {
+        const maxPast = Math.max(0, ...state.workoutSessions
+          .filter(s => s.id !== id && s.category !== 'cardio')
+          .flatMap(s => s.exercises)
+          .filter(e => e.name && e.name.toLowerCase() === c.name.toLowerCase() && e.oneRM)
+          .map(e => e.oneRM || 0))
+        
+        if (maxPast > 0 && c.oneRM > maxPast) isPR = true
+      }
+    })
+  }
 
   petMessage.value = isPR ? "NEW RECORD! 🏆" : "Session Saved! +XP"
   isCelebrating.value = true

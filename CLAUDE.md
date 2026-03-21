@@ -716,6 +716,7 @@ Local time only — no UTC.
 - **Action Colors:**
   - Body Building: Indigo-600 (Electric Indigo) for buttons/badges.
   - Calisthenics: Amber-500 (Flame Orange) for icons/borders.
+  - Cardio: Rose-500 (Vibrant Rose) for icons/badges.
 - **Animation & Interaction:**
   - Save Button: Scale-102 on hover, gradient-to-r.
   - History Cards: Subtle `hover:-translate-y-1` and shadow depth increases on hover.
@@ -775,10 +776,44 @@ Local time only — no UTC.
   - **Spacing**: Ensure a minimum gap between the title and the ribbon to prevent overlapping on mobile.
 - **Ribbon Styling**: Scale down the ribbon to `py-1 px-3` and `text-[9px]`. Remove the ribbon's solid background; use a subtle border instead to prevent heavy visual weighting.
 - **Guardrails**: Do not let the Trash/Edit icons interfere with the ribbon. Icons must remain in the far top-right corner, anchored cleanly above or within the fluid flex row constraints.
+
+## Cardio Tracking (Mode)
+- **Logger UI**:
+  - **Form State**: If `trainingCategory === 'cardio'`, replace [Weight/Sets/Reps] with [Duration/Intensity].
+  - **Inputs**: 
+    - Duration: `type="number"`, placeholder="mins".
+    - Intensity: `type="select"` or `button-group` (Low, Moderate, High, Max).
+  - **Selection**: Use a dropdown for `basicCardioExercises`. If 'Custom...' is selected, show a text input.
+  - **Typography**: Exercise/Session names `text-[13px] font-medium`, labels/stats `text-[11px]`.
+  - **Validation**: Cardio sessions require a valid Name and Duration > 0 to be considered "Active."
+  - **Guardrails**: Maintain glassmorphism card style and ensure `category: 'cardio'` tag is saved.
+
+## Cardio Incline
+- **Conditional Field**: Display 'Incline' input only if selected exercise is `Running`, `Walking`, or `Cycling`.
+- **Incline Selection**: Replace numeric input and pills with a standard styled `<select>` dropdown.
+- **Dropdown Width**: `w-24` fixed width to match the Duration input for symmetry.
+- **Dropdown List**: [0, 1, 2, 3, 4, 5, 8, 10, 12, 15]. Display values with `°` symbol (e.g., "15°").
+- **Data Model**: Store raw numeric values in database, handle unit display in template.
+- **Stats Display**: If `incline > 0`, append `• [INCLINE]°` or `• [INCLINE]%` to the ribbon.
+- **Guardrails**: Synchronize headers (Duration, Incline, Intensity) at the top of the row. Use `rounded-xl` and `bg-white/50 backdrop-blur`. No incline for `Swimming` or `Rowing`.
+
+## Cardio Session Labeling
+- **Auto-Populate**: If `trainingCategory === 'cardio'` and `sessionLabel` matches the previous auto-generated value (or is empty), set label to `[Selected Exercise] Session`.
+- **Manual Override**: Track `isLabelManuallyEdited`. If the user manually edits the `sessionLabel`, stop auto-populating.
+- **Guardrails**: Placeholder remains "e.g. Morning Run".
+
+## Daily Brief Display (Cardio)
+- **Stats Ribbon**: Display `[MINS] • [INTENSITY]` instead of Volume for cardio sessions.
+- **Accent Bar**: Use a Rose-500 vertical gradient for cardio entries.
+- **Guardrails**: Do not attempt to calculate 'Total Volume' for cardio. Maintain 'Compact-Pro' typographic scale (13px/10px) for stats.
+
 ## Data Schema & Logic
-- `workoutSessions`: Array of `{ id, date, label, category, exercises: [] }`.
-- Exercise Object: `{ name, weight, sets, reps, oneRM }`.
-- `category`: 'bodybuilding' or 'calisthenics' (determines UI logic and math).
+- `workoutSessions`: Array of `{ id, date, label, category, exercises: [], cardioDetails? }`.
+- Exercise Object (Strength/Cali): `{ name, weight, sets, reps, oneRM }`.
+- Exercise Object (Cardio): `{ name, duration, intensity }`.
+- `CardioSession`: `{ id, date, name, duration, intensity, category: 'cardio' }`.
+- `category`: 'bodybuilding', 'calisthenics', or 'cardio' (determines UI logic and math).
+- **XP Logic**: Sessions grant base XP; intensity/duration multipliers to be defined in future pet-evolution rules.
 - `selectedDate`: Controlled by `useSelectedDate.js` (ephemeral UI state).
 - **Session Filtering:** The UI must natively filter and show ONLY sessions matching `selectedDate`.
 - **Historical Protection & Session Locking**: 
