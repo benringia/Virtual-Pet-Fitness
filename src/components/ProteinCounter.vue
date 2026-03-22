@@ -55,7 +55,7 @@ watch(totalProtein, (val) => {
 </script>
 
 <template>
-  <div class="bg-white rounded-2xl shadow-sm mb-4 px-4 py-4">
+  <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 mb-4 px-6 py-6 transition-all duration-300">
     <h2 class="font-semibold text-gray-700 mb-3">🥩 Protein</h2>
 
     <p v-if="!latestWeight" class="text-sm text-gray-400 text-center py-2">

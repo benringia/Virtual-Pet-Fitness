@@ -90,6 +90,18 @@
               </svg>
               <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">My Workouts</span>
             </button>
+            <button
+              @click="activeView = 'diet'"
+              :aria-current="activeView === 'diet' ? 'page' : undefined"
+              :class="activeView === 'diet' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
+              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
+              title="Diet"
+            >
+              <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+              </svg>
+              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Diet</span>
+            </button>
           </nav>
         </div>
 
@@ -164,13 +176,18 @@
       <main class="flex-1 min-w-0 overflow-y-auto pb-20 lg:pb-0">
 
         <!-- Progress view -->
-        <div v-if="activeView === 'progress'" class="p-4 lg:p-6">
+        <div v-if="activeView === 'progress'" class="">
           <ProgressDashboard />
         </div>
 
         <!-- Workouts view -->
         <div v-if="activeView === 'workouts'">
           <WorkoutsView />
+        </div>
+
+        <!-- Diet view -->
+        <div v-if="activeView === 'diet'">
+          <DietView />
         </div>
 
         <!-- Overview view -->
@@ -246,33 +263,65 @@
           <!-- Lane 3: Maintenance Lane — Col 3 (Weight & Diet) -->
           <div class="flex flex-col gap-6 w-full h-fit order-3 lg:col-start-3">
             <WeightLog 
-              :class="[!hasLoggedWeightToday ? 'order-first ring-2 ring-indigo-500/10' : 'order-last opacity-80 scale-[0.98]']" 
+              :class="[!hasLoggedWeightToday ? 'order-first' : 'order-last opacity-80 scale-[0.98]']" 
               class="transition-all duration-500"
             />
             
-            <!-- Diet Habits (Restored Tabbed Panel) -->
-            <div class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
-              <div class="flex border-b border-gray-100 px-2">
-                <button
-                  v-for="tab in [
-                    { id: 'diet',     label: 'Diet' },
-                    { id: 'meals',    label: 'Meals' },
-                    { id: 'calories', label: 'Cals' },
-                    { id: 'protein',  label: 'Protein' },
-                  ]"
-                  :key="tab.id"
-                  @click="activeRightTab = tab.id"
-                  :class="activeRightTab === tab.id
-                    ? 'border-b-2 border-indigo-600 text-indigo-600 font-semibold'
-                    : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
-                  class="flex-1 text-[10px] font-bold uppercase tracking-wider py-3 px-1 transition-colors -mb-px cursor-pointer"
-                >{{ tab.label }}</button>
+            <!-- Diet Habits Teaser Card -->
+            <div 
+              @click="activeView = 'diet'"
+              class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-lg shadow-slate-200/40 p-6 cursor-pointer transition-all duration-500 ease-out hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl hover:shadow-slate-200/50 group"
+            >
+              <div class="flex items-center justify-between mb-5">
+                <h3 class="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                  <span class="text-xl">🥗</span> Diet
+                </h3>
+                <span 
+                  class="text-[10px] font-bold bg-orange-100 text-orange-600 px-3 py-1 rounded-full uppercase tracking-widest transition-all duration-300"
+                  :class="{ 'ring-2 ring-orange-300/60 animate-[streakGlow_1.5s_ease-in-out_infinite]': state.streaks.diet.count >= 3 }"
+                >
+                  {{ state.streaks.diet.count || 0 }} day streak
+                </span>
               </div>
-              <div class="min-h-[300px]">
-                <div v-show="activeRightTab === 'diet'"><DietHabits /></div>
-                <div v-show="activeRightTab === 'meals'"><MealLogger /></div>
-                <div v-show="activeRightTab === 'calories'"><CaloriesTracker /></div>
-                <div v-show="activeRightTab === 'protein'"><ProteinCounter /></div>
+
+              <div class="space-y-4">
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden shadow-inner">
+                  <div 
+                    class="bg-gradient-to-r from-emerald-400 to-emerald-500 h-full rounded-full transition-all duration-700 ease-out delay-100"
+                    :style="{ width: `${dietProgressPercent}%` }"
+                  ></div>
+                </div>
+                
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                      {{ completedDietHabitsCount }}/{{ DIET_HABITS.length }} habits completed
+                    </p>
+                    <p class="text-xs text-slate-400 mt-0.5 italic font-medium">
+                      {{ encouragementText }}
+                    </p>
+                  </div>
+                  <div class="text-right">
+                    <p v-if="dietXpEarned > 0" 
+                      class="text-sm font-bold text-emerald-600 uppercase tracking-tight transition-all duration-300"
+                      :class="{ 'animate-[xpPulse_1.2s_ease-in-out_infinite]': dietXpEarned > 0 }"
+                    >
+                      +{{ dietXpEarned }} XP today
+                    </p>
+                    <p v-else class="text-[11px] font-bold text-slate-400 uppercase tracking-widest italic opacity-60">
+                      0 XP
+                    </p>
+                  </div>
+                </div>
+
+                <!-- CTA Button -->
+                <button 
+                  @click.stop="activeView = 'diet'"
+                  class="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold py-3 rounded-2xl shadow-lg shadow-emerald-200/50 transition-all duration-300 transform group-hover:translate-y-[-2px] active:scale-95 flex items-center justify-center gap-2"
+                >
+                  Open Diet Tracker
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </button>
               </div>
             </div>
           </div>
@@ -387,6 +436,19 @@
         <span>Workouts</span>
       </button>
 
+      <!-- Diet -->
+      <button
+        @click="activeView = 'diet'"
+        :class="activeView === 'diet' ? 'text-indigo-600' : 'text-slate-400'"
+        class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
+        aria-label="Diet"
+      >
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        </svg>
+        <span>Diet</span>
+      </button>
+
       <!-- Profile placeholder -->
       <button
         class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors cursor-pointer"
@@ -407,6 +469,7 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
 import Header from './components/Header.vue'
+import DietView from './views/DietView.vue'
 import ToastNotification from './components/ToastNotification.vue'
 import EvolutionModal from './components/EvolutionModal.vue'
 import Pet from './components/Pet.vue'
@@ -431,6 +494,7 @@ import { scheduleReminder } from './utils/reminder.js'
 import { canLogRestDay, logRestDay, getRestDaysThisWeek } from './utils/restDay.js'
 import { showWeeklyReport, getThisMonday } from './utils/weeklyReport.js'
 import { activeView } from './composables/useActiveView.js'
+import { DIET_HABITS } from './utils/xp.js'
 
 const timeGreeting = computed(() => {
   const hour = new Date().getHours()
@@ -465,6 +529,20 @@ function handleLogRestDay() {
   saveState(state)
 }
 
+const todayDietHabits = computed(() => state.dietHabits[todayStr] ?? {})
+const completedDietHabitsCount = computed(() => 
+  DIET_HABITS.filter(h => todayDietHabits.value[h.key]).length
+)
+const dietProgressPercent = computed(() => (completedDietHabitsCount.value / DIET_HABITS.length) * 100)
+const dietXpEarned = computed(() => 
+  DIET_HABITS.reduce((sum, h) => sum + (todayDietHabits.value[h.key] ? h.xp : 0), 0)
+)
+const encouragementText = computed(() => {
+  if (completedDietHabitsCount.value === 0) return 'Start your first healthy habit today 💪'
+  if (completedDietHabitsCount.value === DIET_HABITS.length) return 'All habits complete 🎉'
+  return "You're doing great — keep going!"
+})
+
 onMounted(() => {
   checkDayRollover(state)
   if (state.reminder.enabled && Notification.permission === 'granted') {
@@ -490,3 +568,15 @@ function handleReset() {
   showResetModal.value = false
 }
 </script>
+
+<style>
+@keyframes xpPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+
+@keyframes streakGlow {
+  0%, 100% { box-shadow: 0 0 0px rgba(251,146,60,0.4); }
+  50% { box-shadow: 0 0 10px rgba(251,146,60,0.6); }
+}
+</style>

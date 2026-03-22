@@ -1,6 +1,20 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-slate-800 mb-8 px-1">Mastery Overview</h1>
+  <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-[1600px] mx-auto">
+    <!-- 1. Page Header (Styled to match Workouts/Diet) -->
+    <div class="mb-8 flex flex-col gap-2 px-1">
+      <button @click="activeView = 'overview'"
+        class="flex items-center gap-1 text-[10px] uppercase font-bold tracking-[0.2em] text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer group w-fit">
+        <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+        Back to Overview
+      </button>
+
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+          <span>📊</span> My Progress
+        </h1>
+        <p class="text-sm text-slate-400 font-medium tracking-tight">Review your journey, analyze trends, and plan your evolution.</p>
+      </div>
+    </div>
 
     <!-- Row 1: High Level Stats -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-stretch">
@@ -247,6 +261,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { activeView } from '../composables/useActiveView.js'
 import { state } from '../store/state.js'
 import { WORKOUT_META, STAGE_LIST, getStageFromLevel } from '../utils/xp.js'
 import { todayStr } from '../utils/dates.js'

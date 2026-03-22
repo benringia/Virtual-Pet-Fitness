@@ -40,6 +40,8 @@ const defaultState = {
   hiddenLabels: [],
   miscActivity: 'Walking',
   customMiscName: '',
+  waterIntake: 0,
+  completedHabitsToday: {},
 }
 
 export function loadState() {
@@ -109,6 +111,8 @@ export function resetState(state) {
     hiddenLabels: [],
     miscActivity: 'Walking',
     customMiscName: '',
+    waterIntake: 0,
+    completedHabitsToday: {},
   })
   saveState(state)
   console.log('[resetState] after:', JSON.stringify({

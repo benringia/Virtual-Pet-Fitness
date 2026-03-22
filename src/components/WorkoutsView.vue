@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 lg:p-6 pb-20 max-w-6xl mx-auto bg-[radial-gradient(at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white min-h-screen">
+  <div class="pt-8 px-4 sm:px-6 lg:px-8 pb-20 w-full max-w-[1600px] mx-auto bg-[radial-gradient(at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white min-h-screen">
 
     <!-- Header -->
     <div class="mb-2 flex flex-col gap-2">

@@ -56,6 +56,8 @@ export function checkDayRollover(state) {
   state.calories.burned = 0
   state.calories.burnedManual = []
   state.calories.date = today
+  state.waterIntake = 0
+  state.completedHabitsToday = {}
   state.todayIsRestDay = false
   resetExpiredStreaks(state)
   triggerAchievement('dayReset', '🌅', 'New day!', 'Habits and calories have reset. Keep it up!')

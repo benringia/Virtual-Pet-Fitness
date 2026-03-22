@@ -10,6 +10,7 @@ const BORDER_COLORS = {
   diet:     'border-green-400',
   weight:   'border-pink-400',
   dayReset: 'border-indigo-400',
+  habit:    'border-emerald-400',
 }
 
 const EVOLUTION_MAP = {

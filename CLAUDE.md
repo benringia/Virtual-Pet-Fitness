@@ -1303,8 +1303,8 @@ Local time only — no UTC.
 
 ## UI Layout
 
-### Mastery Overview (Progress View)
-1. **Title**: Rename "Weekly Report" to "Mastery Overview".
+### My Progress (Progress View)
+1. **Title**: Rename "Weekly Report" to "My Progress".
 2. **The "Bento" Grid Layout**:
    - **Top Row (High Level)**: Weight Trend (Left, 2/3 width) and Streaks (Right, 1/3 width).
    - **Middle Row (Activity)**: XP Per Day (Left, 2/3 width) and Workout History (Right, 1/3 width).

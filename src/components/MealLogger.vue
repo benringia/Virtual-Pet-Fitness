@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-sm mb-4 px-4 py-4">
+  <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 mb-4 px-6 py-6 transition-all duration-300">
     <div class="flex items-center gap-2 mb-3">
       <span class="text-base">🍽️</span>
       <h2 class="font-semibold text-gray-700">Meal Logger</h2>
