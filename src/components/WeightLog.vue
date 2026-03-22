@@ -1,10 +1,14 @@
 <template>
-  <section class="relative overflow-hidden bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-6">
+  <section class="relative overflow-hidden bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6">
     
     <!-- Header: Glass-morphism Unit Toggle -->
     <div class="flex items-center justify-between mb-8">
       <h2 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 mb-1">
         <span class="text-2xl">⚖️</span> Weight Log
+        <span v-if="!hasLoggedToday" class="flex h-2 w-2 relative -top-1">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
       </h2>
       <div class="flex bg-white/40 backdrop-blur-md border border-white/60 rounded-xl p-1 text-[10px] font-bold shadow-sm">
         <button

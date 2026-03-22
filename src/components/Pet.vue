@@ -1,6 +1,6 @@
 <template>
   <!-- Pet display card -->
-  <div class="bg-indigo-50 rounded-2xl shadow-sm mb-4 p-4">
+  <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6 mb-4">
 
     <!-- Row 1: Name/stage/level + mood bubble -->
     <div class="flex justify-between items-start mb-2">

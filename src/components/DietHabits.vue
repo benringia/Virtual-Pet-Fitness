@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-sm mb-4 px-4 py-4">
+  <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6 mb-4">
     <!-- Header -->
     <div class="flex items-center justify-between mb-3">
       <h2 class="font-semibold text-gray-700">🥗 Diet today</h2>

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+  <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6">
 
     <!-- Header row -->
     <div class="flex items-center justify-between mb-4">

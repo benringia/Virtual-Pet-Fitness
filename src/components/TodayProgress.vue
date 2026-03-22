@@ -46,13 +46,13 @@ function arc(value, goal) {
 </script>
 
 <template>
-  <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+  <section class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6">
 
     <!-- Header -->
     <h2 class="text-sm font-semibold text-gray-700 mb-4">Today's Progress</h2>
 
     <!-- Three donut rings -->
-    <div class="flex justify-around mb-4">
+    <div class="flex flex-wrap justify-around mb-4">
 
       <!-- Workouts -->
       <div class="flex flex-col items-center gap-1.5">

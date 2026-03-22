@@ -97,8 +97,12 @@ App.vue
 
 - Vue Composition API only
 - Separate logic into `src/utils/` (xp.js, dates.js, predictions.js)
-- Prefer computed values over manual recalculation
-- Keep components small; push logic to utils
+
+### Code Organization
+- **Import Standards**: Always verify that `onMounted`, `onUnmounted`, `watch`, `reactive`, and `computed` are explicitly included in the `import { ... } from 'vue'` statement at the top of the component.
+- **Error Prevention**: If a white screen occurs, prioritize checking the browser console for "ReferenceError: [method] is not defined".
+- Prefer computed values over manual recalculation.
+- Keep components small; push logic to utils.
 
 ## Feature Rules
 
@@ -721,6 +725,195 @@ Local time only — no UTC.
   - Save Button: Scale-102 on hover, gradient-to-r.
   - History Cards: Subtle `hover:-translate-y-1` and shadow depth increases on hover.
   - Success State: Trigger `isCelebrating` on PetMiniWidget for 3.5s.
+
+## Mobile Design Standards
+
+**Update for Native App Feel:**
+
+1. **Activity Layout**:
+   - **Desktop**: Vertical list.
+   - **Mobile (< 768px)**: Use `overflow-x-auto` horizontal carousels for Daily Training categories to maximize vertical "above-the-fold" space.
+   - **Card Width**: Set mobile cards to `w-[85%] flex-shrink-0` to hint that more content exists to the right.
+
+2. **Touch Targets**:
+   - **Buttons**: Minimum height of `44px` for all interactive elements.
+   - **Navigation**: Use `fixed bottom-0` with a `backdrop-blur-lg` effect.
+
+3. **Typography**:
+   - **Header**: `text-2xl font-bold` (reduced from desktop).
+   - **Subtitles**: Use `text-slate-400 text-xs uppercase tracking-widest`.
+
+**GUARDRAILS**:
+- Do not use scrollbars on horizontal carousels (use `scrollbar-hide`).
+- Ensure the 'Misc Movement' section remains a single focused card as it requires input selection.
+
+
+## Global Design System — Glassmorphism
+
+1. **Extended Glassmorphism**:
+   - **Target**: All primary display cards including 'Your Journey', 'Today's Progress', 'Activity Stats', and 'Diet/Habits' boxes.
+   - **Styling Standard**: `bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-6`.
+
+2. **Visual Hierarchy Rules**:
+   - **Primary Cards**: Must use the full glassmorphism style.
+   - **Internal Stats (Sub-cards)**: Use a simpler `bg-slate-50/50` or `bg-white/40` backdrop-blur-md background to maintain depth without nesting multiple heavy shadows.
+
+**GUARDRAILS**:
+- Do not apply `overflow-hidden` to components with floating elements (like the 'Flarepup' badge).
+- Ensure the `shadow-xl` intensity remains consistent across all updated boxes.
+- Match the `p-6` padding standard for all top-level boxes.
+
+
+## UI Layout — Daily Training (Mobile Carousel)
+
+1. **Carousel Sizing (Mobile)**:
+   - **Card Geometry**: Use a fixed-width of `w-40` and a fixed-height of `h-44` for mobile tiles.
+   - **Snap Point**: Use `snap-start` for the carousel horizontal scrolling.
+
+2. **Typography & Icons**:
+   - **Title**: `text-sm font-bold truncate`.
+   - **XP/Status**: `text-[10px] text-slate-400`.
+   - **Icon**: Increase icon size slightly and center it within the tile.
+
+3. **CTA Style**:
+   - **Pill Button**: Use a small `+ LOG` pill at the bottom: `bg-indigo-50 text-indigo-600`.
+
+**GUARDRAILS**:
+- Ensure the desktop view (`md:`) remains a vertical list of full-width rows.
+- Use `overflow-x-auto scrollbar-hide` to maintain the native swipe feel.
+
+
+## UI Layout — Utility Cards
+
+1. **Global Alignment**:
+   - **Requirement**: In the bottom row (Rest Day/Reminder), cards must use `items-start` on the parent container to prevent vertical stretching on ALL screen sizes.
+
+2. **Height Constraints**:
+   - **Intrinsic Height**: Cards should never be forced to match the height of their siblings. They must terminate immediately after their last element (e.g., the 'Log Rest' button).
+
+3. **Daily Reminder (Mobile)**:
+   - **Requirement**: Condense the layout to match the vertical height of the Rest Day card on mobile.
+   - **Layout**: Use a single row for the Title ("Reminder") and the Toggle.
+   - **Countdown**: Hide the large "Until daily reset" block on mobile; replace it with a small `text-[10px]` line under the title.
+
+**GUARDRAILS**:
+- Do not use fixed heights for the cards; they must grow naturally if content is added later.
+- Ensure `items-start` doesn't interfere with the `grid-cols-2` horizontal alignment on mobile.
+- Support both `h-fit` and `self-start` to ensure intrinsic height is the default behavior.
+
+
+## UI Layout — Lane-Based Stability (Vertical Columns)
+
+1. **Lane Structure**:
+   - **Wrapper**: Must use `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start`.
+   - **Lanes**: Group related components into vertical `div class="flex flex-col gap-6 w-full h-fit"` containers (Lanes). This ensures each card's expansion only affects its direct vertical siblings.
+
+2. **Standard Column/Lane Mapping**:
+   - **Lane 1 (Training Lane — Col 1)**: [Daily Training, Misc Movement]
+   - **Lane 2 (Evolve track — Col 2)**: [Pet Hero (Large), Activity Stats]
+   - **Lane 3 (Maintenance Lane — Col 3)**:
+     - 1. Weight Log (Daily Record)
+     - 2. Diet Habits (Daily Record)
+     - *Styling*: Must maintain `flex flex-col gap-6` for consistent rhythm.
+   - **Lane 4 (Lifecycle Lane — Col 4)**: 
+     - 1. Your Journey (Primary Context)
+     - 2. Today's Progress (Daily Context)
+     - 3. Rest Day (Current Action)
+     - 4. Daily Reset / Reminder (Maintenance)
+     - *Constraint*: Must use `flex flex-col gap-6` to ensure cards stack vertically without gaps.
+
+3. **Container Constraints**:
+   - **Widths**: Use `w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8`.
+   - **Alignment**: The main container and the header must share identical horizontal padding classes to ensure start-point alignment.
+   - **Heights**: Always use `h-auto` or `h-fit` (intrinsic height).
+   - **Padding**: Scale padding from `p-4` on mobile to `p-6` on desktop using `p-4 md:p-6`.
+   - **Dynamic Sizing**: Maintain the `max-w-[95%] xl:max-w-[1600px]` width to prevent excessive stretching on ultra-wide viewports.
+
+4. **Dynamic Component Priority (Smart Sorting)**:
+   - **Smart Sorting (Column 1)**: Use `hasLoggedWeightToday` to manage the vertical order within the Lane 1 flex container.
+   - **Active State (Incomplete)**: Weight Log is `order-first` with a `ring-2 ring-indigo-500/10` highlight.
+   - **Completed State**: Weight Log moves to the bottom of Column 1 (`order-last`), elevating Daily Training to the top.
+   - **Daily Training Standout**: When at the top (i.e., Weight Log is complete), apply a "Hero" treatment to Daily Training: `ring-2 ring-orange-500/20 bg-gradient-to-br from-white to-orange-50/30 shadow-2xl shadow-orange-100/40`.
+   - **Smooth Transitions**: Use `transition-all duration-300 md:duration-500` on Lane 1's items for seamless reshuffling.
+
+**GUARDRAILS**:
+- Ensure the Weight Log (when not logged) remains statically pinned to the top of Column 3.
+- Ensure `DietHabits` uses the same `p-4 md:p-6` glassmorphism styling as the Weight Log to maintain visual alignment.
+- Never hide a card entirely upon completion; only adjust its visual priority or sorting order.
+- Maintain the static position of the "Welcome back" header; it must always appear above the interactive grid container regardless of card order.
+- Ensure the main dashboard wrapper matches the header's horizontal padding/margin.
+- Remove all `break-inside-avoid-column` and `columns-x` classes; they are incompatible with stable Grid-Lane architecture.
+- On Desktop (`xl:`), the 'Rest Day' and 'Daily Reset' cards MUST stack vertically (`flex flex-col gap-6`) within their lane to maintain a consistent column width.
+- On Mobile/Tablet, they may remain side-by-side using `grid-cols-2` if horizontal space allows, or stack for legibility.
+- Ensure the 'Weight Log' (Hero) remains at the start of Lane 1.
+- Ensure 'Daily Training' carousel remains `overflow-x-auto` on mobile while fitting into its grid lane on desktop.
+
+## UI Interaction — Adaptive Viewports
+
+1. **Collapsible Behavior (Misc Movement)**:
+   - **Requirement**: The `WorkoutLogger` must be expanded by default on desktop (`xl:`) and the toggle should be visually disabled or hidden.
+   - **Tablet/Mobile**: Must remain collapsible with a clearly interactive chevron icon to conserve vertical space.
+
+2. **Daily Reset Widget (ReminderSettings)**:
+   - **Architecture**: Switch from a vertical stacking flow to a compact, layered design.
+   - **Visuals**: Centered time display with the 'Until reset' countdown in a small, pill-shaped badge directly underneath.
+   - **Toggle**: Place the 'Reminder' label and toggle switch in a single horizontal row at the very top.
+   - **Time Display**: Ensure the `11:33 PM` input is large enough to be touch-friendly on mobile but avoids wrapping or truncation.
+
+3. **Input Grouping (Misc Movement)**:
+   - **Intensity Selector**: The intensity buttons (Easy, Moderate, Intense) MUST use `flex-wrap` and `gap-2` to prevent clipping or horizontal overflow.
+   - **Styling**: On narrow containers, buttons should scale down to `text-[10px]` and reduced padding (`px-2`) to avoid excessive wrapping.
+   - **Logging Button**: The 'Log Activity +' button should occupy its own row at full width on narrow viewports/mobile to provide a target-rich touch experience.
+
+4. **Form Design (Standard Logging Flow)**:
+   - **Input Hierarchy**: Primary Input (Dropdown/Text) → Secondary Modifiers (Intensity/Pills) → Final Action (Full-width Submit Button).
+   - **Layout**: Follow a single vertical stack (flex-col) for all form elements across all responsive breakpoints for unified visual flow.
+   - **Intensity Selector**: Horizontal row of equal-width pills.
+   - **Submit Button**: Prominent, full-width primary action button at the bottom of the card or container.
+   - **Typography**: Inline labels must be small, uppercase, and slightly muted: `text-[10px] tracking-wider text-slate-400`.
+
+**GUARDRAILS**:
+- On desktop (`xl:`), swap the chevron icon for a static header or a hidden state (`hidden xl:block`).
+- Use `transition-all` for the collapsible animation on mobile/tablet.
+- Confirm the 'Until reset' badge uses `whitespace-nowrap` to prevent messy truncation on narrow (<360px) screens.
+- Avoid "side-by-side" layouts for buttons of different shapes or purposes; prioritize the vertical stack for clean alignment.
+- Always maintain the minimum standard glassmorphism card padding (`p-4 md:p-6`).
+- Do NOT let horizontal overflow trigger a scrollbar within the Misc Movement card; always prioritize wrapping for accessibility.
+
+
+## Interactive Logic — Utility Cards
+
+1. **State Priority Hierarchy — Rest Day**:
+   - **Priority 1 (Resting)**: If `isRestDayActive` (today is a rest day), show the "Resting..." status badge. This is the **Terminal State** for the day — do not show "Limit Reached" if a rest day is active.
+   - **Priority 2 (Action)**: If rest days are available and today is NOT a rest day, show the "Log Rest" button.
+   - **Priority 3 (No Days Left)**: If no rest days are active and none are available, show a neutral "Check back tomorrow" sub-label or remain empty.
+
+2. **Visual Persistence**:
+   - The "Resting..." badge takes 100% priority and must persist until the daily reset.
+   - The "Used" pill in the indicator row must remain highlighted while the "Resting..." badge is active.
+
+3. **Vertical Space (Mobile)**:
+   - **Requirement**: The total card height should decrease by at least 20px when in the 'Resting' state to save mobile vertical space.
+
+**GUARDRAILS**:
+- Maintain the 'Used/Avail' indicators at the top.
+- Do not let secondary validation (like `availableDays === 0`) overwrite the active rest state.
+- Add a subtle transition so the button swap doesn't feel jarring.
+
+
+## State Persistence — Rest Day
+
+1. **Rest Day Persistence**:
+   - **Requirement**: The `isRestDayActive` state must be immutable once set to `true` within a single calendar day.
+   - **Syncing**: When `logRestDay` is called, it must immediately call the state persistence save mechanism before any other UI logic to prevent flicker.
+
+2. **Template Stability**:
+   - **Constraint**: Components must use `v-show` or persistent `v-if` conditions for "logged" states to ensure they do not disappear during background data refreshes.
+
+**GUARDRAILS**:
+- Do not trigger any "Reset" logic except at the exact midnight timestamp.
+- Ensure the 'Resting' badge remains visible even if network/storage sync is pending.
+
 
 ## Core Layout (7/5 Split)
 - **Left Column (Col 7-8, Hero):** Houses `PetMiniWidget` (Hero Header) and `LogNewSession` card.
