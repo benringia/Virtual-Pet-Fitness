@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-4 p-3 bg-white rounded-xl shadow-sm border border-slate-100 relative">
+  <div class="flex items-center gap-4 bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-6 relative transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
     
     <!-- Top-Right Speech Bubble -->
     <Transition name="bubble-fade">

@@ -826,7 +826,7 @@ Local time only — no UTC.
    - **Widths**: Use `w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8`.
    - **Alignment**: The main container and the header must share identical horizontal padding classes to ensure start-point alignment.
    - **Heights**: Always use `h-auto` or `h-fit` (intrinsic height).
-   - **Padding**: Scale padding from `p-4` on mobile to `p-6` on desktop using `p-4 md:p-6`.
+   - **Padding**: Scale padding from `p-4 pt-16` on mobile to `p-6` on desktop using `p-4 md:p-6 md:pt-6`. This prevents the Mobile Top Bar from overlapping the header.
    - **Dynamic Sizing**: Maintain the `max-w-[95%] xl:max-w-[1600px]` width to prevent excessive stretching on ultra-wide viewports.
 
 4. **Dynamic Component Priority (Smart Sorting)**:
@@ -835,6 +835,11 @@ Local time only — no UTC.
    - **Completed State**: Weight Log moves to the bottom of Column 1 (`order-last`), elevating Daily Training to the top.
    - **Daily Training Standout**: When at the top (i.e., Weight Log is complete), apply a "Hero" treatment to Daily Training: `ring-2 ring-orange-500/20 bg-gradient-to-br from-white to-orange-50/30 shadow-2xl shadow-orange-100/40`.
    - **Smooth Transitions**: Use `transition-all duration-300 md:duration-500` on Lane 1's items for seamless reshuffling.
+
+5. **Mobile Top Bar & Branding**:
+   - **Visibility**: Render only for small/medium devices (`md:hidden`).
+   - **Styling**: `sticky top-0 w-full h-14 bg-indigo-600 shadow-md z-[60]`. Use a high Z-Index to clear all dashboard cards.
+   - **Branding**: Center the "Flarepup" icon/logo (`h-8 w-8`) horizontally using `flex items-center justify-center`.
 
 **GUARDRAILS**:
 - Ensure the Weight Log (when not logged) remains statically pinned to the top of Column 3.
@@ -1293,3 +1298,62 @@ Local time only — no UTC.
 > - Do not duplicate pet logic; use the shared store state for XP and Level.
 > - Ensure the 'speech bubble' text is high-contrast for readability. 
 > - Ensure navigation labels (e.g., 'Overview') are perfectly vertically centered in all nav-bars.
+
+---
+
+## UI Layout
+
+### Mastery Overview (Progress View)
+1. **Title**: Rename "Weekly Report" to "Mastery Overview".
+2. **The "Bento" Grid Layout**:
+   - **Top Row (High Level)**: Weight Trend (Left, 2/3 width) and Streaks (Right, 1/3 width).
+   - **Middle Row (Activity)**: XP Per Day (Left, 2/3 width) and Workout History (Right, 1/3 width).
+   - **Bottom Row (Future & Pet)**: Monthly Predictions (Full Width) and Evolution Path (Full Width).
+3. **Card Interaction**:
+   - Every card must use the new **Opaque Neo-Glass** standard (Solid bg, hover elevation).
+   - Monthly Predictions should use the 3-column sub-layout for Calories, Change, and Deficit.
+
+**GUARDRAILS**:
+- Maintain consistent `gap-6` between all bento blocks.
+- Ensure the Evolution Path remains at the very bottom as the "Ultimate Goal."
+
+---
+
+## UI Interaction
+
+### Elevation Effects
+1. **Card Hover Logic**:
+   - **Requirement**: All primary dashboard and workout cards MUST have a transition-based hover effect.
+   - **Classes**: `transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50`.
+   - **Performance**: Use `will-change-transform` on complex cards to ensure smooth 60fps movement.
+
+**GUARDRAILS**:
+- Do not apply hover effects to static text or headers.
+- Ensure the elevation does not cause layout shifting in the grid.
+
+---
+
+## UI Standards
+
+### Solid Opaque Cards
+1. **Anti-Glassmorphism**:
+   - **Requirement**: All primary cards (Weight, Training, Journey, Pet, etc.) MUST NOT use `backdrop-blur`.
+   - **Background**: Replace transparent backgrounds (`bg-white/40`) with solid opaque backgrounds.
+   - **New Style**: `bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-6`.
+   - **Reasoning**: To ensure maximum text contrast and eliminate all "blurry" artifacts on complex backgrounds.
+
+2. **Depth**:
+   - Depth is now achieved solely through the `shadow-xl` and the `border-indigo-100`, not transparency.
+
+**GUARDRAILS**:
+- Do not let `opacity-x` classes be applied to any text or data elements.
+
+---
+
+## Feature Roadmap
+
+### UI Streamlining (Current Phase)
+1. **Deprecated Elements**:
+   - **Workout Types Section**: Removed from the 'My Workout' tab to reduce cognitive load.
+   - **Reasoning**: Standardizing on the primary logging flow (Daily Training + Misc Movement) makes the "Workout Types" manager redundant.
+   - **Cleanup**: Ensure removal doesn't leave orphaned logic (e.g., `toggleWorkoutTypes`) in relevant components.

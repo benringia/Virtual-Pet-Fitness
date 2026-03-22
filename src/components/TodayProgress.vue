@@ -46,7 +46,7 @@ function arc(value, goal) {
 </script>
 
 <template>
-  <section class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6">
+  <section class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6">
 
     <!-- Header -->
     <h2 class="text-sm font-semibold text-gray-700 mb-4">Today's Progress</h2>

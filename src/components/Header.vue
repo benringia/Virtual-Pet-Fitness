@@ -1,5 +1,5 @@
 <template>
-  <header class="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-indigo-100">
+  <header class="sticky top-0 z-10 bg-white border-b border-indigo-100">
     <div class="px-4 lg:px-6 py-3 flex items-center justify-between">
 
       <!-- Left: Petfit logo -->

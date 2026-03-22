@@ -1,5 +1,22 @@
 <template>
-  <div class="min-h-screen bg-[#f8f8ff] flex flex-col">
+  <div class="min-h-screen bg-[#f8f8ff] flex flex-col md:pt-0">
+    <!-- Mobile Top Bar (Indigo Branding) -->
+    <div class="md:hidden sticky top-0 left-0 right-0 h-14 bg-indigo-600 z-50 flex items-center justify-center shadow-lg">
+      <div class="bg-indigo-500/30 p-2 rounded-xl ">
+        <svg class="h-6 w-6 text-white" viewBox="10 8 96 86" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(10, 5)">
+            <circle cx="35" cy="18" r="10" fill="currentColor"/>
+            <circle cx="62" cy="18" r="10" fill="currentColor"/>
+            <circle cx="14" cy="30" r="8" fill="currentColor"/>
+            <circle cx="83" cy="30" r="8" fill="currentColor"/>
+            <circle cx="48" cy="52" r="32" fill="currentColor" fill-opacity="0.5"/>
+            <circle cx="38" cy="46" r="6" fill="currentColor"/>
+            <circle cx="58" cy="46" r="6" fill="currentColor"/>
+            <circle cx="48" cy="62" r="6" fill="currentColor"/>
+          </g>
+        </svg>
+      </div>
+    </div>
 
     <div class="flex flex-1 overflow-hidden w-full">
 
@@ -178,7 +195,7 @@
             
             <!-- Activity Stats card -->
             <div class="hidden md:flex flex-col gap-6">
-              <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6">
+              <div class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
                 <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Activity Stats</h3>
                 <!-- Today's Activity donut -->
                 <div class="flex items-center gap-4 mb-4">
@@ -234,7 +251,7 @@
             />
             
             <!-- Diet Habits (Restored Tabbed Panel) -->
-            <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6 overflow-hidden">
+            <div class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
               <div class="flex border-b border-gray-100 px-2">
                 <button
                   v-for="tab in [
@@ -325,7 +342,7 @@
 
     <!-- Mobile bottom nav (fixed) -->
     <nav
-      class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-100 flex z-20"
+      class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex z-20"
       style="padding-bottom: env(safe-area-inset-bottom, 0px)"
       aria-label="Mobile navigation"
     >

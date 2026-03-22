@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 bg-white/70 backdrop-blur-2xl rounded-3xl border border-white/50 shadow-2xl shadow-indigo-100/20">
+  <div class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
     
     <!-- Header: Horizontal Calendar / Daily Slider -->
     <div class="flex items-center justify-between mb-5">
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Calendar Expander -->
-    <div v-show="showFullMonth" class="mb-6 bg-white/50 backdrop-blur-md rounded-3xl p-3 border border-indigo-50/50 shadow-inner">
+    <div v-show="showFullMonth" class="mb-6 bg-white rounded-3xl p-3 border border-indigo-100 shadow-inner">
       <WorkoutCalendar :workoutSets="workoutSets" :workoutSessions="workoutSessions" />
     </div>
 
@@ -21,7 +21,7 @@
     <div v-show="!showFullMonth" class="flex justify-between items-center mb-6 px-1">
       <button v-for="day in weekDays" :key="day.date" @click="selectedDate = day.date"
         class="flex flex-col items-center justify-center w-[46px] h-14 rounded-2xl transition-all cursor-pointer relative"
-        :class="day.date === selectedDate ? 'bg-indigo-600 text-white shadow-[0_4px_12px_rgba(79,70,229,0.3)] scale-105' : 'bg-transparent text-slate-400 hover:bg-white/60'">
+        :class="day.date === selectedDate ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-300/40 scale-105' : 'bg-transparent text-slate-400 hover:bg-white'">
         <span class="text-[9px] font-bold uppercase tracking-wider mb-0.5" :class="day.date === selectedDate ? 'text-indigo-200' : 'text-slate-400'">{{ day.dayName }}</span>
         <span class="text-sm font-bold" :class="day.date === selectedDate ? 'text-white' : 'text-slate-700'">{{ day.dayNumber }}</span>
         
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Session Display -->
-    <div v-if="sessionsForSelectedDate.length === 0" class="text-center py-10 bg-white/50 rounded-3xl border border-dashed border-slate-200 shadow-inner">
+    <div v-if="sessionsForSelectedDate.length === 0" class="text-center py-10 bg-white rounded-3xl border border-dashed border-slate-200 shadow-inner">
       <p class="text-3xl mb-3">🧘‍♂️</p>
       <p class="text-sm font-semibold text-slate-500">Rest Day</p>
       <p class="text-[11px] text-slate-400 mt-1" v-if="selectedDate === todayStr()">No sessions logged for today.</p>
@@ -98,11 +98,11 @@
           
           <h3 v-if="editingSessionId !== sess.id" class="text-sm font-semibold text-slate-900 tracking-tight capitalize flex-1 truncate">{{ sess.label || 'Untitled Session' }}</h3>
           <input v-else v-model="editDraft.label" type="text" placeholder="Session Name"
-            class="block flex-1 text-sm font-semibold capitalize bg-white/50 border border-slate-100 rounded-xl px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-300 text-slate-900 min-w-0"/>
+            class="block flex-1 text-sm font-semibold capitalize bg-white border border-slate-100 rounded-xl px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-300 text-slate-900 min-w-0"/>
           
           <!-- Ribbon (Stats) -->
-          <div class="flex items-center gap-1.5 shrink-0 px-3 py-1 rounded-xl shadow-sm border backdrop-blur-sm"
-            :class="getCategory(sess) === 'calisthenics' ? 'bg-orange-50/80 border-orange-100/50' : getCategory(sess) === 'cardio' ? 'bg-rose-50/80 border-rose-100/50' : 'bg-indigo-50/80 border-indigo-100/50'">
+          <div class="flex items-center gap-1.5 shrink-0 px-3 py-1 rounded-xl shadow-sm border"
+            :class="getCategory(sess) === 'calisthenics' ? 'bg-orange-50 border-orange-100' : getCategory(sess) === 'cardio' ? 'bg-rose-50 border-rose-100' : 'bg-indigo-50 border-indigo-100'">
             
             <span class="text-[9px] font-semibold uppercase tracking-wider flex items-center gap-1" 
               :class="getCategory(sess) === 'calisthenics' ? 'text-orange-600' : getCategory(sess) === 'cardio' ? 'text-rose-600' : 'text-indigo-600'">
@@ -143,7 +143,7 @@
         <div class="space-y-2 border-t border-slate-200/40 pt-4">
           <template v-if="editingSessionId === sess.id">
             <!-- EDITING EXERCISES -->
-            <div v-for="(ex, idx) in editDraft.exercises" :key="'edit-'+idx" class="flex flex-col gap-1.5 bg-white/40 p-2.5 rounded-xl border border-slate-100 shadow-sm relative pr-10">
+            <div v-for="(ex, idx) in editDraft.exercises" :key="'edit-'+idx" class="flex flex-col gap-1.5 bg-white p-2.5 rounded-xl border border-indigo-100 shadow-sm relative pr-10">
               <button @click="removeExercise(idx)" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full border border-dashed border-slate-300 text-slate-400 hover:text-red-400 hover:bg-white hover:border-red-200 transition-all font-semibold cursor-pointer shrink-0">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
               </button>
@@ -285,7 +285,7 @@
       </div>
       
       <!-- Scroll Hint Fade -->
-      <div v-if="sessionsForSelectedDate.length > 1 && !editingSessionId" class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/80 to-transparent pointer-events-none rounded-b-[2.5rem]"></div>
+      <div v-if="sessionsForSelectedDate.length > 1 && !editingSessionId" class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white to-transparent pointer-events-none rounded-b-[2.5rem]"></div>
     </div>
   </div>
 </template>

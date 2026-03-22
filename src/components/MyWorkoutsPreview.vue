@@ -9,9 +9,9 @@ const todayStr = (() => {
 })()
 
 const CATEGORIES = [
-  { id: 'bodybuilding', label: 'Body Building', emoji: '🏋️', color: 'text-indigo-600', bg: 'bg-indigo-50/50' },
-  { id: 'calisthenics', label: 'Calisthenics',  emoji: '🤸', color: 'text-orange-600', bg: 'bg-orange-50/50' },
-  { id: 'cardio',       label: 'Cardio',        emoji: '🏃', color: 'text-rose-600',   bg: 'bg-rose-50/50' },
+  { id: 'bodybuilding', label: 'Body Building', emoji: '🏋️', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+  { id: 'calisthenics', label: 'Calisthenics',  emoji: '🤸', color: 'text-orange-600', bg: 'bg-orange-50' },
+  { id: 'cardio',       label: 'Cardio',        emoji: '🏃', color: 'text-rose-600',   bg: 'bg-rose-50' },
 ]
 
 const categoryStatus = computed(() => {
@@ -28,7 +28,7 @@ function navigateToCategory(catId) {
 </script>
 
 <template>
-  <section class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6">
+  <section class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
     <div class="mb-5">
       <h3 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 mb-1">
         <span class="relative flex h-8 w-8 items-center justify-center bg-orange-100 rounded-full text-lg shadow-sm">

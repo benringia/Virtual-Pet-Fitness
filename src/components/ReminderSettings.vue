@@ -68,7 +68,7 @@ onUnmounted(() => clearInterval(countdownInterval))
 </script>
 
 <template>
-  <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6 flex flex-col">
+  <div class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 flex flex-col">
 
     <!-- Header + toggle row -->
     <div class="flex items-center justify-between mb-4">
@@ -99,12 +99,12 @@ onUnmounted(() => clearInterval(countdownInterval))
           v-model="state.reminder.time"
           type="time"
           aria-label="Reminder time"
-          class="w-full bg-white/60 backdrop-blur-sm border border-indigo-100 rounded-2xl px-3 py-2 text-center text-xl font-black text-gray-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
+          class="w-full bg-white border border-indigo-100 rounded-2xl px-3 py-2 text-center text-xl font-black text-gray-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
         />
       </div>
 
       <!-- Countdown Badge -->
-      <div v-if="state.currentDate !== null" class="mt-3 px-3 py-1 bg-indigo-50/80 rounded-full text-[10px] font-bold text-indigo-600 flex items-center gap-1 justify-center whitespace-nowrap">
+      <div v-if="state.currentDate !== null" class="mt-3 px-3 py-1 bg-indigo-50 rounded-full text-[10px] font-bold text-indigo-600 flex items-center gap-1 justify-center whitespace-nowrap">
         <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         {{ resetCountdown }}
       </div>

@@ -1,229 +1,248 @@
 <template>
-  <div>
-    <div class="mb-4">
-      <button
-        @click="showWeeklyReport = true"
-        class="w-full border border-indigo-300 text-indigo-500 hover:bg-indigo-50 font-medium py-2.5 rounded-xl text-sm transition-colors"
-      >
-        📊 Weekly Report
-      </button>
-    </div>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-8 px-1">Mastery Overview</h1>
 
-    <div class="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
+    <!-- Row 1: High Level Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-stretch">
+      <!-- 1. Weight Trend (Col 1-2) -->
+      <section class="md:col-span-2 bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-xl shadow-indigo-100/20 rounded-3xl p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col">
+        <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4 px-1">⚖️ Weight Trend</h2>
+        <div v-if="weightAsc.length >= 2" class="flex-1 flex flex-col">
+          <div class="flex gap-4 mb-6">
+            <div class="flex-1 bg-white border border-indigo-50 rounded-2xl p-3 text-center shadow-sm">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Start</div>
+              <div class="text-lg font-bold text-slate-700">{{ weightStartDisplay }}<span class="text-xs text-slate-400 ml-1">{{ state.weightUnit }}</span></div>
+            </div>
+            <div class="flex-1 bg-white border border-indigo-50 rounded-2xl p-3 text-center shadow-sm">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Current</div>
+              <div class="text-lg font-bold text-slate-700">{{ weightCurrentDisplay }}<span class="text-xs text-slate-400 ml-1">{{ state.weightUnit }}</span></div>
+            </div>
+            <div class="flex-1 border rounded-2xl p-3 text-center shadow-sm" :class="weightChange > 0 ? 'bg-orange-50 border-orange-100' : 'bg-emerald-50 border-emerald-100'">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Change</div>
+              <div class="text-lg font-bold" :class="weightChange > 0 ? 'text-orange-600' : 'text-emerald-600'">
+                {{ weightChange > 0 ? '+' : '' }}{{ weightChangeDisplay }}<span class="text-xs ml-1">{{ state.weightUnit }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="px-2 mt-auto">
+            <svg :viewBox="`0 0 ${W} ${H}`" class="w-full h-32" aria-hidden="true">
+              <line v-if="goalLineY !== null" :x1="0" :y1="goalLineY" :x2="W" :y2="goalLineY"
+                stroke="#c084fc" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4" />
+              <polyline :points="weightPoints" fill="none" stroke="#6366f1" stroke-width="3"
+                stroke-linejoin="round" stroke-linecap="round" />
+              <circle v-for="(p, i) in weightCoords" :key="i" :cx="p.x" :cy="p.y" r="4" fill="#6366f1" class="shadow-sm" />
+              <text :x="W - 2" :y="weightCoords[0].y + 4" text-anchor="end" font-size="9" font-weight="bold" fill="#94a3b8">{{ weightMinDisplay }}</text>
+              <text :x="W - 2" :y="weightCoords.reduce((a, b) => a.y < b.y ? a : b).y + 4" text-anchor="end" font-size="9" font-weight="bold" fill="#94a3b8">{{ weightMaxDisplay }}</text>
+            </svg>
+          </div>
+        </div>
+        <div v-else class="flex flex-col items-center justify-center py-12 text-slate-400 flex-1">
+          <span class="text-3xl mb-2">📉</span>
+          <p class="text-xs font-bold uppercase tracking-widest">Entry needed</p>
+        </div>
+      </section>
 
-    <!-- 1. Weight Trend -->
-    <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4 lg:mb-0">
-      <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3">⚖️ Weight Trend</h2>
-      <div v-if="weightAsc.length >= 2">
-        <div class="flex gap-3 mb-3">
-          <div class="flex-1 bg-indigo-50 rounded-xl p-2 text-center">
-            <div class="text-xs text-gray-400">Start</div>
-            <div class="font-bold text-gray-700">{{ weightStartDisplay }}<span class="text-xs text-gray-400 ml-0.5">{{ state.weightUnit }}</span></div>
-          </div>
-          <div class="flex-1 bg-indigo-50 rounded-xl p-2 text-center">
-            <div class="text-xs text-gray-400">Current</div>
-            <div class="font-bold text-gray-700">{{ weightCurrentDisplay }}<span class="text-xs text-gray-400 ml-0.5">{{ state.weightUnit }}</span></div>
-          </div>
-          <div class="flex-1 rounded-xl p-2 text-center" :class="weightChange > 0 ? 'bg-orange-50' : 'bg-green-50'">
-            <div class="text-xs text-gray-400">Change</div>
-            <div class="font-bold" :class="weightChange > 0 ? 'text-orange-400' : 'text-green-500'">
-              {{ weightChange > 0 ? '+' : '' }}{{ weightChangeDisplay }}<span class="text-xs ml-0.5">{{ state.weightUnit }}</span>
+      <!-- 2. Streaks (Col 3) -->
+      <section class="md:col-span-1 bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-xl shadow-indigo-100/20 rounded-3xl p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col">
+        <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-5 px-1">🔥 Current Streaks</h2>
+        <div class="flex flex-col gap-4 flex-1">
+          <div v-for="s in streakCards" :key="s.key"
+            class="flex items-center gap-4 bg-white border rounded-2xl p-4 shadow-sm"
+            :class="s.count > 0 ? 'border-orange-100' : 'border-slate-100'">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner"
+                 :class="s.count > 0 ? 'bg-orange-50' : 'bg-slate-50'">
+              {{ s.count > 0 ? (s.key === 'workout' ? '⚡' : (s.key === 'diet' ? '🥗' : '🔥')) : '💤' }}
+            </div>
+            <div class="flex-1">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1.5">{{ s.label }}</div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-2xl font-black" :class="s.count > 0 ? 'text-slate-800' : 'text-slate-300'">{{ s.count }}</span>
+                <span class="text-[10px] font-bold text-slate-400">DAYS</span>
+              </div>
             </div>
           </div>
         </div>
-        <svg :viewBox="`0 0 ${W} ${H}`" class="w-full h-28" aria-hidden="true">
-          <line v-if="goalLineY !== null" :x1="0" :y1="goalLineY" :x2="W" :y2="goalLineY"
-            stroke="#c084fc" stroke-width="1" stroke-dasharray="4 3" opacity="0.6" />
-          <polyline :points="weightPoints" fill="none" stroke="#6366f1" stroke-width="2"
-            stroke-linejoin="round" stroke-linecap="round" />
-          <circle v-for="(p, i) in weightCoords" :key="i" :cx="p.x" :cy="p.y" r="3" fill="#6366f1" />
-          <text :x="W - 2" :y="weightCoords[0].y + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ weightMinDisplay }}</text>
-          <text :x="W - 2" :y="weightCoords.reduce((a, b) => a.y < b.y ? a : b).y + 4" text-anchor="end" font-size="8" fill="#9ca3af">{{ weightMaxDisplay }}</text>
-        </svg>
-      </div>
-      <p v-else class="text-xs text-gray-400 text-center py-4">Log weight entries to see your trend.</p>
-    </section>
+      </section>
+    </div>
 
-    <!-- 2. Workout History Timeline -->
-    <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4 lg:mb-0">
-      <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3">🏋️ Workout History</h2>
-      <div v-if="workoutGroups.length" class="space-y-3 max-h-64 overflow-y-auto pr-1">
-        <div v-for="group in workoutGroups" :key="group.date">
-          <div class="text-xs font-semibold text-indigo-400 mb-1">{{ formatDate(group.date) }}</div>
-          <div v-for="(entry, i) in group.entries" :key="i"
-            class="flex items-center justify-between text-xs bg-indigo-50 rounded-lg px-3 py-1.5 mb-1">
-            <span class="text-gray-600">{{ workoutMeta(entry).emoji }} {{ workoutLabel(entry) }}</span>
-            <span class="text-indigo-500 font-semibold">+{{ entry.xp }} XP</span>
+    <!-- Row 2: Activity Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-stretch">
+      <!-- 3. XP Per Day (Col 1-2) -->
+      <section class="md:col-span-2 bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-xl shadow-indigo-100/20 rounded-3xl p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col">
+        <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-1 px-1">✨ XP Per Day <span class="text-slate-300 font-normal normal-case">(last 30 days)</span></h2>
+        <div v-if="xpBars.some(b => b.xp > 0)" class="flex-1 flex flex-col">
+          <div class="px-2 mt-4 flex-1 flex items-end">
+            <svg :viewBox="`0 0 ${W} ${BAR_H}`" class="w-full h-32" aria-hidden="true">
+              <rect v-for="(bar, i) in xpBars" :key="i"
+                :x="bar.x" :y="bar.y" :width="bar.w" :height="bar.h"
+                :fill="bar.isMax ? '#6366f1' : '#e2e8f0'"
+                rx="3" />
+            </svg>
+          </div>
+          <div class="mt-6 flex items-center justify-center gap-2">
+             <div class="bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100 flex items-center gap-2">
+               <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Best day</span>
+               <span class="text-xs font-black text-indigo-600 tracking-tight">{{ xpMaxDay.date }} · {{ xpMaxDay.xp }} XP</span>
+             </div>
           </div>
         </div>
-      </div>
-      <p v-else class="text-xs text-gray-400 text-center py-4">No workouts logged yet.</p>
-    </section>
-
-    <!-- 3. XP Per Day Bar Chart -->
-    <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4 lg:mb-0">
-      <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase mb-1">✨ XP Per Day <span class="text-gray-300 font-normal normal-case">(last 30 days, workouts)</span></h2>
-      <div v-if="xpBars.some(b => b.xp > 0)">
-        <svg :viewBox="`0 0 ${W} ${BAR_H}`" class="w-full h-28 mt-2" aria-hidden="true">
-          <rect v-for="(bar, i) in xpBars" :key="i"
-            :x="bar.x" :y="bar.y" :width="bar.w" :height="bar.h"
-            :fill="bar.isMax ? '#6366f1' : '#eef2ff'"
-            rx="2" />
-        </svg>
-        <div class="text-xs text-gray-400 text-center mt-1">Best day: <span class="text-indigo-500 font-semibold">{{ xpMaxDay.date }} · {{ xpMaxDay.xp }} XP</span></div>
-      </div>
-      <p v-else class="text-xs text-gray-400 text-center py-4">Log workouts to see daily XP.</p>
-    </section>
-
-    <!-- 4. Streaks -->
-    <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4 lg:mb-0">
-      <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3">🔥 Streaks</h2>
-      <div class="flex gap-3">
-        <div v-for="s in streakCards" :key="s.key"
-          class="flex-1 rounded-xl border p-3 text-center"
-          :class="s.count > 0 ? 'border-yellow-200 bg-yellow-50' : 'border-gray-100 bg-gray-50'">
-          <div class="text-lg mb-1">{{ s.count > 0 ? '🔥' : '💤' }}</div>
-          <div class="text-2xl font-bold" :class="s.count > 0 ? 'text-yellow-600' : 'text-gray-300'">{{ s.count }}</div>
-          <div class="text-xs font-semibold text-gray-500 mt-1">{{ s.label }}</div>
-          <div v-if="s.lastDate" class="text-xs text-gray-400 mt-0.5">last: {{ s.lastDate }}</div>
+        <div v-else class="flex flex-col items-center justify-center py-12 text-slate-400 flex-1">
+          <span class="text-3xl mb-2">✨</span>
+          <p class="text-xs font-bold uppercase tracking-widest">Start evolving</p>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <!-- 4. Workout History (Col 3) -->
+      <section class="md:col-span-1 bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-xl shadow-indigo-100/20 rounded-3xl p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col">
+        <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-5 px-1">🏋️ Recent History</h2>
+        <div v-if="limitedWorkoutGroups.length" class="space-y-4 flex-1">
+          <div v-for="group in limitedWorkoutGroups" :key="group.date" class="relative pl-4 border-l-2 border-indigo-100 pb-2 last:pb-0">
+            <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white border-2 border-indigo-400 shadow-sm"></div>
+            <div class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2 leading-none">{{ formatDate(group.date) }}</div>
+            <div v-for="(entry, i) in group.entries" :key="i"
+              class="flex items-center justify-between bg-white border border-slate-50 rounded-xl px-3 py-2.5 mb-2 shadow-sm last:mb-0">
+              <span class="text-[11px] font-bold text-slate-700">{{ workoutMeta(entry).emoji }} {{ workoutLabel(entry) }}</span>
+              <span class="text-[10px] font-black text-emerald-500 uppercase">+{{ entry.xp }} XP</span>
+            </div>
+          </div>
+        </div>
+        <div v-else class="flex flex-col items-center justify-center py-12 text-slate-400 flex-1">
+          <span class="text-3xl mb-2">💪</span>
+          <p class="text-xs font-bold uppercase tracking-widest">No reps yet</p>
+        </div>
+      </section>
+    </div>
 
     <!-- 5. Monthly Predictions -->
-    <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4 lg:mb-0 lg:col-span-2">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="text-base">🔮</span>
-        <h2 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Monthly Predictions</h2>
-      </div>
+    <section class="bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-xl shadow-indigo-100/20 rounded-3xl p-8 mb-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🔮</div>
+          <h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">Monthly Predictions</h2>
+        </div>
 
-      <!-- Tab row -->
-      <div class="flex gap-2 mb-4">
-        <button
-          v-for="tab in predTabs"
-          :key="tab.key"
-          @click="activeTab = tab.key"
-          class="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-          :class="activeTab === tab.key ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-500 hover:bg-indigo-50'"
-        >{{ tab.label }}</button>
+        <!-- Tab row -->
+        <div class="flex bg-slate-100/50 p-1 rounded-2xl border border-slate-100 self-start md:self-auto">
+          <button
+            v-for="tab in predTabs"
+            :key="tab.key"
+            @click="activeTab = tab.key"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300"
+            :class="activeTab === tab.key ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'"
+          >{{ tab.label }}</button>
+        </div>
       </div>
 
       <!-- Calories tab -->
       <template v-if="activeTab === 'calories'">
-        <p v-if="!predictions.calories.hasData" class="text-xs text-gray-400 text-center py-4">log a calorie day to unlock 🔥</p>
+        <p v-if="!predictions.calories.hasData" class="text-[11px] font-bold text-slate-400 text-center py-8 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 uppercase tracking-widest">log a calorie day to unlock 🔥</p>
         <template v-else>
-          <div class="grid grid-cols-3 gap-3">
-            <div class="bg-indigo-50 rounded-xl p-3 text-center">
-              <div class="text-xs text-gray-400 mb-1">projected deficit</div>
-              <div class="text-lg font-bold text-indigo-500">{{ predictions.calories.projected30dDeficit.toLocaleString() }}</div>
-              <div class="text-xs text-gray-400">kcal</div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white border border-indigo-50 shadow-sm rounded-2xl p-5 text-center">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">projected deficit</div>
+              <div class="text-2xl font-black text-indigo-600 tracking-tight">{{ predictions.calories.projected30dDeficit.toLocaleString() }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">kcal / month</div>
             </div>
-            <div class="rounded-xl p-3 text-center" :class="predictions.calories.weightChangeKg >= 0 ? 'bg-green-50' : 'bg-orange-50'">
-              <div class="text-xs text-gray-400 mb-1">est. weight change</div>
-              <div class="text-lg font-bold" :class="predictions.calories.weightChangeKg >= 0 ? 'text-green-500' : 'text-orange-400'">
+            <div class="bg-white border shadow-sm rounded-2xl p-5 text-center" :class="predictions.calories.weightChangeKg >= 0 ? 'border-emerald-100' : 'border-orange-100'">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">est. weight change</div>
+              <div class="text-2xl font-black tracking-tight" :class="predictions.calories.weightChangeKg >= 0 ? 'text-emerald-600' : 'text-orange-600'">
                 {{ predictions.calories.weightChangeKg >= 0 ? '-' : '+' }}{{ Math.abs(toDisplay(predictions.calories.weightChangeKg)) }}
               </div>
-              <div class="text-xs text-gray-400">{{ state.weightUnit }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">{{ state.weightUnit }} total</div>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3 text-center">
-              <div class="text-xs text-gray-400 mb-1">avg daily deficit</div>
-              <div class="text-lg font-bold text-gray-600">{{ predictions.calories.avgDailyDeficit }}</div>
-              <div class="text-xs text-gray-400">kcal/day</div>
+            <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-5 text-center">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">avg daily deficit</div>
+              <div class="text-2xl font-black text-slate-700 tracking-tight">{{ predictions.calories.avgDailyDeficit }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">kcal / day</div>
             </div>
           </div>
-          <p class="text-xs text-gray-300 mt-3 text-right">Based on your last 7 days of calorie data</p>
+          <p class="text-[10px] font-bold text-slate-300 mt-6 text-right uppercase tracking-widest italic">Based on your last 7 days of data</p>
         </template>
       </template>
 
       <!-- Workouts tab -->
       <template v-else-if="activeTab === 'workouts'">
-        <p v-if="!predictions.workouts.hasData" class="text-xs text-gray-400 text-center py-4">log a workout to unlock 🏋️</p>
+        <p v-if="!predictions.workouts.hasData" class="text-[11px] font-bold text-slate-400 text-center py-8 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 uppercase tracking-widest">log a workout to unlock 🏋️</p>
         <template v-else>
-          <div class="grid grid-cols-3 gap-3">
-            <div class="bg-indigo-50 rounded-xl p-3 text-center">
-              <div class="text-xs text-gray-400 mb-1">projected sessions</div>
-              <div class="text-lg font-bold text-indigo-500">~{{ predictions.workouts.projected30d }}</div>
-              <div class="text-xs text-gray-400">/ month</div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white border border-indigo-50 shadow-sm rounded-2xl p-5 text-center">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">projected sessions</div>
+              <div class="text-2xl font-black text-indigo-600 tracking-tight">~{{ predictions.workouts.projected30d }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">sessions / month</div>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3 text-center">
-              <div class="text-xs text-gray-400 mb-1">weekly average</div>
-              <div class="text-lg font-bold text-gray-600">{{ predictions.workouts.weeklyAvg }}</div>
-              <div class="text-xs text-gray-400">/ week</div>
-            </div>
-            <div class="bg-gray-50 rounded-xl p-3 text-center opacity-40">
-              <div class="text-xs text-gray-400 mb-1">—</div>
-              <div class="text-lg font-bold text-gray-300">—</div>
-              <div class="text-xs text-gray-400"></div>
+            <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-5 text-center">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">weekly average</div>
+              <div class="text-2xl font-black text-slate-700 tracking-tight">{{ predictions.workouts.weeklyAvg }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">sessions / week</div>
             </div>
           </div>
-          <p class="text-xs text-gray-300 mt-3 text-right">Based on your last 14 days of workouts</p>
+          <p class="text-[10px] font-bold text-slate-300 mt-6 text-right uppercase tracking-widest italic">Based on your last 14 days of activity</p>
         </template>
       </template>
 
       <!-- XP & level tab -->
       <template v-else>
-        <p v-if="!predictions.xp.hasData" class="text-xs text-gray-400 text-center py-4">log workouts or habits to unlock ✨</p>
+        <p v-if="!predictions.xp.hasData" class="text-[11px] font-bold text-slate-400 text-center py-8 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 uppercase tracking-widest">log workouts or habits to unlock ✨</p>
         <template v-else>
-          <div class="grid grid-cols-3 gap-3">
-            <div class="bg-indigo-50 rounded-xl p-3 text-center">
-              <div class="text-xs text-gray-400 mb-1">projected xp</div>
-              <div class="text-lg font-bold text-indigo-500">+{{ predictions.xp.projected30d.toLocaleString() }}</div>
-              <div class="text-xs text-gray-400">xp</div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white border border-indigo-50 shadow-sm rounded-2xl p-5 text-center">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">projected xp</div>
+              <div class="text-2xl font-black text-indigo-600 tracking-tight">+{{ predictions.xp.projected30d.toLocaleString() }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">xp / month</div>
             </div>
-            <div class="bg-indigo-50 rounded-xl p-3 text-center">
-              <div class="text-xs text-gray-400 mb-1">levels gained</div>
-              <div class="text-lg font-bold text-indigo-500">{{ predictions.xp.levelsGained }}</div>
-              <div class="text-xs text-gray-400">→ lvl {{ predictions.xp.projectedLevel }}</div>
+            <div class="bg-white border border-indigo-50 shadow-sm rounded-2xl p-5 text-center">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">levels gained</div>
+              <div class="text-2xl font-black text-indigo-600 tracking-tight">{{ predictions.xp.levelsGained }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">→ LVL {{ predictions.xp.projectedLevel }}</div>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3 text-center">
-              <div class="text-xs text-gray-400 mb-1">avg daily xp</div>
-              <div class="text-lg font-bold text-gray-600">{{ predictions.xp.avgDailyXp }}</div>
-              <div class="text-xs text-gray-400">xp/day</div>
+            <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-5 text-center">
+              <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">avg daily xp</div>
+              <div class="text-2xl font-black text-slate-700 tracking-tight">{{ predictions.xp.avgDailyXp }}</div>
+              <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">xp / day</div>
             </div>
           </div>
-          <p class="text-xs text-gray-300 mt-3 text-right">Based on your last 14 days of activity</p>
+          <p class="text-[10px] font-bold text-slate-300 mt-6 text-right uppercase tracking-widest italic">Based on your last 14 days of activity</p>
         </template>
       </template>
     </section>
 
     <!-- 6. Evolution Path -->
-    <section class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 mb-4 lg:mb-0 lg:col-span-2">
-      <p class="text-xs font-bold tracking-widest text-gray-400 uppercase mb-5">Evolution Path</p>
-      <div class="relative flex items-start justify-between px-4">
+    <section class="bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-xl shadow-indigo-100/20 rounded-3xl p-8 mb-8 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50 overflow-x-auto overflow-y-hidden">
+      <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-10 px-1">🏆 Evolution Path</h2>
+      <div class="relative flex items-start justify-between px-8 min-w-[600px] py-4">
         <!-- Base line -->
-        <div class="absolute top-5 left-8 right-8 h-0.5 bg-indigo-100 z-0"></div>
+        <div class="absolute top-10 left-12 right-12 h-1 bg-slate-100 z-0 rounded-full"></div>
         <!-- Progress line -->
         <div
-          class="absolute top-5 left-8 h-0.5 bg-indigo-400 z-0 transition-all duration-500"
-          :style="{ width: currentStageIndex > 0 ? `calc(${(currentStageIndex / (STAGE_LIST.length - 1)) * 100}% - 4rem + 2rem)` : '0%' }"
+          class="absolute top-10 left-12 h-1 bg-gradient-to-r from-indigo-400 to-indigo-600 z-0 transition-all duration-1000 rounded-full shadow-sm shadow-indigo-200"
+          :style="{ width: currentStageIndex > 0 ? `calc(${(currentStageIndex / (STAGE_LIST.length - 1)) * 100}%)` : '0%' }"
         ></div>
 
         <!-- Stage nodes -->
-        <div v-for="(s, i) in STAGE_LIST" :key="s.name" class="relative z-10 flex flex-col items-center gap-1 w-16">
+        <div v-for="(s, i) in STAGE_LIST" :key="s.name" class="relative z-10 flex flex-col items-center gap-3 w-20">
           <div
-            class="w-10 h-10 rounded-full flex items-center justify-center text-xl border-2"
-            :class="i < currentStageIndex  ? 'bg-indigo-100 border-indigo-300'
-                   : i === currentStageIndex ? 'bg-indigo-500 border-indigo-500'
-                   : 'bg-white border-gray-200'"
+            class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl border-2 transition-all duration-500 shadow-sm"
+            :class="i < currentStageIndex  ? 'bg-indigo-50 border-indigo-300 text-indigo-400'
+                   : i === currentStageIndex ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200 scale-110'
+                   : 'bg-white border-slate-200 text-slate-200'"
           >
-            <span :class="i > currentStageIndex ? 'opacity-30' : ''">{{ s.emoji }}</span>
+            <span :class="i > currentStageIndex ? 'grayscale opacity-30' : ''">{{ s.emoji }}</span>
           </div>
-          <span v-if="i === currentStageIndex"
-            class="text-xs bg-indigo-500 text-white rounded-full px-1.5 py-0.5 leading-none font-medium">now</span>
-          <span v-else-if="i < currentStageIndex" class="text-xs text-indigo-400">✓</span>
-          <span v-else class="text-xs opacity-0" aria-hidden="true">·</span>
-          <span
-            class="text-xs font-medium text-center"
-            :class="i === currentStageIndex ? 'text-indigo-500'
-                   : i < currentStageIndex  ? 'text-indigo-400'
-                   : 'text-gray-300'"
-          >{{ s.name.toLowerCase() }}</span>
+          
+          <div class="flex flex-col items-center">
+            <span
+              class="text-[10px] font-black uppercase tracking-widest"
+              :class="i === currentStageIndex ? 'text-indigo-600'
+                     : i < currentStageIndex  ? 'text-indigo-400'
+                     : 'text-slate-300'"
+            >{{ s.name }}</span>
+            <div v-if="i === currentStageIndex" class="mt-1 px-2 py-0.5 bg-indigo-600 text-[8px] font-black text-white rounded-full uppercase tracking-tighter shadow-sm animate-pulse">active</div>
+            <div v-else-if="i < currentStageIndex" class="text-emerald-500 text-[10px] mt-1 font-black">✓</div>
+          </div>
         </div>
       </div>
     </section>
-
-    </div><!-- end grid -->
-  </div><!-- end wrapper -->
+  </div>
 </template>
 
 <script setup>
@@ -306,6 +325,25 @@ const workoutGroups = computed(() => {
     map.get(entry.date).push(entry)
   }
   return [...map.entries()].map(([date, entries]) => ({ date, entries }))
+})
+
+const limitedWorkoutGroups = computed(() => {
+  // Limit to last 5 entries total
+  let count = 0
+  const limited = []
+  for (const group of workoutGroups.value) {
+    const entries = []
+    for (const entry of group.entries) {
+      if (count < 5) {
+        entries.push(entry)
+        count++
+      }
+    }
+    if (entries.length > 0) {
+      limited.push({ date: group.date, entries })
+    }
+  }
+  return limited
 })
 
 // ── XP per day bar chart ──────────────────────────────────────────────────────

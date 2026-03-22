@@ -1,5 +1,5 @@
 <template>
-  <section class="relative overflow-hidden bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-4 md:p-6">
+  <section class="relative overflow-hidden bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
     
     <!-- Header: Glass-morphism Unit Toggle -->
     <div class="flex items-center justify-between mb-8">
@@ -10,7 +10,7 @@
           <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
       </h2>
-      <div class="flex bg-white/40 backdrop-blur-md border border-white/60 rounded-xl p-1 text-[10px] font-bold shadow-sm">
+      <div class="flex bg-white border border-indigo-100 rounded-xl p-1 text-[10px] font-bold shadow-sm">
         <button
           @click="state.weightUnit = 'kg'"
           :class="state.weightUnit === 'kg' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'"
@@ -47,7 +47,7 @@
       </p>
 
       <!-- Goal Info -->
-      <div v-if="state.weightGoal" class="flex items-center gap-2 mt-4 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/80 shadow-sm">
+      <div v-if="state.weightGoal" class="flex items-center gap-2 mt-4 bg-white px-4 py-2 rounded-2xl border border-indigo-100 shadow-sm">
         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target:</span>
         <span class="text-xs font-bold text-slate-700">{{ displayGoalWeight }} {{ state.weightUnit }}</span>
         <span class="w-1 h-1 rounded-full bg-slate-200"></span>
@@ -75,7 +75,7 @@
       </div>
 
       <!-- Editing Form -->
-      <div v-else class="bg-white/80 backdrop-blur-sm rounded-3xl p-5 border border-white shadow-sm space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div v-else class="bg-white rounded-3xl p-5 border border-indigo-100 shadow-sm space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <!-- Goal Objective (Mode Selectors) -->
         <div>
           <p class="text-[10px] font-bold text-slate-400 uppercase mb-3 px-1 tracking-widest">Weight Objective</p>

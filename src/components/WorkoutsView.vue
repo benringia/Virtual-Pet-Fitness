@@ -53,7 +53,8 @@
         <!-- ════════════════════════════════════════════
              LOG NEW SESSION CARD
         ════════════════════════════════════════════ -->
-        <div v-if="selectedDate === todayStr()" class="bg-white/70 backdrop-blur-lg rounded-3xl border-0 shadow-xl shadow-slate-200/50 overflow-hidden relative shadow-[0_0_15px_rgba(79,70,229,0.1)]">
+        <div v-if="selectedDate === todayStr()" 
+          class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-6 overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
       <!-- Card header -->
       <button @click="sessionFormOpen = !sessionFormOpen"
         class="w-full flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-indigo-50/50 transition-colors">
@@ -80,7 +81,7 @@
             <label class="block text-[10px] font-semibold uppercase tracking-widest text-indigo-500 mb-1.5">Session Label</label>
             <input v-model="draftSession.label" @input="isLabelDirty = true" type="text" maxlength="40"
               :placeholder="state.trainingCategory === 'cardio' ? 'e.g. Morning Run' : (state.trainingCategory === 'calisthenics' ? 'e.g. Upper Body Flow' : 'e.g. Push Day · Chest & Triceps')"
-              class="w-full text-sm font-semibold text-gray-800 placeholder-gray-300 border border-indigo-100 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-indigo-50/30"/>
+              class="w-full text-sm font-semibold text-gray-800 placeholder-gray-300 border border-indigo-100 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-indigo-50"/>
             
             <!-- Quick Label Pills -->
             <div v-if="state.trainingCategory === 'bodybuilding' && recentLabels.length" class="flex flex-wrap gap-2 mt-2 px-1">
@@ -95,7 +96,7 @@
           <!-- Exercise rows -->
           <div v-if="draftSession.exercises.length" class="mb-4 space-y-3">
             <div v-for="(ex, i) in draftSession.exercises" :key="i"
-              :class="state.trainingCategory === 'calisthenics' ? 'flex flex-row gap-3 items-start bg-slate-50/50 rounded-2xl px-4 py-4 border border-slate-100/50 w-full' : 'grid grid-cols-12 gap-4 items-start bg-slate-50/50 rounded-2xl px-4 py-4 border border-slate-100/50'">
+              :class="state.trainingCategory === 'calisthenics' ? 'flex flex-row gap-3 items-start bg-white rounded-2xl px-4 py-4 border border-indigo-100 w-full shadow-sm' : 'grid grid-cols-12 gap-4 items-start bg-white rounded-2xl px-4 py-4 border border-indigo-100 shadow-sm'">
               
               <div :class="state.trainingCategory === 'calisthenics' ? 'flex-1 min-w-[120px]' : (state.trainingCategory === 'bodybuilding' ? 'col-span-12 lg:col-span-6' : (state.trainingCategory === 'cardio' ? (isInclineExercise(ex.selectedName) ? 'col-span-12 lg:col-span-4' : 'col-span-12 lg:col-span-5') : 'col-span-12 lg:col-span-7'))">
                 <div class="flex items-center justify-between mb-1.5 px-1">
@@ -131,7 +132,7 @@
                     <!-- Calisthenics Exercise Select -->
                     <div class="relative w-full">
                       <select v-model="ex.name" @change="ex.isHold = STATIC_HOLDS.includes(ex.name)"
-                        class="text-[13px] font-medium border border-gray-200 rounded-xl px-2.5 pr-10 h-11 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white/50 w-full appearance-none">
+                        class="text-[13px] font-medium border border-gray-200 rounded-xl px-2.5 pr-10 h-11 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white w-full appearance-none">
                         <option disabled value="">Select exercise</option>
                         <option v-for="opt in COMMON_CALISTHENICS_EXERCISES" :key="opt" :value="opt">
                           {{ STATIC_HOLDS.includes(opt) ? '⚡ ' : '' }}{{ opt }}
@@ -240,7 +241,7 @@
                 <div :class="isInclineExercise(ex.selectedName) ? 'col-span-12 sm:col-span-6 lg:col-span-2 flex justify-center' : 'col-span-12 sm:col-span-6 lg:col-span-3 flex justify-center'">
                   <div class="flex flex-col items-center w-32 px-1">
                     <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">DURATION</label>
-                    <div class="bg-white/50 border border-slate-100 rounded-xl flex items-center justify-between p-1 w-full h-11">
+                    <div class="bg-white border border-slate-100 rounded-xl flex items-center justify-between p-1 w-full h-11">
                       <button type="button" @click="ex.duration = Math.max(1, (Number(ex.duration) || 1) - 5)" 
                         :class="Number(ex.duration) <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-rose-500 hover:bg-rose-50 transition-all cursor-pointer'"
                         class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-50 rounded-lg text-slate-500">
@@ -263,7 +264,7 @@
                   <div class="flex flex-col items-center w-24">
                     <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">INCLINE (°)</label>
                     <select v-model="ex.incline"
-                      class="h-11 text-sm border border-slate-100 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white/50 w-full text-center">
+                      class="h-11 text-sm border border-slate-100 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white w-full text-center">
                       <option v-for="val in [0, 1, 2, 3, 4, 5, 8, 10, 12, 15]" :key="val" :value="val">{{ val }}°</option>
                     </select>
                   </div>
@@ -274,7 +275,7 @@
                   <div class="flex flex-col items-center w-full max-w-[120px]">
                     <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">INTENSITY</label>
                     <select v-model="ex.intensity" 
-                      class="h-11 text-sm border border-slate-100 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white/50 w-full text-center">
+                      class="h-11 text-sm border border-slate-100 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-rose-300 bg-white w-full text-center">
                       <option disabled value="">Select</option>
                       <option v-for="int in CARDIO_INTENSITIES" :key="int" :value="int">{{ int }}</option>
                     </select>
@@ -293,7 +294,7 @@
           </div>
 
           <button @click="addExercise"
-            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border font-medium text-sm transition-all duration-200 cursor-pointer mb-4"
+            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-indigo-100 font-medium text-sm transition-all duration-200 cursor-pointer mb-4 shadow-sm"
             :class="addBtnClasses">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
             Add Another Exercise
@@ -305,7 +306,7 @@
           <!-- Save button -->
           <button @click="saveSession"
             :disabled="!isValidSession"
-            class="w-full py-3.5 mt-2 rounded-2xl text-sm font-bold text-white hover:scale-[1.02] hover:shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed shadow-sm"
+            class="w-full py-3.5 mt-2 rounded-2xl text-sm font-bold text-white hover:scale-[1.02] hover:shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed shadow-lg shadow-purple-200/50"
             :class="state.trainingCategory === 'cardio' ? 'bg-gradient-to-r from-rose-500 to-pink-500' : 'bg-gradient-to-r from-indigo-600 to-violet-600'">
             💾 Save Session
           </button>
@@ -314,7 +315,7 @@
     </div>
 
     <!-- Pst Date State -->
-    <div v-else class="bg-white/70 backdrop-blur-lg rounded-3xl border-0 shadow-xl shadow-slate-200/50 p-8 flex flex-col items-center justify-center text-center overflow-hidden">
+    <div v-else class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 p-8 flex flex-col items-center justify-center text-center overflow-hidden">
       <p class="text-3xl mb-3">🕰️</p>
       <p class="text-sm font-extrabold tracking-tight text-slate-900">Viewing Past Records</p>
       <p class="text-xs text-slate-500 mt-1 mb-5">Historical sessions cannot be edited directly.</p>
@@ -322,173 +323,6 @@
         Back to Today
       </button>
     </div>
-
-
-
-    <!-- ════════════════════════════════════════════
-         WORKOUT TYPE ACCORDIONS (read-only summary)
-    ════════════════════════════════════════════ -->
-    <div class="mb-3 flex items-center gap-1.5 px-1">
-      <svg class="w-4 h-4 text-indigo-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      <span class="text-[10px] font-semibold uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full">Workout Types</span>
-    </div>
-
-    <div class="columns-1 lg:columns-2 gap-4 mb-6">
-
-      <div v-for="wt in visibleTypes" :key="wt.id"
-        class="break-inside-avoid mb-4 rounded-2xl border bg-white shadow-sm overflow-hidden transition-all"
-        :class="openWorkout === wt.id ? 'border-indigo-100 border-l-4' : 'border-gray-100'"
-        :style="openWorkout === wt.id ? { borderLeftColor: wt.color } : {}">
-
-        <!-- Accordion header -->
-        <div class="flex items-center" :class="openWorkout === wt.id ? 'bg-indigo-50/50' : 'bg-white'">
-          <button class="flex-1 flex items-center gap-2 px-4 py-3 min-h-11 cursor-pointer" @click="toggleAccordion(wt.id)">
-            <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="WORKOUT_META[wt.name]?.dot" :style="!WORKOUT_META[wt.name] ? { backgroundColor: wt.color } : {}"/>
-            <span class="text-sm font-semibold text-gray-700 capitalize">{{ wt.name }}</span>
-            <span class="text-[11px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full font-medium ml-1">{{ sessionCounts[wt.name] ?? 0 }}</span>
-            <svg class="w-4 h-4 text-gray-400 ml-auto transition-transform" :class="{ 'rotate-180': openWorkout === wt.id }" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
-            </svg>
-          </button>
-          <button v-if="!DEFAULT_TYPE_IDS.includes(wt.id)" @click="confirmDeleteId = confirmDeleteId === wt.id ? null : wt.id"
-            class="pr-3 pl-1 py-3 cursor-pointer text-gray-300 hover:text-red-400 transition-colors" aria-label="Remove type">
-            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-          </button>
-        </div>
-
-        <!-- Delete confirm -->
-        <div v-if="confirmDeleteId === wt.id" class="bg-red-50 px-4 py-2 flex items-center gap-2 border-t border-red-100">
-          <span class="text-xs text-red-700 flex-1">Remove {{ wt.name }}?</span>
-          <button @click="removeWorkoutType(wt.id)" class="text-xs font-medium text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded-full cursor-pointer">Remove</button>
-          <button @click="confirmDeleteId = null" class="text-xs font-medium text-gray-500 px-2.5 py-1 rounded-full cursor-pointer">Keep</button>
-        </div>
-
-        <!-- Accordion body — read-only last-session summary -->
-        <div v-if="openWorkout === wt.id" class="border-t border-indigo-50 px-4 py-4 bg-white">
-          <template v-if="DEFAULT_TYPE_IDS.includes(wt.id)">
-            <!-- Default types: show WORKOUT_SUBTYPES reference + XP today -->
-            <div class="mb-3">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs text-gray-500">XP today</span>
-                <span class="text-xs font-semibold text-indigo-600">{{ todayXP[wt.name] ?? 0 }} / {{ WORKOUT_CAP }}</span>
-              </div>
-              <div class="w-full bg-indigo-100 rounded-full h-1.5">
-                <div class="bg-indigo-500 h-1.5 rounded-full" :style="{ width: Math.min(((todayXP[wt.name] ?? 0) / WORKOUT_CAP) * 100, 100) + '%' }"/>
-              </div>
-            </div>
-            <p class="text-[11px] text-gray-400 mb-2 font-medium uppercase tracking-widest">Subtypes</p>
-            <div class="flex flex-wrap gap-1.5">
-              <span v-for="sub in (WORKOUT_SUBTYPES[wt.name] ?? [])" :key="sub.label"
-                class="text-[11px] px-2.5 py-1 bg-indigo-50 text-indigo-500 rounded-full border border-indigo-100">
-                {{ sub.label }} +{{ sub.xp }}
-              </span>
-            </div>
-            <p class="text-[11px] text-gray-300 mt-3 italic mb-2">Use the session logger above to record sets.</p>
-            
-            <div v-if="lastTypeSession[wt.name]" class="mt-4 border-t border-gray-50 pt-3">
-              <p class="text-[10px] text-gray-400 font-medium uppercase tracking-widest mb-2">Last Session</p>
-              <div class="bg-gray-50 rounded-xl p-3 border-l-4" :class="getCategory(lastTypeSession[wt.name]) === 'calisthenics' ? 'border-amber-400' : 'border-indigo-400'">
-                <p class="text-sm font-bold text-gray-700 mb-1">{{ lastTypeSession[wt.name].label || 'Untitled' }} <span class="text-[10px] font-normal text-gray-400 ml-1">{{ formatDate(lastTypeSession[wt.name].date) }}</span></p>
-                <div class="space-y-1">
-                  <div v-for="ex in lastTypeSession[wt.name].exercises" :key="ex.name" class="flex justify-between text-xs text-gray-600">
-                    <span class="truncate pr-2 font-bold">{{ ex.name }}</span>
-                    <span class="shrink-0">
-                      <template v-if="ex.weight > 0">{{ ex.weight }}kg × {{ ex.sets }} sets × {{ ex.reps }} reps</template>
-                      <template v-else-if="ex.sets > 1">{{ ex.sets }} sets × {{ ex.reps }} reps</template>
-                      <template v-else>{{ ex.reps }} reps</template>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <template v-else>
-            <!-- User-defined types: show subtypes + last session -->
-            <div v-if="(wt.subtypes ?? []).length">
-              <p class="text-[11px] text-gray-400 mb-2 uppercase tracking-widest font-medium">Subtypes</p>
-              <div class="flex flex-wrap gap-1.5 mb-3">
-                <span v-for="sub in wt.subtypes" :key="sub.label"
-                  class="text-[11px] px-2.5 py-1 bg-indigo-50 text-indigo-500 rounded-full border border-indigo-100">
-                  {{ sub.label }} +{{ sub.xp }}
-                </span>
-              </div>
-            </div>
-            <p v-else class="text-xs text-gray-400 italic mb-2">No subtypes — add one below</p>
-
-            <!-- Add subtype inline -->
-            <div v-if="showSubForm === wt.id" class="mt-2 flex items-end gap-2">
-              <div class="flex flex-col flex-1">
-                <input v-model="newSubName" @keydown.enter="addSubtype(wt)" type="text" maxlength="30" placeholder="subtype name"
-                  class="text-xs border border-indigo-100 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-300"/>
-              </div>
-              <input v-model.number="newSubXp" type="number" min="5" max="80"
-                class="w-14 text-xs border border-indigo-100 rounded-lg px-2 py-1.5 text-center focus:outline-none focus:ring-1 focus:ring-indigo-300"/>
-              <button @click="addSubtype(wt)" class="bg-indigo-600 text-white text-xs font-medium px-3 py-1.5 rounded-full cursor-pointer">Add</button>
-            </div>
-            <p v-if="subError && showSubForm === wt.id" class="text-xs text-red-500 mt-1">{{ subError }}</p>
-            <button v-if="(wt.subtypes ?? []).length < 8" @click="toggleSubForm(wt.id)"
-              class="mt-1 text-xs text-gray-400 hover:text-indigo-400 transition-colors cursor-pointer underline-offset-2 hover:underline">
-              <span v-if="showSubForm !== wt.id">+ add subtype</span>
-              <span v-else>cancel</span>
-            </button>
-            
-            <div v-if="lastTypeSession[wt.name]" class="mt-4 border-t border-gray-50 pt-3">
-              <p class="text-[10px] text-gray-400 font-medium uppercase tracking-widest mb-2">Last Session</p>
-              <div class="bg-gray-50 rounded-xl p-3 border-l-4" :class="getCategory(lastTypeSession[wt.name]) === 'calisthenics' ? 'border-amber-400' : 'border-indigo-400'">
-                <p class="text-sm font-bold text-gray-700 mb-1">{{ lastTypeSession[wt.name].label || 'Untitled' }} <span class="text-[10px] font-normal text-gray-400 ml-1">{{ formatDate(lastTypeSession[wt.name].date) }}</span></p>
-                <div class="space-y-1">
-                  <div v-for="ex in lastTypeSession[wt.name].exercises" :key="ex.name" class="flex justify-between text-xs text-gray-600">
-                    <span class="truncate pr-2 font-bold">{{ ex.name }}</span>
-                    <span class="shrink-0">
-                      <template v-if="ex.weight > 0">{{ ex.weight }}kg × {{ ex.sets }} sets × {{ ex.reps }} reps</template>
-                      <template v-else-if="ex.sets > 1">{{ ex.sets }} sets × {{ ex.reps }} reps</template>
-                      <template v-else>{{ ex.reps }} reps</template>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-
-      <!-- Show/hide inactive -->
-      <div v-if="inactiveTypeCount > 0" class="break-inside-avoid mb-4">
-        <button @click="showAllTypes = !showAllTypes"
-          class="w-full text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 cursor-pointer px-4 py-2 rounded-full text-center transition-colors">
-          {{ showAllTypes ? 'Hide inactive types ▴' : `Show ${inactiveTypeCount} more ▾` }}
-        </button>
-      </div>
-
-      <!-- Add custom type -->
-      <div v-if="!showAddForm" class="break-inside-avoid mb-4">
-        <button @click="showAddForm = true"
-          class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-indigo-200 text-indigo-400 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer text-sm font-medium">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
-          Add a custom workout type
-        </button>
-      </div>
-
-      <div v-if="showAddForm" class="break-inside-avoid bg-white border border-indigo-100 rounded-xl p-4 mb-4">
-        <p class="text-xs text-indigo-500 uppercase tracking-widest mb-2">New workout type</p>
-        <input v-model="newTypeName" @keydown.enter="addWorkoutType" type="text" maxlength="30" placeholder="e.g. Cycling"
-          class="w-full bg-white border border-indigo-200 rounded-xl px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
-        <p v-if="addError" class="text-xs text-red-500 mb-2">{{ addError }}</p>
-        <div class="flex gap-2 mb-3">
-          <button v-for="c in COLOR_SWATCHES" :key="c" @click="newTypeColor = c"
-            :style="{ backgroundColor: c }"
-            :class="newTypeColor === c ? 'ring-2 ring-offset-1 ring-indigo-500' : ''"
-            class="w-5 h-5 rounded-full cursor-pointer"/>
-        </div>
-        <div class="flex gap-2">
-          <button @click="addWorkoutType" class="text-sm px-4 py-1.5 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer font-medium">Add</button>
-          <button @click="cancelAdd" class="text-sm px-4 py-1.5 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 cursor-pointer">Cancel</button>
-        </div>
-      </div>
-
-    </div>
-
       </div> <!-- End Left Column -->
 
       <!-- RIGHT COLUMN -->
@@ -511,7 +345,7 @@
     <!-- Celebration Overlay -->
     <Transition name="scale">
       <div v-if="showConfetti" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none p-6">
-        <div class="bg-white/90 backdrop-blur-md px-10 py-8 rounded-[40px] shadow-2xl border-4 border-emerald-100 flex flex-col items-center gap-4 text-center">
+        <div class="bg-white px-10 py-8 rounded-[40px] shadow-2xl border-4 border-emerald-100 flex flex-col items-center gap-4 text-center">
           <span class="text-7xl">👑</span>
           <div class="space-y-1">
             <h3 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">New Personal Record!</h3>
@@ -546,8 +380,6 @@ const TIPS = [
   "Slow progress is still progress.",
   "Don't stop until you're proud."
 ]
-const DEFAULT_TYPE_IDS = ['strength', 'walking', 'boxing', 'tennis']
-const COLOR_SWATCHES   = ['#f472b6', '#60a5fa', '#f87171', '#4ade80', '#fb923c', '#a78bfa']
 const CATEGORIES = [
   { id: 'bodybuilding', label: 'Body Building', emoji: '🏋️' },
   { id: 'calisthenics', label: 'Calisthenics',  emoji: '🤸' },
@@ -593,20 +425,9 @@ function isInclineExercise(name) {
 // ── UI State ──
 const sessionFormOpen = ref(true)
 const calendarOpen    = ref(false)
-const openWorkout     = ref(null)
-const showAddForm     = ref(false)
 const showConfetti    = ref(false)
 const weightInputs    = ref([])
 const activeTip       = ref(TIPS[Math.floor(Math.random() * TIPS.length)])
-const newTypeName     = ref('')
-const newTypeColor    = ref('#f472b6')
-const addError        = ref('')
-const confirmDeleteId = ref(null)
-const newSubName      = ref('')
-const newSubXp        = ref(20)
-const subError        = ref('')
-const showSubForm     = ref(null)
-const showAllTypes    = ref(false)
 const saveError       = ref('')
 const petMessage      = ref('')
 const isCelebrating   = ref(false)
@@ -666,10 +487,10 @@ const activeCategoryInfo = computed(() => {
 
 const addBtnClasses = computed(() => {
   switch (state.trainingCategory) {
-    case 'bodybuilding': return 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100'
-    case 'calisthenics': return 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-100'
-    case 'cardio':       return 'bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100'
-    default:             return 'bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100'
+    case 'bodybuilding': return 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-white'
+    case 'calisthenics': return 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-white'
+    case 'cardio':       return 'bg-rose-50 text-rose-600 border-rose-100 hover:bg-white'
+    default:             return 'bg-slate-50 text-slate-600 border-slate-100 hover:bg-white'
   }
 })
 
@@ -905,40 +726,6 @@ const sessionHeader = computed(() => {
   return "Previous Training"
 })
 
-const lastTypeSession = computed(() => {
-  const map = {}
-  for (const wt of state.workoutTypes) {
-    const t = wt.name.toLowerCase()
-    map[wt.name] = allSessions.value.find(s => 
-      s.type?.toLowerCase() === t || s.label.toLowerCase().includes(t) || s.exercises.some(e => e.name.toLowerCase().includes(t))
-    )
-  }
-  return map
-})
-
-const todayXP = computed(() => {
-  const totals = {}
-  for (const wt of state.workoutTypes) totals[wt.name] = 0
-  for (const w of state.workouts) if (w.date === today && w.type in totals) totals[w.type] += w.xp
-  return totals
-})
-
-const sessionCounts = computed(() => {
-  const counts = {}
-  for (const wt of state.workoutTypes) counts[wt.name] = 0
-  for (const w of state.workouts) if (w.type in counts) counts[w.type]++
-  return counts
-})
-
-const inactiveTypeCount = computed(() =>
-  state.workoutTypes.filter(wt => DEFAULT_TYPE_IDS.includes(wt.id) && (sessionCounts.value[wt.name] ?? 0) === 0).length
-)
-
-const visibleTypes = computed(() => {
-  if (showAllTypes.value) return state.workoutTypes
-  return state.workoutTypes.filter(wt => !DEFAULT_TYPE_IDS.includes(wt.id) || (sessionCounts.value[wt.name] ?? 0) > 0)
-})
-
 // ── Helpers ──
 function getCategory(sess) {
   if (sess.category) return sess.category
@@ -954,41 +741,9 @@ function formatDate(dateStr) {
 function slugify(name) { return name.toLowerCase().replace(/\s+/g, '-') }
 
 function toggleAccordion(id) {
-  openWorkout.value = openWorkout.value === id ? null : id
-  showSubForm.value = null; subError.value = ''; newSubName.value = ''; newSubXp.value = 20
+  // Option to keep for other UI if needed, but per request we are cleaning up logic.
+  // Since the UI is gone, this is deprecated.
 }
-
-function addWorkoutType() {
-  const name = newTypeName.value.trim()
-  if (!name) { addError.value = 'Name is required'; return }
-  if (state.workoutTypes.some(wt => wt.name.toLowerCase() === name.toLowerCase())) { addError.value = 'Already exists'; return }
-  const newId = slugify(name)
-  state.workoutTypes.push({ id: newId, name, color: newTypeColor.value, sessions: [], subtypes: [] })
-  showAllTypes.value = true
-  addXP(state, 5)
-  newTypeName.value = ''; newTypeColor.value = '#f472b6'; addError.value = ''; showAddForm.value = false
-}
-
-function cancelAdd() { newTypeName.value = ''; newTypeColor.value = '#f472b6'; addError.value = ''; showAddForm.value = false }
-
-function removeWorkoutType(id) {
-  state.workoutTypes = state.workoutTypes.filter(wt => wt.id !== id)
-  if (openWorkout.value === id) openWorkout.value = null
-  confirmDeleteId.value = null
-}
-
-function addSubtype(wt) {
-  const name = newSubName.value.trim(); const xp = Number(newSubXp.value)
-  if (!name) { subError.value = 'Name required'; return }
-  if (xp < 5 || xp > 80) { subError.value = 'XP must be 5–80'; return }
-  const existing = wt.subtypes ?? []
-  if (existing.length >= 8) { subError.value = 'Max 8'; return }
-  if (existing.some(s => s.label.toLowerCase() === name.toLowerCase())) { subError.value = 'Already exists'; return }
-  wt.subtypes = [...existing, { label: name, xp }]
-  newSubName.value = ''; newSubXp.value = 20; subError.value = ''; showSubForm.value = null
-}
-
-function toggleSubForm(id) { showSubForm.value = showSubForm.value === id ? null : id; if (!showSubForm.value) subError.value = '' }
 </script>
 
 <style scoped>
