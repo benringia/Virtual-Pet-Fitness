@@ -141,14 +141,7 @@
             Welcome back, <span class="text-indigo-600 capitalize">{{ state.petName || 'Flarepup' }}</span> 👋
           </h1>
         </div>
-        <!-- Center: Search bar (placeholder, desktop only) -->
-        <div class="hidden lg:flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 w-64">
-          <svg class="w-4 h-4 text-gray-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input type="text" placeholder="Search..." class="bg-transparent text-xs text-gray-500 placeholder-gray-400 outline-none w-full" disabled/>
-        </div>
+
         <!-- Right: mobile avatar + desktop controls -->
         <div class="flex items-center gap-3">
           <!-- Mobile-only profile avatar placeholder -->
