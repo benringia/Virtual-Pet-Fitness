@@ -25,8 +25,56 @@
          <!-- Primary Action: Meal Logger -->
          <MealLogger class="ring-2 ring-emerald-500/10 shadow-indigo-100/50" />
          
-         <!-- Primary Tracking: Protein Counter -->
-         <ProteinCounter class="opacity-95 hover:opacity-100 transition-opacity" />
+         <!-- Primary Tracking: Protein + Calorie side-by-side -->
+         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+           <ProteinCounter class="opacity-95 hover:opacity-100 transition-opacity !mb-0" />
+
+           <!-- Dynamic Calorie Counter -->
+           <div class="bg-gradient-to-br from-white to-slate-50 rounded-3xl border border-slate-100 shadow-md p-5 transition-all duration-300">
+             <div class="flex items-center justify-between mb-3">
+               <h2 class="font-semibold text-gray-700">🔥 Calories</h2>
+               <span class="text-[10px] uppercase tracking-wide font-semibold px-2 py-0.5 rounded-full"
+                 :class="{
+                   'bg-rose-50 text-rose-500': calorieData?.mode === 'deficit',
+                   'bg-emerald-50 text-emerald-600': calorieData?.mode === 'maintain',
+                   'bg-indigo-50 text-indigo-500': calorieData?.mode === 'surplus',
+                   'bg-slate-100 text-slate-400': !calorieData
+                 }"
+               >{{ calorieData?.mode ?? 'no goal' }}</span>
+             </div>
+
+             <p v-if="!calorieData" class="text-sm text-gray-400 text-center py-2">
+               Log your weight to set a calorie goal
+             </p>
+
+             <template v-else>
+               <div class="text-xl font-bold text-slate-900 mb-3">
+                 <span :class="{
+                   'text-rose-500': calorieData.mode === 'deficit',
+                   'text-emerald-600': calorieData.mode === 'maintain',
+                   'text-indigo-500': calorieData.mode === 'surplus'
+                 }">{{ state.calories.eaten }}</span>
+                 <span class="text-sm font-normal text-slate-400"> / {{ calorieData.goal }} kcal</span>
+               </div>
+
+               <div class="bg-gray-100 rounded-full h-2 mb-2">
+                 <div
+                   class="h-2 rounded-full transition-all duration-300"
+                   :class="{
+                     'bg-rose-500': calorieData.mode === 'deficit',
+                     'bg-emerald-500': calorieData.mode === 'maintain',
+                     'bg-indigo-500': calorieData.mode === 'surplus'
+                   }"
+                   :style="{ width: calorieProgress + '%' }"
+                 ></div>
+               </div>
+
+               <p class="text-xs text-slate-400 mt-2">
+                 {{ remainingCalories > 0 ? remainingCalories + ' kcal remaining' : 'Goal reached ✓' }}
+               </p>
+             </template>
+           </div>
+         </div>
       </div>
 
       <!-- RIGHT COLUMN: Nutrition Status Panel -->
@@ -169,6 +217,7 @@ import { state } from '../store/state.js'
 import { todayStr } from '../utils/dates.js'
 import { activeView } from '../composables/useActiveView.js'
 import { triggerAchievement } from '../utils/achievements.js'
+import { getCalorieGoal } from '../utils/calorieGoal.js'
 import MealLogger from '../components/MealLogger.vue'
 import ProteinCounter from '../components/ProteinCounter.vue'
 import PetMiniWidget from '../components/PetMiniWidget.vue'
@@ -303,6 +352,19 @@ const completedHabits = computed(() =>
   Object.values(derivedHabits.value).filter(Boolean).length
 )
 const scorePercent = computed(() => (completedHabits.value / 5) * 100)
+
+// ── Calorie Goal Logic ──
+const calorieData = computed(() => getCalorieGoal(state))
+
+const calorieProgress = computed(() => {
+  if (!calorieData.value?.goal) return 0
+  return Math.min(100, (state.calories.eaten / calorieData.value.goal) * 100)
+})
+
+const remainingCalories = computed(() => {
+  if (!calorieData.value) return 0
+  return calorieData.value.goal - state.calories.eaten
+})
 </script>
 
 <style scoped>

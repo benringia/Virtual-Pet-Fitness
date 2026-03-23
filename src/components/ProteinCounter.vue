@@ -43,6 +43,16 @@ const isGoalMet = computed(() =>
   proteinGoal.value !== null && totalProtein.value >= proteinGoal.value
 )
 
+const groupedMeals = computed(() => {
+  const map = {}
+  mealsWithProtein.value.forEach(m => {
+    if (!map[m.name]) map[m.name] = { protein: 0, count: 0 }
+    map[m.name].protein += m.protein
+    map[m.name].count++
+  })
+  return Object.entries(map).map(([name, d]) => ({ name, protein: d.protein, count: d.count }))
+})
+
 watch(totalProtein, (val) => {
   if (proteinGoal.value === null) return
   const todayKey = todayStr()
@@ -55,7 +65,7 @@ watch(totalProtein, (val) => {
 </script>
 
 <template>
-  <div class="bg-gradient-to-br from-white to-indigo-50/40 rounded-3xl border border-white shadow-xl shadow-indigo-100/50 mb-4 px-6 py-6 transition-all duration-300">
+  <div class="bg-gradient-to-br from-white to-slate-50 rounded-3xl border border-slate-100 shadow-md p-5 transition-all duration-300">
     <h2 class="font-semibold text-gray-700 mb-3">🥩 Protein</h2>
 
     <p v-if="!latestWeight" class="text-sm text-gray-400 text-center py-2">
@@ -94,14 +104,14 @@ watch(totalProtein, (val) => {
       </div>
 
       <!-- Meal breakdown -->
-      <div v-if="mealsWithProtein.length" class="max-h-28 overflow-y-auto space-y-1">
+      <div v-if="groupedMeals.length" class="max-h-28 overflow-y-auto space-y-1">
         <div
-          v-for="meal in mealsWithProtein"
-          :key="meal.id"
+          v-for="item in groupedMeals"
+          :key="item.name"
           class="flex justify-between text-xs text-gray-400 bg-indigo-50 rounded-lg px-2 py-1"
         >
-          <span class="capitalize truncate mr-2">{{ meal.name }}</span>
-          <span class="shrink-0 font-medium text-indigo-500">{{ meal.protein }}g</span>
+          <span class="capitalize truncate mr-2">{{ item.name }}{{ item.count > 1 ? ' ×' + item.count : '' }}</span>
+          <span class="shrink-0 font-medium text-indigo-500">{{ item.protein }}g</span>
         </div>
       </div>
     </template>
