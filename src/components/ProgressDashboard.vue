@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-[1600px] mx-auto">
+  <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-6xl mx-auto">
     <!-- 1. Page Header (Styled to match Workouts/Diet) -->
     <div class="mb-8 flex flex-col gap-2 px-1">
       <button @click="activeView = 'overview'"

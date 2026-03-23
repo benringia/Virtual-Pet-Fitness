@@ -95,10 +95,9 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { state } from '../store/state.js'
 import { addXP } from '../utils/xp.js'
 import { todayStr, maybeSetStartDate } from '../utils/dates.js'
-import { updateWorkoutStreak } from '../utils/streaks.js'
+import { updateWorkoutStreak, fireWorkoutToasts } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
 import { computeMood, willStreakBreak } from '../utils/mood.js'
-import { triggerAchievement } from '../utils/achievements.js'
 
 const MISC_LIBRARY = [
   { name: 'Walking',           defaultIntensity: 'Easy' },
@@ -109,10 +108,6 @@ const MISC_LIBRARY = [
   { name: 'Hiking',            defaultIntensity: 'Intense' },
   { name: 'Custom...',         defaultIntensity: 'Moderate' },
 ]
-
-const STREAK_MILESTONES = [7, 14, 30]
-const STREAK_MESSAGES = { 7: 'One week of consistency', 14: 'Two weeks strong', 30: 'One month of dedication' }
-const STREAK_EMOJIS = { 7: '🔥', 14: '💫', 30: '👑' }
 
 // Adjusted XP rewards for Misc activity (reduced as per guardrails)
 const CUSTOM_SUBTYPES = [
@@ -158,16 +153,6 @@ function handleActivityChange() {
     if (intensity) {
       selectedCustom.value = intensity
     }
-  }
-}
-
-function fireWorkoutToasts() {
-  if (state.workouts.length === 1) {
-    triggerAchievement('workout', '🏋️', 'First workout!', 'Your journey begins', 'workout-first')
-  }
-  const count = state.streaks.workout.count
-  if (STREAK_MILESTONES.includes(count)) {
-    triggerAchievement('streak', STREAK_EMOJIS[count], `${count}-day streak!`, STREAK_MESSAGES[count], `streak-${count}-workout-${todayStr()}`)
   }
 }
 

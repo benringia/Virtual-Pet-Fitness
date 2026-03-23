@@ -1,5 +1,11 @@
 <template>
-  <div class="min-h-screen bg-[#f8f8ff] flex flex-col md:pt-0">
+  <div v-if="!isAuthReady" class="min-h-screen bg-[#f8f8ff] flex items-center justify-center">
+    <span class="text-slate-400 text-sm">Loading…</span>
+  </div>
+
+  <AuthView v-else-if="!state.session" />
+
+  <div v-else class="min-h-screen bg-[#f8f8ff] flex flex-col md:pt-0">
     <!-- Mobile Top Bar (Indigo Branding) -->
     <div class="md:hidden sticky top-0 left-0 right-0 h-14 bg-indigo-600 z-50 flex items-center justify-center shadow-lg">
       <div class="bg-indigo-500/30 p-2 rounded-xl ">
@@ -62,19 +68,7 @@
               <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Overview</span>
             </button>
 
-            <!-- Progress -->
-            <button
-              @click="activeView = 'progress'"
-              :aria-current="activeView === 'progress' ? 'page' : undefined"
-              :class="activeView === 'progress' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
-              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
-              title="Progress"
-            >
-              <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
-              </svg>
-              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Progress</span>
-            </button>
+            
 
             <!-- My Workouts -->
             <button
@@ -102,14 +96,29 @@
               </svg>
               <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Diet</span>
             </button>
+
+            <!-- Progress -->
+            <button
+              @click="activeView = 'progress'"
+              :aria-current="activeView === 'progress' ? 'page' : undefined"
+              :class="activeView === 'progress' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
+              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
+              title="Progress"
+            >
+              <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+              </svg>
+              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Progress</span>
+            </button>
           </nav>
         </div>
 
         <!-- Bottom: logout + reset -->
         <div class="p-2 flex flex-col gap-2 pb-4">
-          <!-- Logout placeholder -->
+          <!-- Logout -->
           <button
-            title="Coming soon"
+            @click="handleLogout"
+            title="Log out"
             class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl text-white/60 hover:text-white transition-colors duration-200 cursor-pointer"
           >
             <svg class="w-5 h-5 shrink-0" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -133,7 +142,7 @@
       <!-- MAIN CONTENT -->
       <div class="flex flex-col flex-1 min-w-0 lg:pl-16">
       <!-- Top header bar -->
-      <header class="flex items-center justify-between px-4 md:px-8 lg:px-12 py-3 sticky top-0 z-10 max-w-[95%] xl:max-w-[1600px] mx-auto w-full">
+      <header class="flex items-center justify-between px-4 md:px-8 lg:px-12 py-3 sticky top-0 z-10 max-w-400 mx-auto w-full">
         <!-- Left: Page title -->
         <div>
           <p class="text-xs text-gray-400 uppercase tracking-widest font-medium">{{ timeGreeting }}</p>
@@ -144,29 +153,107 @@
 
         <!-- Right: mobile avatar + desktop controls -->
         <div class="flex items-center gap-3">
-          <!-- Mobile-only profile avatar placeholder -->
-          <div class="lg:hidden w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center" title="Coming soon">
-            <span class="text-sm font-semibold text-slate-500">{{ (state.petName || 'F')[0].toUpperCase() }}</span>
+          <!-- Mobile-only profile avatar -->
+          <div class="lg:hidden w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+            <span class="text-sm font-semibold text-indigo-600">{{ userInitial }}</span>
           </div>
           <!-- Desktop: Notification + Avatar -->
           <div class="hidden lg:flex items-center gap-3">
-            <button class="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" title="Coming soon">
-              <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-              <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full"/>
-            </button>
-            <div class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-xl px-2 py-1 transition-colors" title="Coming soon">
-              <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
-                <span class="text-xs font-semibold text-indigo-600">{{ (state.petName || 'F')[0].toUpperCase() }}</span>
+            <!-- Notification Bell -->
+            <div class="relative notif-dropdown">
+              <button
+                @click="notifDropdownOpen = !notifDropdownOpen"
+                class="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                :aria-expanded="notifDropdownOpen"
+                aria-haspopup="true"
+                aria-label="Notifications"
+              >
+                <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span v-if="state.notifications.length > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full"/>
+              </button>
+
+              <div
+                v-if="notifDropdownOpen"
+                class="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-xl border border-slate-100 z-50 overflow-hidden"
+                role="menu"
+              >
+                <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                  <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
+                  <button
+                    v-if="state.notifications.length > 0"
+                    @click="state.notifications.splice(0)"
+                    class="text-xs text-slate-400 hover:text-rose-500 transition-colors"
+                  >Clear all</button>
+                </div>
+                <div class="max-h-80 overflow-y-auto">
+                  <div v-if="state.notifications.length === 0" class="px-4 py-6 text-center text-sm text-slate-400">
+                    You're all caught up 🎉
+                  </div>
+                  <div
+                    v-for="n in state.notifications"
+                    :key="n.id"
+                    class="flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors"
+                  >
+                    <span class="text-lg shrink-0 mt-0.5">{{ n.emoji || '🔔' }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-slate-700 leading-tight">{{ n.title }}</p>
+                      <p class="text-xs text-slate-400 leading-tight mt-0.5">{{ n.message }}</p>
+                      <p class="text-[11px] text-slate-300 mt-1">{{ formatTime(n.createdAt) }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <span class="text-xs font-medium text-gray-700">{{ state.petName || 'Flarepup' }}</span>
+            </div>
+            <div class="relative profile-dropdown">
+              <button
+                @click="profileMenuOpen = !profileMenuOpen"
+                class="flex items-center gap-2 rounded-xl px-2 py-1 hover:bg-gray-50 transition-colors cursor-pointer"
+                :aria-expanded="profileMenuOpen"
+                aria-haspopup="true"
+              >
+                <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <span class="text-xs font-semibold text-indigo-600">{{ userInitial }}</span>
+                </div>
+                <span class="text-xs font-medium text-gray-700">{{ displayName }}</span>
+              </button>
+
+              <div
+                v-if="profileMenuOpen"
+                class="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-lg border border-slate-100 z-50 overflow-hidden"
+                role="menu"
+              >
+                <div class="px-4 py-2.5 border-b border-slate-100">
+                  <p class="text-xs font-medium text-slate-800 truncate">{{ displayName }}</p>
+                  <p class="text-[11px] text-slate-400 truncate">{{ state.user?.email }}</p>
+                </div>
+                <button
+                  @click="activeView = 'profile'; profileMenuOpen = false"
+                  class="w-full text-left px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                  role="menuitem"
+                >
+                  Profile
+                </button>
+                <button
+                  @click="handleLogout"
+                  class="w-full text-left px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 transition-colors"
+                  role="menuitem"
+                >
+                  Log out
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </header>
       <main class="flex-1 min-w-0 overflow-y-auto pb-20 lg:pb-0">
+
+        <!-- Profile view -->
+        <div v-if="activeView === 'profile'">
+          <ProfileView />
+        </div>
 
         <!-- Progress view -->
         <div v-if="activeView === 'progress'" class="">
@@ -184,7 +271,7 @@
         </div>
 
         <!-- Overview view -->
-        <div v-if="activeView === 'overview'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 md:px-8 lg:px-12 py-4 lg:py-6 items-start max-w-[95%] xl:max-w-[1600px] mx-auto w-full font-sans transition-all duration-500">
+        <div v-if="activeView === 'overview'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 md:px-8 lg:px-12 py-4 lg:py-6 items-start max-w-400 mx-auto w-full font-sans transition-all duration-500">
           
           <!-- Lane 1: Primary Flow (Weight, Movement, Training) -->
           <div class="flex flex-col gap-6 w-full h-fit order-1 transition-all duration-500">
@@ -461,6 +548,7 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
+import AuthView from './views/AuthView.vue'
 import Header from './components/Header.vue'
 import DietView from './views/DietView.vue'
 import ToastNotification from './components/ToastNotification.vue'
@@ -479,9 +567,11 @@ import StatsPanel from './components/StatsPanel.vue'
 import ProgressDashboard from './components/ProgressDashboard.vue'
 import WorkoutsView from './components/WorkoutsView.vue'
 import ReminderSettings from './components/ReminderSettings.vue'
+import ProfileView from './views/ProfileView.vue'
 import WeeklyReportModal from './components/WeeklyReportModal.vue'
 import { state } from './store/state.js'
 import { resetState, saveState } from './store/persistence.js'
+import { supabase } from './lib/supabase.js'
 import { checkDayRollover } from './utils/dates.js'
 import { scheduleReminder } from './utils/reminder.js'
 import { canLogRestDay, logRestDay, getRestDaysThisWeek } from './utils/restDay.js'
@@ -536,7 +626,7 @@ const encouragementText = computed(() => {
   return "You're doing great — keep going!"
 })
 
-onMounted(() => {
+onMounted(async () => {
   checkDayRollover(state)
   if (state.reminder.enabled && Notification.permission === 'granted') {
     scheduleReminder(state.reminder.time)
@@ -549,12 +639,60 @@ onMounted(() => {
       state.lastWeeklyReportShown = thisMonday
     }
   }
+
+  try {
+    const { data } = await supabase.auth.getSession()
+    state.session = data.session
+    state.user = data.session?.user ?? null
+  } catch {
+    state.session = null
+    state.user = null
+  } finally {
+    isAuthReady.value = true
+  }
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    state.session = session
+    state.user = session?.user ?? null
+  })
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.profile-dropdown')) {
+      profileMenuOpen.value = false
+    }
+    if (!e.target.closest('.notif-dropdown')) {
+      notifDropdownOpen.value = false
+    }
+  })
 })
 
 // activeView is imported from composables/useActiveView.js (shared with MyWorkoutsPreview)
+const isAuthReady = ref(false)
 const activeRightTab = ref('diet')
 const railExpanded = ref(false)
 const showResetModal = ref(false)
+const profileMenuOpen = ref(false)
+const notifDropdownOpen = ref(false)
+
+function formatTime(timestamp) {
+  const diff = Date.now() - timestamp
+  if (diff < 60000) return 'Just now'
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago'
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago'
+  return new Date(timestamp).toLocaleDateString()
+}
+
+const displayName = computed(() =>
+  state.user?.user_metadata?.name || state.user?.email?.split('@')[0] || 'User'
+)
+const userInitial = computed(() => displayName.value.charAt(0).toUpperCase())
+
+async function handleLogout() {
+  profileMenuOpen.value = false
+  await supabase.auth.signOut().catch(() => {})
+  state.user = null
+  state.session = null
+}
 
 function handleReset() {
   resetState(state)

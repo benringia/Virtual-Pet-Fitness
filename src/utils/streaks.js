@@ -1,4 +1,20 @@
 import { todayStr } from './dates.js'
+import { triggerAchievement } from './achievements.js'
+
+const STREAK_MILESTONES = [7, 14, 30]
+const STREAK_MESSAGES = { 7: 'One week of consistency', 14: 'Two weeks strong', 30: 'One month of dedication' }
+const STREAK_EMOJIS   = { 7: '🔥', 14: '💫', 30: '👑' }
+
+export function fireWorkoutToasts(state) {
+  const sessionCount = (state.workoutSessions ?? []).length + (state.workouts ?? []).filter(w => w.type === 'Custom').length
+  if (sessionCount === 1) {
+    triggerAchievement('workout', '🏋️', 'First workout!', 'Your journey begins', 'workout-first')
+  }
+  const count = state.streaks.workout.count
+  if (STREAK_MILESTONES.includes(count)) {
+    triggerAchievement('streak', STREAK_EMOJIS[count], `${count}-day streak!`, STREAK_MESSAGES[count], `streak-${count}-workout-${todayStr()}`)
+  }
+}
 
 function dateMinus1(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')

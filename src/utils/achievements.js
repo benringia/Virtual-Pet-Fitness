@@ -1,5 +1,6 @@
 import { reactive, ref } from 'vue'
 import { todayStr } from './dates.js'
+import { state } from '../store/state.js'
 
 const BORDER_COLORS = {
   levelup:  'border-indigo-500',
@@ -33,6 +34,9 @@ export function triggerAchievement(type, emoji, title, message, dedupeKey) {
 
   if (notifications.length >= 3) notifications.shift()
   notifications.push({ id: Date.now() + Math.random(), type, emoji, title, message, borderColor: BORDER_COLORS[type] ?? 'border-indigo-300' })
+
+  state.notifications.unshift({ id: crypto.randomUUID(), emoji, title, message, createdAt: Date.now() })
+  if (state.notifications.length > 20) state.notifications.pop()
 }
 
 export function triggerEvolution(fromStage, toStage) {

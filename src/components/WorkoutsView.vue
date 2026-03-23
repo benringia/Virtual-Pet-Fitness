@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-8 px-4 sm:px-6 lg:px-8 pb-20 w-full max-w-[1600px] mx-auto bg-[radial-gradient(at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white min-h-screen">
+  <div class="pt-8 px-4 sm:px-6 lg:px-8 pb-20 w-full max-w-6xl mx-auto bg-[radial-gradient(at_top_right,var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white min-h-screen">
 
     <!-- Header -->
     <div class="mb-2 flex flex-col gap-2">
@@ -363,10 +363,9 @@ import { ref, computed, onUnmounted } from 'vue'
 import { state } from '../store/state.js'
 import { WORKOUT_SUBTYPES, WORKOUT_META, WORKOUT_CAP, addXP } from '../utils/xp.js'
 import { todayStr, maybeSetStartDate } from '../utils/dates.js'
-import { updateWorkoutStreak } from '../utils/streaks.js'
+import { updateWorkoutStreak, fireWorkoutToasts } from '../utils/streaks.js'
 import { setMood } from '../utils/pet.js'
 import { computeMood, willStreakBreak } from '../utils/mood.js'
-import { triggerAchievement } from '../utils/achievements.js'
 import { activeView } from '../composables/useActiveView.js'
 import { selectedDate } from '../composables/useSelectedDate.js'
 import { calc1RM } from '../utils/workoutMath.js'
@@ -664,15 +663,15 @@ function saveSession() {
   const xpAvailable = Math.max(0, WORKOUT_CAP - currentXP)
   const xpAward = Math.min(30, xpAvailable)
 
+  state.workouts.push({ type: 'Strength', name: draftSession.value.label || 'Session', xp: xpAward, date: todayStr() })
   if (xpAward > 0) {
-    state.workouts.push({ type: 'Strength', name: draftSession.value.label || 'Session', xp: xpAward, date: todayStr() })
     addXP(state, xpAward)
   }
 
   updateWorkoutStreak(state)
   setMood('workout')
   state.petMood = computeMood(state, { streakBroke: broke })
-  if (state.workouts.length === 1) triggerAchievement('workout', '🏋️', 'First session!', 'Your journey begins', 'session-first')
+  fireWorkoutToasts(state)
 
   draftSession.value = { 
     label: '', 

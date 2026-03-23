@@ -42,12 +42,36 @@ const defaultState = {
   customMiscName: '',
   waterIntake: 0,
   completedHabitsToday: {},
+  notifications: [],
+  user: null,
+  session: null,
+}
+
+function reconcileWorkouts(state) {
+  const sessions = state.workoutSessions ?? []
+  if (!sessions.length) return
+  const recorded = new Set(
+    (state.workouts ?? []).filter(w => w.sessionId).map(w => w.sessionId)
+  )
+  for (const s of sessions) {
+    if (!recorded.has(s.id)) {
+      state.workouts.push({
+        sessionId: s.id,
+        type: s.category === 'cardio' ? 'Cardio' : 'Strength',
+        name: s.label || 'Session',
+        xp: 0,
+        date: s.date,
+      })
+    }
+  }
 }
 
 export function loadState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    return saved ? { ...defaultState, ...JSON.parse(saved) } : { ...defaultState }
+    const state = saved ? { ...defaultState, ...JSON.parse(saved) } : { ...defaultState }
+    reconcileWorkouts(state)
+    return state
   } catch {
     return { ...defaultState }
   }
@@ -113,6 +137,8 @@ export function resetState(state) {
     customMiscName: '',
     waterIntake: 0,
     completedHabitsToday: {},
+    notifications: [],
+    petMood: 'idle',
   })
   saveState(state)
   console.log('[resetState] after:', JSON.stringify({

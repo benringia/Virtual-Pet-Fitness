@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-8 px-4 sm:px-6 lg:px-8 pb-20 w-full max-w-[1600px] mx-auto font-sans bg-[radial-gradient(at_top_right,_var(--tw-gradient-stops))] from-indigo-50/50 via-slate-50 to-white min-h-screen">
+  <div class="pt-8 px-4 sm:px-6 lg:px-8 pb-20 w-full max-w-6xl mx-auto font-sans bg-[radial-gradient(at_top_right,var(--tw-gradient-stops))] from-indigo-50/50 via-slate-50 to-white min-h-screen">
     
     <!-- 1. Page Header (Styled to match WorkoutsView) -->
     <div class="mb-8 flex flex-col gap-2 px-1">
