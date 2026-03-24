@@ -85,6 +85,11 @@
             {{ error }}
           </p>
 
+          <!-- Success (email confirmation required) -->
+          <p v-if="successMsg" role="status" class="text-xs text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+            {{ successMsg }}
+          </p>
+
           <button
             type="submit"
             :disabled="loading || !email.trim() || !password.trim()"
@@ -103,6 +108,7 @@
 <script setup>
 import { ref } from 'vue'
 import { supabase } from '../lib/supabase.js'
+import { handleAuthError } from '../utils/authErrors.js'
 
 const email = ref('')
 const password = ref('')
@@ -110,25 +116,50 @@ const name = ref('')
 const isLogin = ref(true)
 const loading = ref(false)
 const error = ref('')
+const successMsg = ref('')
+
+async function attemptLogin(email, password) {
+  const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+  return { data, authError }
+}
 
 async function handleSubmit() {
   error.value = ''
+  successMsg.value = ''
   loading.value = true
 
-  try {
-    const { error: authError } = isLogin.value
-      ? await supabase.auth.signInWithPassword({ email: email.value, password: password.value })
-      : await supabase.auth.signUp({
-          email: email.value,
-          password: password.value,
-          options: { data: { name: name.value.trim() || undefined } },
-        })
+  console.log('LOGIN ATTEMPT', { email: email.value })
 
-    if (authError) {
-      error.value = authError.message
+  try {
+    if (isLogin.value) {
+      const { authError } = await attemptLogin(email.value, password.value)
+      if (authError) error.value = handleAuthError(authError)
+      return
     }
-  } catch {
-    error.value = 'Something went wrong. Please try again.'
+
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value,
+      options: { data: { name: name.value.trim() || undefined } },
+    })
+
+    if (signUpError?.code === 'user_already_exists') {
+      const { authError } = await attemptLogin(email.value, password.value)
+      if (authError) error.value = handleAuthError(authError)
+      return
+    }
+
+    if (signUpError) {
+      error.value = handleAuthError(signUpError)
+      return
+    }
+
+    if (!data.session) {
+      successMsg.value = 'Check your email to confirm your account.'
+    }
+    // If data.session exists, onAuthStateChange in App.vue handles the transition automatically
+  } catch (e) {
+    error.value = handleAuthError(e)
   } finally {
     loading.value = false
   }

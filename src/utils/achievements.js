@@ -12,6 +12,7 @@ const BORDER_COLORS = {
   weight:   'border-pink-400',
   dayReset: 'border-indigo-400',
   habit:    'border-emerald-400',
+  error:    'border-rose-400',
 }
 
 const EVOLUTION_MAP = {
