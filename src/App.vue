@@ -570,7 +570,7 @@ import ReminderSettings from './components/ReminderSettings.vue'
 import ProfileView from './views/ProfileView.vue'
 import WeeklyReportModal from './components/WeeklyReportModal.vue'
 import { state } from './store/state.js'
-import { resetState, saveState } from './store/persistence.js'
+import { resetState, saveState, reloadStateForUser } from './store/persistence.js'
 import { supabase } from './lib/supabase.js'
 import { checkDayRollover } from './utils/dates.js'
 import { scheduleReminder } from './utils/reminder.js'
@@ -642,9 +642,11 @@ onMounted(async () => {
 
   try {
     const { data } = await supabase.auth.getSession()
+    reloadStateForUser(state, data.session?.user?.id ?? null)
     state.session = data.session
     state.user = data.session?.user ?? null
   } catch {
+    reloadStateForUser(state, null)
     state.session = null
     state.user = null
   } finally {
@@ -652,6 +654,7 @@ onMounted(async () => {
   }
 
   supabase.auth.onAuthStateChange((_event, session) => {
+    reloadStateForUser(state, session?.user?.id ?? null)
     state.session = session
     state.user = session?.user ?? null
   })

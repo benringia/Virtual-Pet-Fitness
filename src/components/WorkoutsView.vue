@@ -659,7 +659,7 @@ function saveSession() {
   maybeSetStartDate(state)
   const broke = willStreakBreak(state)
 
-  const currentXP = todayXP.value['Strength'] || 0
+  const currentXP = state.workouts.filter(w => w.date === todayStr()).reduce((sum, w) => sum + (w.xp || 0), 0)
   const xpAvailable = Math.max(0, WORKOUT_CAP - currentXP)
   const xpAward = Math.min(30, xpAvailable)
 

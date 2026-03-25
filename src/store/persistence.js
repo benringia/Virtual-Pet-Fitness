@@ -1,50 +1,9 @@
-const STORAGE_KEY = 'flarepup-v5'
+import { createDefaultState } from './defaultState.js'
 
-const defaultState = {
-  petName: "Petfit",
-  startDate: localDateStr(),
-  currentDate: localDateStr(),
-  xp: 0,
-  level: 1,
-  workouts: [],
-  workoutTypes: [
-    { id: 'strength', name: 'Strength', color: '#f472b6', sessions: [] },
-    { id: 'walking',  name: 'Walking',  color: '#60a5fa', sessions: [] },
-    { id: 'boxing',   name: 'Boxing',   color: '#f87171', sessions: [] },
-    { id: 'tennis',   name: 'Tennis',   color: '#4ade80', sessions: [] },
-  ],
-  dietHabits: {},
-  calories: { eaten: 0, burned: 0, burnedManual: [], goal: 2000, date: null },
-  streaks: {
-    workout: { count: 0, lastDate: null },
-    diet: { count: 0, lastDate: null },
-    deficit: { count: 0, lastDate: null },
-  },
-  calHistory: [],
-  weightLog: [],
-  weightGoal: null,
-  weightGoalType: 'Maintain',
-  hasCelebratedGoal: false,
-  weightUnit: 'kg',
-  meals: [],
-  proteinActivityLevel: 'active',
-  petMood: 'idle',
-  reminder: { enabled: false, time: '20:00' },
-  restDays: [],
-  todayIsRestDay: false,
-  lastWeeklyReportShown: null,
-  workoutSets: [],
-  workoutSessions: [],
-  trainingCategory: 'bodybuilding',
-  workoutPrograms: {},
-  hiddenLabels: [],
-  miscActivity: 'Walking',
-  customMiscName: '',
-  waterIntake: 0,
-  completedHabitsToday: {},
-  notifications: [],
-  user: null,
-  session: null,
+let currentUserId = null
+
+function getStorageKey(userId) {
+  return userId ? `flarepup-v5-${userId}` : null
 }
 
 function reconcileWorkouts(state) {
@@ -66,19 +25,44 @@ function reconcileWorkouts(state) {
   }
 }
 
-export function loadState() {
+export function loadState(userId) {
+  currentUserId = userId ?? null
+  const key = getStorageKey(currentUserId)
+
+  if (!key) {
+    console.debug('[loadState] no userId — returning clean defaults (not persisted)')
+    return createDefaultState()
+  }
+
   try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    const state = saved ? { ...defaultState, ...JSON.parse(saved) } : { ...defaultState }
+    const saved = localStorage.getItem(key)
+    if (!saved) {
+      console.debug('[loadState] NEW USER', currentUserId, '— initializing clean defaults')
+      const fresh = createDefaultState()
+      localStorage.setItem(key, JSON.stringify(fresh))
+      return fresh
+    }
+    console.debug('[loadState] EXISTING USER', currentUserId, '— loading from', key)
+    const state = { ...createDefaultState(), ...JSON.parse(saved) }
     reconcileWorkouts(state)
     return state
   } catch {
-    return { ...defaultState }
+    console.warn('[loadState] parse error — falling back to defaults')
+    return createDefaultState()
   }
 }
 
+export function reloadStateForUser(state, userId) {
+  // Hard reset first — prevents stale in-memory fields surviving into new user's context
+  Object.assign(state, createDefaultState())
+  const fresh = loadState(userId)
+  Object.assign(state, fresh)
+}
+
 export function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  const key = getStorageKey(currentUserId)
+  if (!key) return  // no user authenticated — do not write to localStorage
+  localStorage.setItem(key, JSON.stringify(state))
 }
 
 function localDateStr() {
@@ -88,7 +72,6 @@ function localDateStr() {
 
 export function resetState(state) {
   import('../utils/achievements.js').then(({ clearShownToday }) => clearShownToday())
-  const today = localDateStr()
   console.log('[resetState] before:', JSON.stringify({
     meals: state.meals?.length,
     'calories.eaten': state.calories?.eaten,
@@ -99,47 +82,14 @@ export function resetState(state) {
     xp: state.xp,
     level: state.level,
   }))
-  Object.assign(state, {
-    petName: 'Flarepup',
-    startDate: today,
-    currentDate: today,
-    xp: 0,
-    level: 1,
-    workouts: [],
-    workoutTypes: [
-      { id: 'strength', name: 'Strength', color: '#f472b6', sessions: [] },
-      { id: 'walking',  name: 'Walking',  color: '#60a5fa', sessions: [] },
-      { id: 'boxing',   name: 'Boxing',   color: '#f87171', sessions: [] },
-      { id: 'tennis',   name: 'Tennis',   color: '#4ade80', sessions: [] },
-    ],
-    dietHabits: {},
-    calories: { eaten: 0, burned: 0, burnedManual: [], goal: 2000, date: today },
-    streaks: {
-      workout: { count: 0, lastDate: null },
-      diet: { count: 0, lastDate: null },
-      deficit: { count: 0, lastDate: null },
-    },
-    calHistory: [],
-    weightLog: [],
-    weightGoal: null,
-    weightGoalType: 'Maintain',
-    hasCelebratedGoal: false,
-    weightUnit: 'kg',
-    meals: [],
-    restDays: [],
-    todayIsRestDay: false,
-    workoutSets: [],
-    workoutSessions: [],
-    trainingCategory: 'bodybuilding',
-    workoutPrograms: {},
-    hiddenLabels: [],
-    miscActivity: 'Walking',
-    customMiscName: '',
-    waterIntake: 0,
-    completedHabitsToday: {},
-    notifications: [],
-    petMood: 'idle',
-  })
+  const fresh = createDefaultState()
+  // resetState sets today's date explicitly — override the factory's value
+  const today = localDateStr()
+  fresh.startDate = today
+  fresh.currentDate = today
+  fresh.calories.date = today
+  fresh.petName = 'Flarepup'
+  Object.assign(state, fresh)
   saveState(state)
   console.log('[resetState] after:', JSON.stringify({
     meals: state.meals?.length,
