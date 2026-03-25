@@ -6,7 +6,8 @@ function localDateStr() {
 export function createDefaultState() {
   const today = localDateStr()
   return {
-    petName: 'Petfit',
+    petName: 'Flarepup',
+    hasSeenWelcome: false,
     startDate: today,
     currentDate: today,
     xp: 0,

@@ -8,11 +8,17 @@
         Back to Overview
       </button>
 
-      <div>
-        <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-          <span>📊</span> My Progress
-        </h1>
-        <p class="text-sm text-slate-400 font-medium tracking-tight">Review your journey, analyze trends, and plan your evolution.</p>
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+            <span>📊</span> My Progress
+          </h1>
+          <p class="text-sm text-slate-400 font-medium tracking-tight">Review your journey, analyze trends, and plan your evolution.</p>
+        </div>
+        <button @click="showWeeklyReport = true"
+          class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition shrink-0 cursor-pointer">
+          📊 Weekly Report
+        </button>
       </div>
     </div>
 

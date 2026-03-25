@@ -451,6 +451,7 @@
 
     <ToastNotification />
     <EvolutionModal />
+    <WelcomeModal v-if="showWelcome" @save="handleWelcomeSave" />
     <WeeklyReportModal />
 
     <!-- Reset confirmation modal -->
@@ -460,8 +461,8 @@
       @click.self="showResetModal = false"
     >
       <div class="bg-white rounded-2xl p-6 shadow-lg max-w-sm w-full mx-4">
-        <h2 class="font-medium text-gray-800 mb-2">Reset everything?</h2>
-        <p class="text-sm text-gray-500 mb-6">This will erase all your progress, workouts, and data. This cannot be undone.</p>
+        <h2 class="font-medium text-gray-800 mb-2">Reset your progress?</h2>
+        <p class="text-sm text-gray-500 mb-6">This will reset <strong>your</strong> progress, workouts, and data only. Other accounts are not affected. This cannot be undone.</p>
         <div class="flex gap-3 justify-end">
           <button @click="showResetModal = false" class="bg-indigo-50 text-indigo-600 rounded-xl px-5 py-2 text-sm font-medium hover:bg-indigo-100 transition-colors cursor-pointer">Cancel</button>
           <button @click="handleReset" class="bg-red-100 text-red-600 rounded-xl px-5 py-2 text-sm font-medium hover:bg-red-200 transition-colors cursor-pointer">Reset</button>
@@ -547,7 +548,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watchEffect, nextTick } from 'vue'
 import AuthView from './views/AuthView.vue'
 import Header from './components/Header.vue'
 import DietView from './views/DietView.vue'
@@ -569,8 +570,10 @@ import WorkoutsView from './components/WorkoutsView.vue'
 import ReminderSettings from './components/ReminderSettings.vue'
 import ProfileView from './views/ProfileView.vue'
 import WeeklyReportModal from './components/WeeklyReportModal.vue'
+import WelcomeModal from './components/WelcomeModal.vue'
 import { state } from './store/state.js'
-import { resetState, saveState, reloadStateForUser } from './store/persistence.js'
+import { saveState, reloadStateForUser } from './store/persistence.js'
+import { createDefaultState } from './store/defaultState.js'
 import { supabase } from './lib/supabase.js'
 import { checkDayRollover } from './utils/dates.js'
 import { scheduleReminder } from './utils/reminder.js'
@@ -642,21 +645,16 @@ onMounted(async () => {
 
   try {
     const { data } = await supabase.auth.getSession()
-    reloadStateForUser(state, data.session?.user?.id ?? null)
-    state.session = data.session
-    state.user = data.session?.user ?? null
+    await handleAuth(data.session)
   } catch {
-    reloadStateForUser(state, null)
     state.session = null
     state.user = null
   } finally {
     isAuthReady.value = true
   }
 
-  supabase.auth.onAuthStateChange((_event, session) => {
-    reloadStateForUser(state, session?.user?.id ?? null)
-    state.session = session
-    state.user = session?.user ?? null
+  supabase.auth.onAuthStateChange(async (_event, session) => {
+    await handleAuth(session)
   })
 
   document.addEventListener('click', (e) => {
@@ -669,7 +667,28 @@ onMounted(async () => {
   })
 })
 
+// Hydrate state BEFORE setting session so showWelcome evaluates on fully loaded state
+async function handleAuth(session) {
+  if (session?.user?.id) {
+    reloadStateForUser(state, session.user.id)
+  }
+  state.session = session
+  state.user = session?.user ?? null
+  await nextTick()
+}
+
 // activeView is imported from composables/useActiveView.js (shared with MyWorkoutsPreview)
+const showWelcome = computed(() => !!state.session?.user?.id && state.hasSeenWelcome === false)
+
+watchEffect(() => {
+  console.log('[Auth] session:', state.session?.user?.id, '| hasSeenWelcome:', state.hasSeenWelcome, '| showWelcome:', showWelcome.value)
+})
+
+function handleWelcomeSave(name) {
+  state.petName = name || 'Flarepup'
+  state.hasSeenWelcome = true
+}
+
 const isAuthReady = ref(false)
 const activeRightTab = ref('diet')
 const railExpanded = ref(false)
@@ -698,7 +717,21 @@ async function handleLogout() {
 }
 
 function handleReset() {
-  resetState(state)
+  const userId = state.session?.user?.id
+  if (!userId) {
+    showResetModal.value = false
+    return
+  }
+  const savedSession = state.session
+  const savedUser = state.user
+  const key = `flarepup-v5-${userId}`
+  localStorage.removeItem(key)
+  const fresh = createDefaultState()
+  fresh.hasSeenWelcome = false
+  Object.assign(state, fresh)
+  state.session = savedSession
+  state.user = savedUser
+  saveState(state)
   showResetModal.value = false
 }
 </script>

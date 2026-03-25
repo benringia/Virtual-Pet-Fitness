@@ -39,11 +39,16 @@ export function loadState(userId) {
     if (!saved) {
       console.debug('[loadState] NEW USER', currentUserId, '— initializing clean defaults')
       const fresh = createDefaultState()
+      fresh.hasSeenWelcome = false  // explicit: force welcome modal for new users
       localStorage.setItem(key, JSON.stringify(fresh))
       return fresh
     }
     console.debug('[loadState] EXISTING USER', currentUserId, '— loading from', key)
-    const state = { ...createDefaultState(), ...JSON.parse(saved) }
+    const parsed = JSON.parse(saved)
+    const state = { ...createDefaultState(), ...parsed }
+    if (!('hasSeenWelcome' in parsed)) {
+      state.hasSeenWelcome = true
+    }
     reconcileWorkouts(state)
     return state
   } catch {
@@ -72,35 +77,21 @@ function localDateStr() {
 
 export function resetState(state) {
   import('../utils/achievements.js').then(({ clearShownToday }) => clearShownToday())
-  console.log('[resetState] before:', JSON.stringify({
-    meals: state.meals?.length,
-    'calories.eaten': state.calories?.eaten,
-    'calories.burned': state.calories?.burned,
-    'calories.burnedManual': state.calories?.burnedManual,
-    weightLog: state.weightLog?.length,
-    weightGoal: state.weightGoal,
-    xp: state.xp,
-    level: state.level,
-  }))
+  const savedSession = state.session
+  const savedUser = state.user
+  const savedName = state.petName
+  const savedWelcome = state.hasSeenWelcome
   const fresh = createDefaultState()
-  // resetState sets today's date explicitly — override the factory's value
   const today = localDateStr()
   fresh.startDate = today
   fresh.currentDate = today
   fresh.calories.date = today
-  fresh.petName = 'Flarepup'
   Object.assign(state, fresh)
+  state.session = savedSession
+  state.user = savedUser
+  state.petName = savedName || 'Flarepup'
+  state.hasSeenWelcome = savedWelcome ?? true
   saveState(state)
-  console.log('[resetState] after:', JSON.stringify({
-    meals: state.meals?.length,
-    'calories.eaten': state.calories?.eaten,
-    'calories.burned': state.calories?.burned,
-    'calories.burnedManual': state.calories?.burnedManual,
-    weightLog: state.weightLog?.length,
-    weightGoal: state.weightGoal,
-    xp: state.xp,
-    level: state.level,
-  }))
 }
 
 let debounceTimer = null
