@@ -96,9 +96,9 @@
           <!-- Exercise rows -->
           <div v-if="draftSession.exercises.length" class="mb-4 space-y-3">
             <div v-for="(ex, i) in draftSession.exercises" :key="i"
-              :class="state.trainingCategory === 'calisthenics' ? 'flex flex-row gap-3 items-start bg-white rounded-2xl px-4 py-4 border border-indigo-100 w-full shadow-sm' : 'grid grid-cols-12 gap-4 items-start bg-white rounded-2xl px-4 py-4 border border-indigo-100 shadow-sm'">
+              :class="state.trainingCategory === 'calisthenics' ? 'flex flex-row gap-3 items-start bg-white rounded-2xl px-4 py-4 border border-indigo-100 w-full shadow-sm' : state.trainingCategory === 'bodybuilding' ? 'flex flex-col gap-2 bg-white/40 rounded-xl p-3 border border-slate-100' : 'grid grid-cols-12 gap-4 items-start bg-white rounded-2xl px-4 py-4 border border-indigo-100 shadow-sm'">
               
-              <div :class="state.trainingCategory === 'calisthenics' ? 'flex-1 min-w-[120px]' : (state.trainingCategory === 'bodybuilding' ? 'col-span-12 lg:col-span-6' : (state.trainingCategory === 'cardio' ? (isInclineExercise(ex.selectedName) ? 'col-span-12 lg:col-span-4' : 'col-span-12 lg:col-span-5') : 'col-span-12 lg:col-span-7'))">
+              <div :class="state.trainingCategory === 'calisthenics' ? 'flex-1 min-w-[120px]' : (state.trainingCategory === 'bodybuilding' ? 'w-full' : (state.trainingCategory === 'cardio' ? (isInclineExercise(ex.selectedName) ? 'col-span-12 lg:col-span-4' : 'col-span-12 lg:col-span-5') : 'col-span-12 lg:col-span-7'))">
                 <div class="flex items-center justify-between mb-1.5 px-1">
                   <div class="flex items-center gap-2">
                     <label v-if="state.trainingCategory === 'bodybuilding'" class="w-28 shrink-0 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Part</label>
@@ -185,55 +185,100 @@
               </div>
 
               <template v-if="state.trainingCategory !== 'cardio'">
-                <!-- Weight -->
-                <div v-if="state.trainingCategory === 'bodybuilding' || (state.trainingCategory === 'calisthenics' && ex.isWeighted)" 
-                   :class="state.trainingCategory === 'calisthenics' ? 'w-24 shrink-0' : 'col-span-12 lg:col-span-2 min-w-[96px]'">
-                  <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center relative flex items-center justify-center gap-1">
-                    Weight
-                    <span v-if="state.trainingCategory === 'bodybuilding' && isPR(ex.name, ex.weight, ex.reps)" 
-                      class="absolute -top-1 -right-1 text-emerald-500 animate-pulse drop-shadow-sm text-[12px]" title="Personal Record!">👑</span>
-                  </label>
-                  <div class="flex items-center justify-center gap-1 overflow-visible">
-                    <button @click="increment(ex, 'weight', -2.5)" 
-                      class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
-                    <input v-model="ex.weight" type="number" inputmode="decimal" pattern="[0-9]*" min="0" step="0.5" placeholder="kg"
-                      :ref="el => { if (el) weightInputs[i] = el }"
-                      class="text-[13px] border border-gray-200 rounded-lg px-0.5 py-2 focus:outline-none focus:ring-1 bg-white text-center w-full min-w-0"
-                      :class="state.trainingCategory === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
-                    <button @click="increment(ex, 'weight', 2.5)" 
-                      class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                <!-- BODYBUILDING: Row 2 — Weight, Sets, Reps + Delete in one flex row -->
+                <div v-if="state.trainingCategory === 'bodybuilding'" class="flex gap-3 items-end mt-1">
+                  <!-- Weight -->
+                  <div class="flex-1 min-w-0">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-1 text-center relative flex items-center justify-center gap-1">
+                      Weight
+                      <span v-if="isPR(ex.name, ex.weight, ex.reps)"
+                        class="absolute -top-1 -right-1 text-emerald-500 animate-pulse drop-shadow-sm text-[12px]" title="Personal Record!">👑</span>
+                    </label>
+                    <div class="flex items-center justify-center gap-1 overflow-visible">
+                      <button @click="increment(ex, 'weight', -2.5)"
+                        class="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
+                      <input v-model="ex.weight" type="number" inputmode="decimal" pattern="[0-9]*" min="0" step="0.5" placeholder="kg"
+                        :ref="el => { if (el) weightInputs[i] = el }"
+                        class="text-[13px] border border-gray-200 rounded-lg px-0.5 h-10 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full min-w-0"/>
+                      <button @click="increment(ex, 'weight', 2.5)"
+                        class="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                    </div>
+                  </div>
+                  <!-- Sets -->
+                  <div class="flex-1 min-w-0">
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-1 text-center">Sets</label>
+                    <div class="flex items-center justify-center gap-1">
+                      <button @click="increment(ex, 'sets', -1)"
+                        class="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
+                      <input v-model="ex.sets" type="number" inputmode="numeric" pattern="[0-9]*" min="1" placeholder="3"
+                        class="text-[13px] border border-gray-200 rounded-lg px-0.5 h-10 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full min-w-0"/>
+                      <button @click="increment(ex, 'sets', 1)"
+                        class="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                    </div>
+                  </div>
+                  <!-- Reps -->
+                  <div class="flex-1 min-w-0">
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-1 text-center">Reps</label>
+                    <div class="flex items-center justify-center gap-1">
+                      <button @click="increment(ex, 'reps', -1)"
+                        class="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
+                      <input v-model="ex.reps" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="10"
+                        class="text-[13px] border border-gray-200 rounded-lg px-0.5 h-10 focus:outline-none focus:ring-1 focus:ring-indigo-300 bg-white text-center w-full min-w-0"/>
+                      <button @click="increment(ex, 'reps', 1)"
+                        class="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                    </div>
+                  </div>
+                  <!-- Delete (bodybuilding inline) -->
+                  <div class="shrink-0 flex items-end pb-1">
+                    <button v-if="i > 0" @click="removeExercise(i)" class="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer bg-white rounded-lg border border-gray-200 p-1.5 shadow-sm" aria-label="Remove exercise">
+                      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div v-else class="w-8 h-8"></div>
                   </div>
                 </div>
 
-                <!-- Sets -->
-                <div :class="state.trainingCategory === 'calisthenics' ? 'w-24 shrink-0' : (state.trainingCategory === 'bodybuilding' ? 'col-span-6 lg:col-span-2' : 'col-span-6 lg:col-span-2')">
-                  <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Sets</label>
-                  <div class="flex items-center justify-center gap-1">
-                    <button @click="increment(ex, 'sets', -1)" 
-                      class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
-                    <input v-model="ex.sets" type="number" inputmode="numeric" pattern="[0-9]*" min="1" placeholder="3"
-                      class="w-14 text-[13px] border border-gray-200 rounded-lg px-0.5 py-2 focus:outline-none focus:ring-1 bg-white text-center min-w-0"
-                      :class="state.trainingCategory === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
-                    <button @click="increment(ex, 'sets', 1)" 
-                      class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                <!-- CALISTHENICS: original inline structure -->
+                <template v-else>
+                  <!-- Weight -->
+                  <div v-if="ex.isWeighted" class="w-24 shrink-0">
+                    <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Weight</label>
+                    <div class="flex items-center justify-center gap-1 overflow-visible">
+                      <button @click="increment(ex, 'weight', -2.5)"
+                        class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
+                      <input v-model="ex.weight" type="number" inputmode="decimal" pattern="[0-9]*" min="0" step="0.5" placeholder="kg"
+                        :ref="el => { if (el) weightInputs[i] = el }"
+                        class="text-[13px] border border-gray-200 rounded-lg px-0.5 py-2 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white text-center w-full min-w-0"/>
+                      <button @click="increment(ex, 'weight', 2.5)"
+                        class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                    </div>
                   </div>
-                </div>
-
-                <!-- Reps / Hold -->
-                <div :class="state.trainingCategory === 'calisthenics' ? 'w-24 shrink-0' : (state.trainingCategory === 'bodybuilding' ? 'col-span-6 lg:col-span-2' : 'col-span-6 lg:col-span-2')">
-                  <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">
-                    {{ isSkillExercise(ex) ? 'HOLD (SEC)' : 'REPS' }}
-                  </label>
-                  <div class="flex items-center justify-center gap-1">
-                    <button @click="increment(ex, 'reps', -1)" 
-                      class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
-                    <input v-model="ex.reps" type="number" inputmode="numeric" pattern="[0-9]*" min="0" :placeholder="isSkillExercise(ex) ? '15' : '10'"
-                      class="w-14 text-[13px] border border-gray-200 rounded-lg px-0.5 py-2 focus:outline-none focus:ring-1 bg-white text-center min-w-0"
-                      :class="state.trainingCategory === 'calisthenics' ? 'focus:ring-amber-500' : 'focus:ring-indigo-300'"/>
-                    <button @click="increment(ex, 'reps', 1)" 
-                      class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                  <!-- Sets -->
+                  <div class="w-24 shrink-0">
+                    <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">Sets</label>
+                    <div class="flex items-center justify-center gap-1">
+                      <button @click="increment(ex, 'sets', -1)"
+                        class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
+                      <input v-model="ex.sets" type="number" inputmode="numeric" pattern="[0-9]*" min="1" placeholder="3"
+                        class="w-14 text-[13px] border border-gray-200 rounded-lg px-0.5 py-2 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white text-center min-w-0"/>
+                      <button @click="increment(ex, 'sets', 1)"
+                        class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                    </div>
                   </div>
-                </div>
+                  <!-- Reps / Hold -->
+                  <div class="w-24 shrink-0">
+                    <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 px-1 text-center">
+                      {{ isSkillExercise(ex) ? 'HOLD (SEC)' : 'REPS' }}
+                    </label>
+                    <div class="flex items-center justify-center gap-1">
+                      <button @click="increment(ex, 'reps', -1)"
+                        class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">−</button>
+                      <input v-model="ex.reps" type="number" inputmode="numeric" pattern="[0-9]*" min="0" :placeholder="isSkillExercise(ex) ? '15' : '10'"
+                        class="w-14 text-[13px] border border-gray-200 rounded-lg px-0.5 py-2 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white text-center min-w-0"/>
+                      <button @click="increment(ex, 'reps', 1)"
+                        class="text-slate-400 hover:text-amber-600 transition-colors cursor-pointer px-1 flex-shrink-0 text-base font-bold select-none">+</button>
+                    </div>
+                  </div>
+                </template>
               </template>
               
               <template v-if="state.trainingCategory === 'cardio'">
@@ -283,8 +328,8 @@
                 </div>
               </template>
 
-              <!-- Delete -->
-              <div :class="state.trainingCategory === 'cardio' && isInclineExercise(ex.selectedName) ? 'col-span-12 lg:col-span-1 flex justify-center pb-2 mt-4' : 'col-span-2 lg:col-span-1 flex justify-center pb-2 mt-4'">
+              <!-- Delete (calisthenics + cardio only; bodybuilding has it inline in the inputs row) -->
+              <div v-if="state.trainingCategory !== 'bodybuilding'" :class="state.trainingCategory === 'cardio' && isInclineExercise(ex.selectedName) ? 'col-span-12 lg:col-span-1 flex justify-center pb-2 mt-4' : 'col-span-2 lg:col-span-1 flex justify-center pb-2 mt-4'">
                 <button v-if="i > 0" @click="removeExercise(i)" class="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer bg-white rounded-lg border border-gray-200 p-1.5 shadow-sm" aria-label="Remove exercise">
                   <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                 </button>
