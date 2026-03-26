@@ -7,8 +7,8 @@
 
   <div v-else class="min-h-screen bg-[#f8f8ff] flex flex-col md:pt-0">
     <!-- Mobile Top Bar (Indigo Branding) -->
-    <div class="md:hidden sticky top-0 left-0 right-0 h-14 bg-indigo-600 z-50 flex items-center justify-center shadow-lg">
-      <div class="bg-indigo-500/30 p-2 rounded-xl ">
+    <div class="md:hidden sticky top-0 left-0 right-0 h-14 bg-[#0f172a] z-50 flex items-center justify-center shadow-lg">
+      <div class="bg-white/10 p-2 rounded-xl ">
         <svg class="h-6 w-6 text-white" viewBox="10 8 96 86" xmlns="http://www.w3.org/2000/svg">
           <g transform="translate(10, 5)">
             <circle cx="35" cy="18" r="10" fill="currentColor"/>
@@ -24,20 +24,24 @@
       </div>
     </div>
 
-    <div class="flex flex-1 overflow-hidden w-full">
+    <div class="flex flex-1 w-full">
 
       <!-- LEFT SIDEBAR (desktop only) — rail nav -->
       <aside
         @mouseenter="railExpanded = true"
         @mouseleave="railExpanded = false"
         :class="railExpanded ? 'w-60' : 'w-16'"
-        class="hidden lg:flex flex-col shrink-0 bg-indigo-600 border-r border-indigo-500 fixed left-0 top-0 h-screen overflow-hidden transition-all duration-300 ease-in-out z-30"
+        class="sticky hidden lg:flex flex-col shrink-0 relative bg-gradient-to-b from-[#0f172a] via-[#1e1b4b] to-[#312e81] border-r border-white/10 fixed left-0 top-0 h-screen overflow-hidden transition-all duration-300 ease-in-out z-30"
       >
-        <!-- Top: logo + nav -->
-        <div class="flex flex-col flex-1 p-2 pt-4 gap-1">
+        <!-- Glass overlay -->
+        <div class="absolute inset-0 backdrop-blur-xl bg-white/5 pointer-events-none"></div>
+        <!-- Content wrapper -->
+        <div class="relative z-10 flex flex-col h-full">
+        <!-- Top: logo + nav (scrollable) -->
+        <div class="flex flex-col flex-1 overflow-y-auto px-2 py-4 gap-1 scrollbar-thin scrollbar-thumb-white/10">
 
           <!-- Logo -->
-          <div class="w-full flex items-center gap-3 min-h-11 px-3 py-2 overflow-hidden">
+          <div class="w-full flex items-center gap-3 min-h-11 px-1 py-2">
             <svg class="w-7 h-7 shrink-0" :class="railExpanded ? 'mx-0' : 'mx-auto'" viewBox="10 8 96 86" xmlns="http://www.w3.org/2000/svg" aria-label="Petfit">
               <g transform="translate(10, 5)">
                 <circle cx="35" cy="18" r="10" fill="white"/>
@@ -58,14 +62,15 @@
             <button
               @click="activeView = 'overview'"
               :aria-current="activeView === 'overview' ? 'page' : undefined"
-              :class="activeView === 'overview' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
-              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
+              :class="activeView === 'overview' ? 'bg-white/10 text-white shadow-[0_0_12px_rgba(34,211,238,0.3)] border border-white/10' : 'text-white/60 hover:text-white hover:bg-white/10 hover:translate-x-1'"
+              class="relative group w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer"
               title="Overview"
             >
-              <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <div v-if="activeView === 'overview'" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+              <svg class="w-5 h-5 shrink-0 transition-colors duration-200" :class="[railExpanded ? 'mx-0' : 'mx-auto', activeView === 'overview' ? 'text-cyan-400' : 'text-white/60 group-hover:text-cyan-400']" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
               </svg>
-              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Overview</span>
+              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap">Overview</span>
             </button>
 
             
@@ -74,52 +79,55 @@
             <button
               @click="activeView = 'workouts'"
               :aria-current="activeView === 'workouts' ? 'page' : undefined"
-              :class="activeView === 'workouts' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
-              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
+              :class="activeView === 'workouts' ? 'bg-white/10 text-white shadow-[0_0_12px_rgba(34,211,238,0.3)] border border-white/10' : 'text-white/60 hover:text-white hover:bg-white/10 hover:translate-x-1'"
+              class="relative group w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer"
               title="My Workouts"
             >
-              <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <div v-if="activeView === 'workouts'" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+              <svg class="w-5 h-5 shrink-0 transition-colors duration-200" :class="[railExpanded ? 'mx-0' : 'mx-auto', activeView === 'workouts' ? 'text-cyan-400' : 'text-white/60 group-hover:text-cyan-400']" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
               </svg>
-              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">My Workouts</span>
+              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap">My Workouts</span>
             </button>
             <button
               @click="activeView = 'diet'"
               :aria-current="activeView === 'diet' ? 'page' : undefined"
-              :class="activeView === 'diet' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
-              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
+              :class="activeView === 'diet' ? 'bg-white/10 text-white shadow-[0_0_12px_rgba(34,211,238,0.3)] border border-white/10' : 'text-white/60 hover:text-white hover:bg-white/10 hover:translate-x-1'"
+              class="relative group w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer"
               title="Diet"
             >
-              <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <div v-if="activeView === 'diet'" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+              <svg class="w-5 h-5 shrink-0 transition-colors duration-200" :class="[railExpanded ? 'mx-0' : 'mx-auto', activeView === 'diet' ? 'text-cyan-400' : 'text-white/60 group-hover:text-cyan-400']" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
               </svg>
-              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Diet</span>
+              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap">Diet</span>
             </button>
 
             <!-- Progress -->
             <button
               @click="activeView = 'progress'"
               :aria-current="activeView === 'progress' ? 'page' : undefined"
-              :class="activeView === 'progress' ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'"
-              class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-colors duration-200 cursor-pointer"
+              :class="activeView === 'progress' ? 'bg-white/10 text-white shadow-[0_0_12px_rgba(34,211,238,0.3)] border border-white/10' : 'text-white/60 hover:text-white hover:bg-white/10 hover:translate-x-1'"
+              class="relative group w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer"
               title="Progress"
             >
-              <svg class="w-5 h-5 shrink-0 text-white" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <div v-if="activeView === 'progress'" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+              <svg class="w-5 h-5 shrink-0 transition-colors duration-200" :class="[railExpanded ? 'mx-0' : 'mx-auto', activeView === 'progress' ? 'text-cyan-400' : 'text-white/60 group-hover:text-cyan-400']" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
               </svg>
-              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap text-white">Progress</span>
+              <span v-show="railExpanded" class="text-sm font-medium whitespace-nowrap">Progress</span>
             </button>
           </nav>
         </div>
 
-        <!-- Bottom: logout + reset -->
-        <div class="p-2 flex flex-col gap-2 pb-4">
+        <!-- Bottom: logout + reset (always visible) -->
+        <div class="shrink-0 flex flex-col gap-2 px-2 py-3 border-t border-white/10">
           <!-- Logout -->
           <button
             @click="handleLogout"
             title="Log out"
-            class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl text-white/60 hover:text-white transition-colors duration-200 cursor-pointer"
+            class="w-full flex items-center gap-3 min-h-11 px-3 py-2 rounded-xl text-white/40 hover:text-rose-400 transition-colors duration-200 cursor-pointer"
           >
             <svg class="w-5 h-5 shrink-0" :class="railExpanded ? 'mx-0' : 'mx-auto'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
@@ -137,116 +145,124 @@
             </button>
           </div>
         </div>
+        </div><!-- end content wrapper -->
       </aside>
 
       <!-- MAIN CONTENT -->
       <div class="flex flex-col flex-1 min-w-0 lg:pl-16">
       <!-- Top header bar -->
-      <header class="flex items-center justify-between px-4 md:px-8 lg:px-12 py-3 sticky top-0 z-10 max-w-400 mx-auto w-full">
-        <!-- Left: Page title -->
-        <div>
-          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium">{{ timeGreeting }}</p>
-          <h1 class="text-2xl font-bold text-gray-800 leading-tight lg:text-xl">
-            Welcome back, <span class="text-indigo-600 capitalize">{{ state.petName || 'Flarepup' }}</span> 👋
-          </h1>
-        </div>
+      <header class=" lg:pl-16 z-40">
+        <div class="flex items-center justify-between px-6 py-3">
 
-        <!-- Right: mobile avatar + desktop controls -->
-        <div class="flex items-center gap-3">
-          <!-- Mobile-only profile avatar -->
-          <div class="lg:hidden w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-            <span class="text-sm font-semibold text-indigo-600">{{ userInitial }}</span>
+          <!-- Left: identity -->
+          <div class=" gap-2 leading-none">
+            <span class="text-4xl text-gray-700 font-bold tracking-tight">Welcome Back, </span>
+            <span class="text-2xl font-bold text-[#312e81] capitalize">{{ state.petName || 'Flarepup' }}!</span>
+            <br><span class="text-xs text-gray-400">Let's crush today!</span>
           </div>
-          <!-- Desktop: Notification + Avatar -->
-          <div class="hidden lg:flex items-center gap-3">
-            <!-- Notification Bell -->
-            <div class="relative notif-dropdown">
-              <button
-                @click="notifDropdownOpen = !notifDropdownOpen"
-                class="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-                :aria-expanded="notifDropdownOpen"
-                aria-haspopup="true"
-                aria-label="Notifications"
-              >
-                <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-                <span v-if="state.notifications.length > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full"/>
-              </button>
 
-              <div
-                v-if="notifDropdownOpen"
-                class="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-xl border border-slate-100 z-50 overflow-hidden"
-                role="menu"
-              >
-                <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                  <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
-                  <button
-                    v-if="state.notifications.length > 0"
-                    @click="state.notifications.splice(0)"
-                    class="text-xs text-slate-400 hover:text-rose-500 transition-colors"
-                  >Clear all</button>
-                </div>
-                <div class="max-h-80 overflow-y-auto">
-                  <div v-if="state.notifications.length === 0" class="px-4 py-6 text-center text-sm text-slate-400">
-                    You're all caught up 🎉
+          <!-- Right: controls -->
+          <div class="flex items-center gap-3">
+            <!-- Mobile avatar -->
+            <div class="lg:hidden w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+              <span class="text-xs font-semibold text-indigo-600">{{ userInitial }}</span>
+            </div>
+
+            <!-- Desktop controls -->
+            <div class="hidden lg:flex items-center gap-3">
+              <!-- Notification Bell -->
+              <div class="relative notif-dropdown">
+                <button
+                  @click="notifDropdownOpen = !notifDropdownOpen"
+                  class="relative p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  :aria-expanded="notifDropdownOpen"
+                  aria-haspopup="true"
+                  aria-label="Notifications"
+                >
+                  <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                  <span v-if="state.notifications.length > 0" class="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full"/>
+                </button>
+
+                <div
+                  v-if="notifDropdownOpen"
+                  class="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-xl border border-slate-100 z-50 overflow-hidden"
+                  role="menu"
+                >
+                  <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                    <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
+                    <button
+                      v-if="state.notifications.length > 0"
+                      @click="state.notifications.splice(0)"
+                      class="text-xs text-slate-400 hover:text-rose-500 transition-colors"
+                    >Clear all</button>
                   </div>
-                  <div
-                    v-for="n in state.notifications"
-                    :key="n.id"
-                    class="flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors"
-                  >
-                    <span class="text-lg shrink-0 mt-0.5">{{ n.emoji || '🔔' }}</span>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-sm font-medium text-slate-700 leading-tight">{{ n.title }}</p>
-                      <p class="text-xs text-slate-400 leading-tight mt-0.5">{{ n.message }}</p>
-                      <p class="text-[11px] text-slate-300 mt-1">{{ formatTime(n.createdAt) }}</p>
+                  <div class="max-h-80 overflow-y-auto">
+                    <div v-if="state.notifications.length === 0" class="px-4 py-6 text-center text-sm text-slate-400">
+                      You're all caught up 🎉
+                    </div>
+                    <div
+                      v-for="n in state.notifications"
+                      :key="n.id"
+                      class="flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors"
+                    >
+                      <span class="text-lg shrink-0 mt-0.5">{{ n.emoji || '🔔' }}</span>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-slate-700 leading-tight">{{ n.title }}</p>
+                        <p class="text-xs text-slate-400 leading-tight mt-0.5">{{ n.message }}</p>
+                        <p class="text-[11px] text-slate-300 mt-1">{{ formatTime(n.createdAt) }}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="relative profile-dropdown">
-              <button
-                @click="profileMenuOpen = !profileMenuOpen"
-                class="flex items-center gap-2 rounded-xl px-2 py-1 hover:bg-gray-50 transition-colors cursor-pointer"
-                :aria-expanded="profileMenuOpen"
-                aria-haspopup="true"
-              >
-                <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <span class="text-xs font-semibold text-indigo-600">{{ userInitial }}</span>
-                </div>
-                <span class="text-xs font-medium text-gray-700">{{ displayName }}</span>
-              </button>
 
-              <div
-                v-if="profileMenuOpen"
-                class="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-lg border border-slate-100 z-50 overflow-hidden"
-                role="menu"
-              >
-                <div class="px-4 py-2.5 border-b border-slate-100">
-                  <p class="text-xs font-medium text-slate-800 truncate">{{ displayName }}</p>
-                  <p class="text-[11px] text-slate-400 truncate">{{ state.user?.email }}</p>
+              <!-- Profile chip -->
+              <div class="relative profile-dropdown">
+                <button
+                  @click="profileMenuOpen = !profileMenuOpen"
+                  class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  :aria-expanded="profileMenuOpen"
+                  aria-haspopup="true"
+                >
+                  <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <span class="text-xs font-semibold text-indigo-600">{{ userInitial }}</span>
+                  </div>
+                  <span class="text-sm text-gray-700">{{ displayName }}</span>
+                </button>
+
+                <div
+                  v-if="profileMenuOpen"
+                  class="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-lg border border-slate-100 z-50 overflow-hidden"
+                  role="menu"
+                >
+                  <div class="px-4 py-2.5 border-b border-slate-100">
+                    <p class="text-xs font-medium text-slate-800 truncate">{{ displayName }}</p>
+                    <p class="text-[11px] text-slate-400 truncate">{{ state.user?.email }}</p>
+                  </div>
+                  <button
+                    @click="activeView = 'profile'; profileMenuOpen = false"
+                    class="w-full text-left px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                    role="menuitem"
+                  >
+                    Profile
+                  </button>
+                  <button
+                    @click="handleLogout"
+                    class="w-full text-left px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 transition-colors"
+                    role="menuitem"
+                  >
+                    Log out
+                  </button>
                 </div>
-                <button
-                  @click="activeView = 'profile'; profileMenuOpen = false"
-                  class="w-full text-left px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-                  role="menuitem"
-                >
-                  Profile
-                </button>
-                <button
-                  @click="handleLogout"
-                  class="w-full text-left px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 transition-colors"
-                  role="menuitem"
-                >
-                  Log out
-                </button>
               </div>
             </div>
           </div>
+
         </div>
+        <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
       </header>
       <main class="flex-1 min-w-0 overflow-y-auto pb-20 lg:pb-0">
 
@@ -271,8 +287,13 @@
         </div>
 
         <!-- Overview view -->
-        <div v-if="activeView === 'overview'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 md:px-8 lg:px-12 py-4 lg:py-6 items-start max-w-400 mx-auto w-full font-sans transition-all duration-500">
-          
+        <div v-if="activeView === 'overview'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 md:px-8 lg:px-12 py-4 lg:py-4 items-start max-w-400 mx-auto w-full font-sans transition-all duration-500">
+
+          <!-- Pet Hero: full-width row -->
+          <div class="col-span-full mb-2">
+            <Pet />
+          </div>
+
           <!-- Lane 1: Primary Flow (Weight, Movement, Training) -->
           <div class="flex flex-col gap-6 w-full h-fit order-1 transition-all duration-500">
             
@@ -286,10 +307,9 @@
             />
           </div>
 
-          <!-- Lane 2: Evolve track — Col 2 (Pet & Stats) -->
+          <!-- Lane 2: Evolve track — Col 2 (Stats) -->
           <div class="flex flex-col gap-6 w-full h-fit order-2 lg:col-start-2">
-            <Pet />
-            
+
             <!-- Activity Stats card -->
             <div class="hidden md:flex flex-col gap-6">
               <div class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">

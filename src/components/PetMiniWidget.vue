@@ -10,10 +10,10 @@
     </Transition>
 
     <!-- Left: Pet Avatar -->
-    <div 
-      class="w-20 h-20 shrink-0 rounded-full flex items-center justify-center bg-indigo-50 text-4xl transition-transform duration-300"
+    <div
+      class="w-20 h-20 shrink-0 rounded-full flex items-center justify-center bg-indigo-50 transition-transform duration-300 overflow-hidden"
       :class="isCelebrating ? 'animate-bounce' : ''">
-      <span class="select-none">{{ stageEmoji }}</span>
+      <DotLottieVue :src="currentPetSrc" autoplay loop class="w-16 h-16" />
     </div>
 
     <!-- Right: Name, Level, XP Bar -->
@@ -32,8 +32,17 @@
 
 <script setup>
 import { computed } from 'vue'
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import { state } from '../store/state.js'
 import { getStageFromLevel, XP_PER_LEVEL } from '../utils/xp.js'
+
+const PET_MAP = {
+  core: '/pets/core.lottie',
+  anima: '/pets/anima.lottie',
+  dance: '/pets/dance.lottie'
+}
+
+const currentPetSrc = computed(() => PET_MAP[state.petType] || PET_MAP.core)
 
 const props = defineProps({
   isCelebrating: {

@@ -1,79 +1,86 @@
 <template>
-  <!-- Pet display card -->
-  <div class="bg-gradient-to-br from-white to-indigo-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-100/30 p-4 md:p-6 mb-4 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-200/50">
+  <!-- Pet display card — immersive environment hero -->
+  <div class="z-1 relative w-full rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(99,102,241,0.15)] border border-white/10 transition-transform duration-300 hover:scale-[1.0] mb-4">
 
-    <!-- Row 1: Name/stage/level + mood bubble -->
-    <div class="flex justify-between items-start mb-2">
-      <!-- Left: name + stage + level -->
-      <div class="flex flex-col">
-        <div class="group flex items-center gap-1">
-          <template v-if="!editing">
-            <span class="text-base font-bold text-indigo-700 leading-tight capitalize">{{ state.petName }}</span>
-            <button
-              @click="startEdit"
-              aria-label="Rename pet"
-              class="opacity-0 group-hover:opacity-100 cursor-pointer text-indigo-300 hover:text-indigo-500 transition-opacity ml-1 text-sm leading-none"
-            >✏️</button>
-          </template>
-          <template v-else>
-            <input
-              ref="inputEl"
-              v-model="editValue"
-              maxlength="20"
-              @keyup.enter="saveEdit"
-              @blur="saveEdit"
-              class="text-base font-bold text-indigo-700 bg-transparent border-b border-indigo-400 focus:outline-none w-32 leading-tight"
-            />
-          </template>
-        </div>
-        <div class="flex items-center gap-2 mt-1">
-          <span class="text-xs font-semibold uppercase tracking-widest text-indigo-400">{{ stage }}</span>
-          <span class="bg-indigo-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">lvl {{ state.level }}</span>
-        </div>
-      </div>
+    <!-- Background Image -->
+    <img :key="currentEnvironment" :src="currentEnvironment" alt=""
+      class="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-500" />
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-linear-to-b from-black/30 via-black/20 to-black/40"></div>
+    <!-- Glass Overlay -->
+    <div class="absolute inset-0 backdrop-blur-[3px] bg-white/5"></div>
 
-      <!-- Right: mood bubble -->
-      <div class="bubble-float max-w-35 shrink-0 ml-2">
-        <Transition name="mood-fade" mode="out-in">
-          <div :key="state.petMood" class="bg-white rounded-xl border border-indigo-100 shadow-sm p-2">
-            <span class="text-xs font-medium text-indigo-500">{{ moodMessage }}</span>
+    <!-- Content -->
+    <div class="relative z-10 p-5">
+
+      <!-- Row 1: Name/stage/level + mood bubble -->
+      <div class="flex justify-between items-start mb-2">
+        <!-- Left: name + stage + level -->
+        <div class="flex flex-col">
+          <div class="group flex items-center gap-1">
+            <template v-if="!editing">
+              <span class="text-xl font-bold text-white leading-tight capitalize">{{ state.petName }}</span>
+              <button
+                @click="startEdit"
+                aria-label="Rename pet"
+                class="opacity-0 group-hover:opacity-100 cursor-pointer text-white/50 hover:text-white transition-opacity ml-1 text-sm leading-none"
+              >✏️</button>
+            </template>
+            <template v-else>
+              <input
+                ref="inputEl"
+                v-model="editValue"
+                maxlength="20"
+                @keyup.enter="saveEdit"
+                @blur="saveEdit"
+                class="text-base font-bold text-white bg-transparent border-b border-white/50 focus:outline-none w-32 leading-tight"
+              />
+            </template>
           </div>
-        </Transition>
-      </div>
-    </div>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-xs font-semibold uppercase tracking-widest text-white/70">{{ stage }}</span>
+            <span class="bg-linear-to-r from-cyan-400 to-blue-500 transition-all duration-500 animate-[glowPulse_2s_ease-in-out_infinite] text-white text-xs font-bold px-2.5 py-0.5 rounded-full">lvl {{ state.level }}</span>
+          </div>
+        </div>
 
-    <!-- Row 2: Lottie Pet -->
-    <div class="flex flex-col items-center my-4">
-      <div class="relative flex items-center justify-center">
-        <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;left:-4px;animation-delay:0s">✨</span>
-        <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;right:-4px;animation-delay:0.25s">✨</span>
-        <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;left:-4px;animation-delay:0.5s">✨</span>
-        <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;right:-4px;animation-delay:0.75s">✨</span>
+        <!-- Right: mood bubble -->
+        <div class="bubble-float max-w-35 shrink-0 ml-2">
+          <Transition name="mood-fade" mode="out-in">
+            <div :key="state.petMood" class="bg-white/10 backdrop-blur-md rounded-xl border border-white/10 p-2">
+              <span class="text-xs font-medium text-white">{{ moodMessage }}</span>
+            </div>
+          </Transition>
+        </div>
+      </div>
 
-        <DotLottieVue
-          ref="lottieRef"
-          :src="currentPetSrc"
-          autoplay
-          loop
-          class="w-44 h-44"
-        />
+      <!-- Row 2: Pet (centered, no inner background — card handles it) -->
+      <div class="flex flex-col items-center py-6">
+        <div class="relative flex items-center justify-center">
+          <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;left:-4px;animation-delay:0s">✨</span>
+          <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;right:-4px;animation-delay:0.25s">✨</span>
+          <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;left:-4px;animation-delay:0.5s">✨</span>
+          <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;right:-4px;animation-delay:0.75s">✨</span>
+          <DotLottieVue ref="lottieRef" :src="currentPetSrc" autoplay loop
+            class="w-48 h-48 drop-shadow-[0_10px_25px_rgba(0,0,0,0.5)]" />
+        </div>
+        <div v-if="moodOverlay" class="mt-1 text-2xl">{{ moodOverlay }}</div>
       </div>
-      <div v-if="moodOverlay" class="mt-1 text-2xl">{{ moodOverlay }}</div>
-    </div>
 
-    <!-- Row 3: XP bar -->
-    <div>
-      <div class="flex justify-between text-xs text-gray-400 mb-1.5">
-        <span>xp to next level</span>
-        <span class="font-semibold text-indigo-500">{{ xpProgress }} / {{ XP_PER_LEVEL }}</span>
+      <!-- Row 3: XP bar (futuristic) -->
+      <div class="mt-4">
+        <div class="flex justify-between text-xs text-white/70 mb-1.5">
+          <span>xp to next level</span>
+          <span class="font-semibold text-white/80">{{ xpProgress }} / {{ XP_PER_LEVEL }}</span>
+        </div>
+        <div class="w-full h-2 rounded-full bg-black/30 backdrop-blur-sm overflow-hidden">
+          <div
+            class="h-full rounded-full bg-linear-to-r from-cyan-400 to-blue-500 transition-all duration-500 animate-[glowPulse_2s_ease-in-out_infinite]"
+            :style="{ width: xpPct + '%' }"
+          />
+        </div>
+        <div class="text-right text-[10px] text-white/50 mt-1">{{ Math.round(xpPct) }}%</div>
       </div>
-      <div class="w-full bg-indigo-100 rounded-full h-3 overflow-hidden">
-        <div
-          class="h-3 rounded-full transition-all duration-500 bg-linear-to-r from-indigo-400 to-indigo-600"
-          :style="{ width: xpPct + '%' }"
-        />
-      </div>
-      <div class="text-right text-[10px] text-indigo-400 mt-1">{{ Math.round(xpPct) }}%</div>
+
     </div>
   </div>
 </template>
@@ -133,6 +140,25 @@ const PET_MAP = {
   dance: '/pets/dance.lottie',
 }
 
+// ── Environment background ────────────────────────────────────────────────────
+const ENV_MAP = {
+  'dirty-room':   '/env/s1-dirty-room.png',
+  'repair-bench': '/env/s2-repair-bench.png',
+  'tech-lab':     '/env/s3-techlab-discovery.png',
+  'gateway':      '/env/s4-advanced-workshop.png',
+  'ai-core':      '/env/s5-transcendence.png',
+}
+
+function getEnvironment(level) {
+  if (level >= 20) return 'ai-core'
+  if (level >= 15) return 'gateway'
+  if (level >= 10) return 'tech-lab'
+  if (level >= 5)  return 'repair-bench'
+  return 'dirty-room'
+}
+
+const currentEnvironment = computed(() => ENV_MAP[getEnvironment(state.level)])
+
 const petType       = computed(() => state.petType || 'core')
 const currentPetSrc = computed(() => PET_MAP[petType.value] || PET_MAP.core)
 
@@ -175,4 +201,9 @@ watch(() => state.level, (newLevel, oldLevel) => {
 .mood-fade-leave-active { transition: opacity 0.5s ease; }
 .mood-fade-enter-from,
 .mood-fade-leave-to     { opacity: 0; }
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(34,211,238,0.6); }
+  50%       { box-shadow: 0 0 20px rgba(34,211,238,1); }
+}
 </style>
