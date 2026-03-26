@@ -80,6 +80,7 @@ export function resetState(state) {
   const savedSession = state.session
   const savedUser = state.user
   const savedName = state.petName
+  const savedPetType = state.petType
   const savedWelcome = state.hasSeenWelcome
   const fresh = createDefaultState()
   const today = localDateStr()
@@ -90,6 +91,7 @@ export function resetState(state) {
   state.session = savedSession
   state.user = savedUser
   state.petName = savedName || 'Flarepup'
+  state.petType = savedPetType ?? null
   state.hasSeenWelcome = savedWelcome ?? true
   saveState(state)
 }

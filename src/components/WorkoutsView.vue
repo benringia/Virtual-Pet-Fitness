@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-8 px-4 sm:px-6 lg:px-8 pb-20 w-full max-w-6xl mx-auto bg-[radial-gradient(at_top_right,var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white min-h-screen">
+  <div class="pt-8 px-4 sm:px-6 lg:px-8 pb-20 w-full max-w-350 mx-auto bg-[radial-gradient(at_top_right,var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white min-h-screen">
 
     <!-- Header -->
     <div class="mb-2 flex flex-col gap-2">
@@ -289,16 +289,16 @@
                     <div class="bg-white border border-slate-100 rounded-xl flex items-center justify-between p-1 w-full h-11">
                       <button type="button" @click="ex.duration = Math.max(1, (Number(ex.duration) || 1) - 5)" 
                         :class="Number(ex.duration) <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-rose-500 hover:bg-rose-50 transition-all cursor-pointer'"
-                        class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-50 rounded-lg text-slate-500">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        class="w-6 h-6 shrink-0 flex items-center justify-center bg-slate-50 rounded-lg text-slate-500">
+                        <svg class="w-2 h-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
                       </button>
                       <div class="flex items-center justify-center flex-1">
                         <input v-model.number="ex.duration" type="number" inputmode="numeric" min="1"
                           class="text-sm bg-transparent border-none focus:ring-0 text-center w-8 focus:outline-none appearance-none p-0 font-medium"/>
                         <span class="text-[10px] text-slate-400 ml-1 w-6 text-left">{{ Number(ex.duration) === 1 ? 'min' : 'mins' }}</span>
                       </div>
-                      <button type="button" @click="ex.duration = (Number(ex.duration) || 0) + 5" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-50 rounded-lg text-slate-500 hover:text-rose-500 hover:bg-rose-50 transition-all cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                      <button type="button" @click="ex.duration = (Number(ex.duration) || 0) + 5" class="w-6 h-6 shrink-0 flex items-center justify-center bg-slate-50 rounded-lg text-slate-500 hover:text-rose-500 hover:bg-rose-50 transition-all cursor-pointer">
+                        <svg class="w-2 h-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                       </button>
                     </div>
                   </div>

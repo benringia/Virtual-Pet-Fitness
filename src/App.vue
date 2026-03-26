@@ -684,8 +684,9 @@ watchEffect(() => {
   console.log('[Auth] session:', state.session?.user?.id, '| hasSeenWelcome:', state.hasSeenWelcome, '| showWelcome:', showWelcome.value)
 })
 
-function handleWelcomeSave(name) {
+function handleWelcomeSave({ name, petType }) {
   state.petName = name || 'Flarepup'
+  state.petType = petType
   state.hasSeenWelcome = true
 }
 

@@ -17,7 +17,15 @@
       "Bash(python scripts/search.py \"fitness tracker dashboard gamified stats cards premium\" --design-system -p \"Petfit\" -f markdown)",
       "Bash(python skills/ui-ux-pro-max/scripts/search.py \"gamified fitness tracker virtual pet pastel playful\" --design-system -p \"Petfit\")",
       "Bash(python .claude/skills/ui-ux-pro-max/scripts/search.py \"gamified fitness tracker virtual pet pastel playful\" --design-system -p \"Petfit\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(ls -la \"c:\\\\Users\\\\Ben\\\\Documents\\\\claude-projects\\\\Virtual-Pet-Fitness\\\\src\\\\components\\\\pets\"\" 2>&1 || echo \"Directory does not exist \")",
+      "WebFetch(domain:developers.lottiefiles.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(mv robot1.lottie core.lottie)",
+      "Bash(mv robot2.lottie anima.lottie)",
+      "Bash(mv robot3.lottie dance.lottie)"
     ]
   },
   "hooks": {

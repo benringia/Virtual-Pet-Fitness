@@ -42,14 +42,21 @@
       </div>
     </div>
 
-    <!-- Row 2: Pet emoji -->
+    <!-- Row 2: Lottie Pet -->
     <div class="flex flex-col items-center my-4">
       <div class="relative flex items-center justify-center">
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;left:-4px;animation-delay:0s">✨</span>
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="top:-4px;right:-4px;animation-delay:0.25s">✨</span>
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;left:-4px;animation-delay:0.5s">✨</span>
         <span v-if="nearEvolution" class="sparkle absolute text-base" style="bottom:-4px;right:-4px;animation-delay:0.75s">✨</span>
-        <div class="text-7xl select-none" :class="nearEvolution ? 'bounce' : animClass">{{ stageEmoji }}</div>
+
+        <DotLottieVue
+          ref="lottieRef"
+          :src="currentPetSrc"
+          autoplay
+          loop
+          class="w-44 h-44"
+        />
       </div>
       <div v-if="moodOverlay" class="mt-1 text-2xl">{{ moodOverlay }}</div>
     </div>
@@ -73,15 +80,16 @@
 
 <script setup>
 import { computed, ref, nextTick, watch } from 'vue'
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import { state } from '../store/state.js'
 import { getStageFromLevel, XP_PER_LEVEL } from '../utils/xp.js'
-import { mood } from '../utils/pet.js'
+import { mood as petMoodRef } from '../utils/pet.js'
 import { MOOD_MESSAGES } from '../utils/mood.js'
 import { triggerEvolution } from '../utils/achievements.js'
 
-const editing = ref(false)
+const editing  = ref(false)
 const editValue = ref('')
-const inputEl = ref(null)
+const inputEl  = ref(null)
 
 function startEdit() {
   editValue.value = state.petName
@@ -95,15 +103,15 @@ function saveEdit() {
   editing.value = false
 }
 
-const STAGE_EMOJI = { Egg: '🥚', Pup: '🐶', Blossom: '🌸', Fighter: '🥷', Queen: '👸' }
+// Mood overlay emoji (driven by pet.js mood ref)
 const MOOD_OVERLAY = { idle: '', happy: '😊', excited: '✨', diet: '🥗', workout: '💪' }
-const MOOD_ANIM = { idle: '', happy: 'animate-bounce', excited: 'animate-bounce', diet: 'animate-pulse', workout: 'animate-bounce' }
+const moodOverlay  = computed(() => MOOD_OVERLAY[petMoodRef.value])
 
-const xpIntoLevel = computed(() => state.xp % XP_PER_LEVEL)
+const xpIntoLevel     = computed(() => state.xp % XP_PER_LEVEL)
 const evolutionLevels = [3, 6, 10, 15]
-const nearEvolution = computed(() => {
-  const nextEvolution = evolutionLevels.find(l => l > state.level)
-  return nextEvolution && state.level === nextEvolution - 1 && xpIntoLevel.value >= 75
+const nearEvolution   = computed(() => {
+  const next = evolutionLevels.find(l => l > state.level)
+  return next && state.level === next - 1 && xpIntoLevel.value >= 75
 })
 
 const moodMessage = computed(() =>
@@ -112,50 +120,59 @@ const moodMessage = computed(() =>
     : (MOOD_MESSAGES[state.petMood] ?? MOOD_MESSAGES.idle)
 )
 
-const stage = computed(() => getStageFromLevel(state.level))
-const stageEmoji = computed(() => STAGE_EMOJI[stage.value])
-const moodOverlay = computed(() => MOOD_OVERLAY[mood.value])
-const animClass = computed(() => MOOD_ANIM[mood.value])
-
+const stage      = computed(() => getStageFromLevel(state.level))
 const xpProgress = xpIntoLevel
-const xpPct = computed(() => (xpIntoLevel.value / XP_PER_LEVEL) * 100)
+const xpPct      = computed(() => (xpIntoLevel.value / XP_PER_LEVEL) * 100)
 
+// ── Lottie pet ────────────────────────────────────────────────────────────────
+const lottieRef = ref(null)
+
+const PET_MAP = {
+  core:  '/pets/core.lottie',
+  anima: '/pets/anima.lottie',
+  dance: '/pets/dance.lottie',
+}
+
+const petType       = computed(() => state.petType || 'core')
+const currentPetSrc = computed(() => PET_MAP[petType.value] || PET_MAP.core)
+
+// Ensure playback resumes after a src swap (reactive :src auto-reloads,
+// but an explicit play() call guards against edge cases)
+watch(petType, async () => {
+  await nextTick()
+  lottieRef.value?.getDotLottieInstance()?.play()
+})
+
+// Future mood hook — placeholder for segment-based animation triggers
+watch(() => state.petMood, () => {
+  // e.g. lottieRef.value?.getDotLottieInstance()?.setMarker(state.petMood)
+})
+
+// Level-up: trigger evolution modal; no CSS pulse on canvas element
 watch(() => state.level, (newLevel, oldLevel) => {
   const newStage = getStageFromLevel(newLevel)
   const oldStage = getStageFromLevel(oldLevel)
   if (newStage !== oldStage) triggerEvolution(oldStage, newStage)
 })
-
 </script>
 
 <style scoped>
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
+  50%       { transform: translateY(-4px); }
 }
 .bubble-float {
   animation: float 1.6s ease-in-out infinite;
 }
 
-
-@keyframes bounce-pet {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-.bounce { animation: bounce-pet 0.8s ease-in-out infinite; }
-
 @keyframes sparkle {
   0%, 100% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 1; transform: scale(1.2); }
+  50%       { opacity: 1; transform: scale(1.2); }
 }
 .sparkle { animation: sparkle 1s ease-in-out infinite; }
 
 .mood-fade-enter-active,
-.mood-fade-leave-active {
-  transition: opacity 0.5s ease;
-}
+.mood-fade-leave-active { transition: opacity 0.5s ease; }
 .mood-fade-enter-from,
-.mood-fade-leave-to {
-  opacity: 0;
-}
+.mood-fade-leave-to     { opacity: 0; }
 </style>
