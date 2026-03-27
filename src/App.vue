@@ -155,7 +155,15 @@
         <div class="flex items-center justify-between px-6 py-3">
 
           <!-- Left: identity -->
-          <div class=" gap-2 leading-none">
+          <!-- Mobile greeting -->
+          <div class="block md:hidden px-0 pt-1">
+            <h1 class="text-lg font-semibold text-gray-900 leading-tight">
+              Welcome Back, <span class="text-indigo-600 capitalize">{{ state.petName || 'Flarepup' }}!</span>
+            </h1>
+            <p class="text-sm text-gray-500 mt-0.5">Let's crush today 💪</p>
+          </div>
+          <!-- Desktop greeting -->
+          <div class="hidden md:flex gap-2 leading-none">
             <span class="text-4xl text-gray-700 font-bold tracking-tight">Welcome Back, </span>
             <span class="text-2xl font-bold text-[#312e81] capitalize">{{ state.petName || 'Flarepup' }}!</span>
             <br><span class="text-xs text-gray-400">Let's crush today!</span>
@@ -320,7 +328,7 @@
         </div>
         <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
       </header>
-      <main class="flex-1 min-w-0 overflow-y-auto pb-20 lg:pb-0">
+      <main class="flex-1 min-w-0 overflow-y-auto pb-28 lg:pb-0">
 
         <!-- Profile view -->
         <div v-if="activeView === 'profile'">
@@ -546,78 +554,86 @@
       </div>
     </div>
 
-    <!-- Mobile bottom nav (fixed) -->
+    <!-- Mobile bottom nav (floating pill) -->
     <nav
-      class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex z-20"
+      class="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50"
       style="padding-bottom: env(safe-area-inset-bottom, 0px)"
       aria-label="Mobile navigation"
     >
+      <div class="flex items-center justify-between px-3 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg">
 
-      <!-- Overview -->
-      <button
-        @click="activeView = 'overview'"
-        :class="activeView === 'overview' ? 'text-indigo-600' : 'text-slate-400'"
-        class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
-        aria-label="Overview"
-      >
-        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-        </svg>
-        <span>Overview</span>
-      </button>
+        <!-- Overview -->
+        <button
+          @click="activeView = 'overview'"
+          :class="activeView === 'overview' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-400 hover:text-gray-600'"
+          class="relative flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer"
+          aria-label="Overview"
+        >
+          <svg class="w-5 h-5 mb-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+          <span class="text-[10px] font-medium">Overview</span>
+          <div v-if="activeView === 'overview'" class="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-500"></div>
+        </button>
 
-      <!-- Progress -->
-      <button
-        @click="activeView = 'progress'"
-        :class="activeView === 'progress' ? 'text-indigo-600' : 'text-slate-400'"
-        class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
-        aria-label="Progress"
-      >
-        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
-        </svg>
-        <span>Progress</span>
-      </button>
+        <!-- Progress -->
+        <button
+          @click="activeView = 'progress'"
+          :class="activeView === 'progress' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-400 hover:text-gray-600'"
+          class="relative flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer"
+          aria-label="Progress"
+        >
+          <svg class="w-5 h-5 mb-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+          </svg>
+          <span class="text-[10px] font-medium">Progress</span>
+          <div v-if="activeView === 'progress'" class="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-500"></div>
+        </button>
 
-      <!-- My Workouts -->
-      <button
-        @click="activeView = 'workouts'"
-        :class="activeView === 'workouts' ? 'text-indigo-600' : 'text-slate-400'"
-        class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
-        aria-label="My Workouts"
-      >
-        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
-        </svg>
-        <span>Workouts</span>
-      </button>
+        <!-- My Workouts -->
+        <button
+          @click="activeView = 'workouts'"
+          :class="activeView === 'workouts' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-400 hover:text-gray-600'"
+          class="relative flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer"
+          aria-label="My Workouts"
+        >
+          <svg class="w-5 h-5 mb-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
+          </svg>
+          <span class="text-[10px] font-medium">Workouts</span>
+          <div v-if="activeView === 'workouts'" class="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-500"></div>
+        </button>
 
-      <!-- Diet -->
-      <button
-        @click="activeView = 'diet'"
-        :class="activeView === 'diet' ? 'text-indigo-600' : 'text-slate-400'"
-        class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
-        aria-label="Diet"
-      >
-        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-        </svg>
-        <span>Diet</span>
-      </button>
+        <!-- Diet -->
+        <button
+          @click="activeView = 'diet'"
+          :class="activeView === 'diet' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-400 hover:text-gray-600'"
+          class="relative flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer"
+          aria-label="Diet"
+        >
+          <svg class="w-5 h-5 mb-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+          <span class="text-[10px] font-medium">Diet</span>
+          <div v-if="activeView === 'diet'" class="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-500"></div>
+        </button>
 
-      <!-- Profile placeholder -->
-      <button
-        class="flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors cursor-pointer"
-        aria-label="Profile (coming soon)"
-        title="Coming soon"
-      >
-        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-        </svg>
-        <span>Profile</span>
-      </button>
+        <!-- Profile -->
+        <button
+          @click="activeView = 'profile'"
+          :class="activeView === 'profile' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-400 hover:text-gray-600'"
+          class="relative flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer"
+          aria-label="Profile"
+        >
+          <svg class="w-5 h-5 mb-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+          <span class="text-[10px] font-medium">Profile</span>
+          <div v-if="activeView === 'profile'" class="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-500"></div>
+        </button>
 
+      </div>
     </nav>
 
   </div>
