@@ -174,89 +174,145 @@
               <div class="relative notif-dropdown">
                 <button
                   @click="notifDropdownOpen = !notifDropdownOpen"
-                  class="relative p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  class="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-indigo-400"
                   :aria-expanded="notifDropdownOpen"
                   aria-haspopup="true"
                   aria-label="Notifications"
                 >
-                  <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg class="w-4.5 h-4.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                   </svg>
-                  <span v-if="state.notifications.length > 0" class="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full"/>
+                  <span
+                    v-if="state.notifications.length > 0"
+                    class="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 bg-indigo-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none"
+                  >{{ state.notifications.length > 9 ? '9+' : state.notifications.length }}</span>
                 </button>
 
-                <div
-                  v-if="notifDropdownOpen"
-                  class="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-xl border border-slate-100 z-50 overflow-hidden"
-                  role="menu"
-                >
-                  <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                    <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
-                    <button
-                      v-if="state.notifications.length > 0"
-                      @click="state.notifications.splice(0)"
-                      class="text-xs text-slate-400 hover:text-rose-500 transition-colors"
-                    >Clear all</button>
-                  </div>
-                  <div class="max-h-80 overflow-y-auto">
-                    <div v-if="state.notifications.length === 0" class="px-4 py-6 text-center text-sm text-slate-400">
-                      You're all caught up 🎉
+                <Transition name="dropdown">
+                  <div
+                    v-if="notifDropdownOpen"
+                    class="absolute right-0 mt-2 w-84 rounded-2xl bg-white border border-slate-100 shadow-[0_8px_32px_rgba(15,23,42,0.12)] z-50 overflow-hidden"
+                    role="menu"
+                  >
+                    <!-- Header -->
+                    <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+                      <div class="flex items-center gap-2">
+                        <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
+                        <span
+                          v-if="state.notifications.length > 0"
+                          class="px-1.5 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-semibold rounded-full"
+                        >{{ state.notifications.length }}</span>
+                      </div>
+                      <button
+                        v-if="state.notifications.length > 0"
+                        @click="state.notifications.splice(0)"
+                        class="text-[11px] text-slate-400 hover:text-rose-500 transition-colors duration-150 font-medium cursor-pointer"
+                      >Clear all</button>
                     </div>
-                    <div
-                      v-for="n in state.notifications"
-                      :key="n.id"
-                      class="flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors"
-                    >
-                      <span class="text-lg shrink-0 mt-0.5">{{ n.emoji || '🔔' }}</span>
-                      <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-slate-700 leading-tight">{{ n.title }}</p>
-                        <p class="text-xs text-slate-400 leading-tight mt-0.5">{{ n.message }}</p>
-                        <p class="text-[11px] text-slate-300 mt-1">{{ formatTime(n.createdAt) }}</p>
+
+                    <!-- Items -->
+                    <div class="max-h-72 overflow-y-auto">
+                      <!-- Empty state -->
+                      <div v-if="state.notifications.length === 0" class="flex flex-col items-center justify-center px-6 py-8 gap-2">
+                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mb-1">
+                          <svg class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                          </svg>
+                        </div>
+                        <p class="text-sm font-medium text-slate-500">All caught up</p>
+                        <p class="text-xs text-slate-400">No new notifications</p>
+                      </div>
+
+                      <!-- Notification rows -->
+                      <div
+                        v-for="n in state.notifications"
+                        :key="n.id"
+                        class="group flex items-start gap-3 px-5 py-3.5 border-b border-slate-50 last:border-0 hover:bg-slate-50/70 transition-colors duration-150 cursor-default"
+                      >
+                        <div class="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5 text-base leading-none">
+                          {{ n.emoji || '🔔' }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-[13px] font-medium text-slate-700 leading-tight">{{ n.title }}</p>
+                          <p class="text-xs text-slate-400 leading-snug mt-0.5">{{ n.message }}</p>
+                          <p class="text-[10px] text-slate-300 mt-1">{{ formatTime(n.createdAt) }}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </Transition>
               </div>
 
               <!-- Profile chip -->
               <div class="relative profile-dropdown">
                 <button
                   @click="profileMenuOpen = !profileMenuOpen"
-                  class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  class="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-colors duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-indigo-400"
                   :aria-expanded="profileMenuOpen"
                   aria-haspopup="true"
                 >
-                  <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
-                    <span class="text-xs font-semibold text-indigo-600">{{ userInitial }}</span>
+                  <!-- Avatar -->
+                  <div class="w-7 h-7 rounded-lg bg-linear-to-br from-indigo-400 to-indigo-600 flex items-center justify-center shadow-sm">
+                    <span class="text-[11px] font-bold text-white uppercase">{{ userInitial }}</span>
                   </div>
-                  <span class="text-sm text-gray-700">{{ displayName }}</span>
+                  <span class="text-sm font-medium text-slate-700 max-w-20 truncate">{{ displayName }}</span>
+                  <!-- Chevron -->
+                  <svg
+                    class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200"
+                    :class="profileMenuOpen ? 'rotate-180' : ''"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/>
+                  </svg>
                 </button>
 
-                <div
-                  v-if="profileMenuOpen"
-                  class="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-lg border border-slate-100 z-50 overflow-hidden"
-                  role="menu"
-                >
-                  <div class="px-4 py-2.5 border-b border-slate-100">
-                    <p class="text-xs font-medium text-slate-800 truncate">{{ displayName }}</p>
-                    <p class="text-[11px] text-slate-400 truncate">{{ state.user?.email }}</p>
+                <Transition name="dropdown">
+                  <div
+                    v-if="profileMenuOpen"
+                    class="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-slate-100 shadow-[0_8px_32px_rgba(15,23,42,0.12)] z-50 overflow-hidden"
+                    role="menu"
+                  >
+                    <!-- User identity block -->
+                    <div class="flex items-center gap-3 px-4 py-4 bg-linear-to-br from-slate-50 to-indigo-50/40 border-b border-slate-100">
+                      <div class="w-9 h-9 rounded-xl bg-linear-to-br from-indigo-400 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
+                        <span class="text-sm font-bold text-white uppercase">{{ userInitial }}</span>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-semibold text-slate-800 truncate leading-tight">{{ displayName }}</p>
+                        <p class="text-[11px] text-slate-400 truncate mt-0.5">{{ state.user?.email }}</p>
+                      </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="py-1.5">
+                      <button
+                        @click="activeView = 'profile'; profileMenuOpen = false"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors duration-150 cursor-pointer"
+                        role="menuitem"
+                      >
+                        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                        </svg>
+                        Profile settings
+                      </button>
+                    </div>
+
+                    <!-- Logout — visually separated -->
+                    <div class="border-t border-slate-100 py-1.5">
+                      <button
+                        @click="handleLogout"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors duration-150 cursor-pointer"
+                        role="menuitem"
+                      >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+                        </svg>
+                        Sign out
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    @click="activeView = 'profile'; profileMenuOpen = false"
-                    class="w-full text-left px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-                    role="menuitem"
-                  >
-                    Profile
-                  </button>
-                  <button
-                    @click="handleLogout"
-                    class="w-full text-left px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 transition-colors"
-                    role="menuitem"
-                  >
-                    Log out
-                  </button>
-                </div>
+                </Transition>
               </div>
             </div>
           </div>
@@ -758,6 +814,16 @@ function handleReset() {
 </script>
 
 <style>
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+}
+
 @keyframes xpPulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.08); opacity: 0.85; }
